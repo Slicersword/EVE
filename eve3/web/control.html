@@ -1,0 +1,91 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EVE control</title>
+<style>
+body{margin:0;background:#0d1117;color:#dbe7f3;font:15px/1.45 system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:14px}
+h1{font-size:20px;margin:6px 0 12px}h2{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#7d93a8;margin:18px 0 8px}
+button{font:inherit;padding:10px 14px;border-radius:8px;border:1px solid #30445a;background:#16212e;color:#dbe7f3;cursor:pointer;margin:3px}
+button:active{background:#22374d}
+#estop{width:100%;padding:20px;font-size:22px;font-weight:700;background:#b3201f;border-color:#ff5c5c;color:#fff}
+input,select{font:inherit;padding:9px;border-radius:8px;border:1px solid #30445a;background:#0b141d;color:#dbe7f3}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.grow{flex:1;min-width:160px}
+table{border-collapse:collapse;width:100%}td{padding:4px 8px;border-bottom:1px solid #1d2a38;vertical-align:top}
+td:first-child{color:#7d93a8;white-space:nowrap;width:38%}
+.ok{color:#58d68d}.bad{color:#ff7b72}#msg{min-height:22px;margin:8px 0;color:#f2cc60}
+small{color:#7d93a8}
+</style></head><body><main>
+<h1>EVE control</h1>
+<button id="estop">EMERGENCY STOP</button>
+<div id="msg"></div>
+<h2>Status</h2><table id="st"></table>
+<h2>Talk</h2>
+<div class="row"><input id="chat" class="grow" placeholder="Type to EVE (English / हिंदी / मराठी)"><button data-do="chat">Send</button></div>
+<div class="row"><input id="say" class="grow" placeholder="Make EVE say this">
+<select id="lang"><option>en</option><option>hi</option><option>mr</option></select><button data-do="say">Say</button></div>
+<div class="row" id="expr"></div>
+<h2>Attended session <small>(needed before anything moves)</small></h2>
+<div class="row"><button data-cmd="session_start" data-args='{"minutes":10}'>Start 10 min</button>
+<button data-cmd="session_end">End</button><button data-cmd="clear">Clear stop / arm</button><button data-cmd="stop">Soft stop</button></div>
+<h2>Wheels <small>(M07 test: wheels lifted off the ground)</small></h2>
+<div class="row"><label><input type="checkbox" id="lift"> wheels are lifted</label>
+<button data-do="dtest" data-l="60" data-r="60">Test forward 1 s</button>
+<button data-do="dtest" data-l="40" data-r="70">Test arc left</button><button data-do="dtest" data-l="70" data-r="40">Test arc right</button></div>
+<div class="row"><button data-cmd="drive" data-args='{"left":100,"right":100,"seconds":1.5}'>Forward</button>
+<button data-cmd="drive" data-args='{"left":50,"right":110,"seconds":1.2}'>Left</button>
+<button data-cmd="drive" data-args='{"left":110,"right":50,"seconds":1.2}'>Right</button></div>
+<h2>Head <small>(M08: centre marks aligned by hand first)</small></h2>
+<div class="row"><label><input type="checkbox" id="clear"> nothing blocks the head</label>
+<button data-do="home">Set home here</button><button data-cmd="head_release">Release</button></div>
+<div class="row"><button data-do="jog" data-p="-8">Pan -8</button><button data-do="jog" data-p="8">Pan +8</button>
+<button data-do="jog" data-t="-8">Tilt -8</button><button data-do="jog" data-t="8">Tilt +8</button>
+<button data-cmd="head_look" data-args='{"direction":"center"}'>Look centre</button></div>
+<h2>Memory</h2>
+<div class="row"><button data-do="notes">Show notes</button><button data-do="rem">Show reminders</button><button data-do="erase">Erase all memory</button></div>
+<pre id="out"></pre>
+</main><script>
+let token=location.hash.slice(1)||'';
+const $=id=>document.getElementById(id),msg=$('msg');
+if(!token){token=prompt('EVE token (on the Pi: python3 tools/evectl.py token)')||''}
+history.replaceState(null,'',location.pathname);
+async function cmd(name,args){
+  try{const r=await fetch('/api/command',{method:'POST',headers:{'Content-Type':'application/json','X-EVE-Token':token},body:JSON.stringify({name,args:args||{}})});
+    const j=await r.json();msg.textContent=(j.ok?'OK: ':'NO: ')+(typeof j.message==='string'?j.message:JSON.stringify(j.message));msg.className=j.ok?'ok':'bad';return j}
+  catch(e){msg.textContent='No connection to EVE';msg.className='bad';return{ok:false}}
+}
+$('estop').onclick=()=>cmd('estop');
+document.querySelectorAll('[data-cmd]').forEach(b=>b.onclick=()=>cmd(b.dataset.cmd,JSON.parse(b.dataset.args||'{}')));
+['idle','happy','love','sleepy','surprised','sad','listening','alert'].forEach(n=>{const b=document.createElement('button');b.textContent=n;b.onclick=()=>cmd('expression',{name:n});$('expr').appendChild(b)});
+const acts={
+  chat:async()=>{const t=$('chat').value;if(!t)return;const j=await cmd('chat',{text:t});if(j.ok){msg.textContent='EVE: '+(j.message.reply||'(no words)');$('chat').value=''}},
+  say:()=>cmd('say',{text:$('say').value,lang:$('lang').value}),
+  dtest:b=>cmd('drive_test',{left:+b.dataset.l,right:+b.dataset.r,wheels_lifted:$('lift').checked}),
+  home:()=>cmd('head_home',{confirm:$('clear').checked&&confirm('Are the head centre marks lined up?')}),
+  jog:b=>cmd('head_jog',{pan:+(b.dataset.p||0),tilt:+(b.dataset.t||0),confirm:$('clear').checked}),
+  notes:async()=>{$('out').textContent=JSON.stringify((await cmd('notes')).message,null,1)},
+  rem:async()=>{$('out').textContent=JSON.stringify((await cmd('reminders')).message,null,1)},
+  erase:()=>confirm('Erase ALL notes and reminders?')&&cmd('erase_memory',{confirm:true}),
+};
+document.querySelectorAll('[data-do]').forEach(b=>b.onclick=()=>acts[b.dataset.do](b));
+$('chat').onkeydown=e=>{if(e.key==='Enter')acts.chat()};
+function row(k,v,good){const tr=document.createElement('tr'),a=document.createElement('td'),b=document.createElement('td');a.textContent=k;b.textContent=v;
+  if(good!==undefined)b.className=good?'ok':'bad';tr.append(a,b);return tr}
+async function poll(){
+  try{const r=await fetch('/api/status?t='+encodeURIComponent(token),{cache:'no-store'});if(!r.ok)throw 0;const s=await r.json(),t=$('st');t.textContent='';
+    t.append(row('Mega',s.mega.online?'online, firmware '+s.mega.firmware_id+(s.mega.firmware_ok?' (matches)':' (DOES NOT MATCH config)'):'offline: '+(s.mega.error||'connecting'),s.mega.online&&s.mega.firmware_ok),
+      row('Distance mm (FL, FR, rear)',JSON.stringify(s.sensors.distance_mm),s.sensors.distance_mm.every(v=>v!==null)),
+      row('Tilt deg',String(s.sensors.tilt_deg),s.sensors.tilt_deg!==null),
+      row('Cliff raw (FL, rear, FR)',JSON.stringify(s.sensors.cliff_raw)+(s.sensors.cliff_calibrated?'':' - not calibrated'),s.sensors.cliff_calibrated&&!s.sensors.cliff_unsafe.some(Boolean)),
+      row('Person sensor (PIR)',String(s.sensors.pir)),
+      row('Session',s.power.session_active?s.power.remaining_s+' s left':'not active ('+s.power.ended_reason+')',s.power.session_active),
+      row('Pi supply flags',String(s.power.throttled)),
+      row('Wheels allowed',s.safety.drive_permitted?'yes':'no: '+s.safety.drive_block_reason,s.safety.drive_permitted),
+      row('Head allowed',s.safety.head_permitted?'yes':'no: '+s.safety.head_block_reason,s.safety.head_permitted),
+      row('Head',s.head.homed?'homed, pan '+s.head.pan+', tilt '+s.head.tilt:'not homed'),
+      row('Face',s.expression+(s.sleeping?' (sleeping)':'')),
+      row('Features',Object.entries(s.features).map(([k,v])=>k+': '+v).join(' | ')),
+      row('Still to commission',s.commissioning.missing.join(', ')||'nothing',!s.commissioning.missing.length));
+  }catch(e){$('st').textContent='';$('st').append(row('EVE','no connection or wrong token',false))}
+}
+setInterval(poll,1000);poll();
+</script></body></html>

@@ -1,0 +1,53 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EVE</title>
+<style>
+:root{--c:#6fe3ff;--g:#2bbcff}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;cursor:none;user-select:none;-webkit-user-select:none}
+#face{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7vh}
+.eyes{display:flex;gap:16vw;transition:transform .25s ease-out;will-change:transform}
+.eye{width:17vw;height:34vh;background:var(--c);border-radius:50%;box-shadow:0 0 5vw var(--g);
+     transition:height .12s ease,border-radius .25s,background .3s,transform .25s,width .25s;will-change:height,transform}
+.mouth{width:15vw;height:5vh;border-bottom:1.4vh solid var(--c);border-radius:0 0 50% 50%;
+       transition:all .2s ease;filter:drop-shadow(0 0 1.5vw var(--g))}
+.blink .eye{height:2vh}
+.happy .eye,.love .eye{height:17vh;border-radius:50% 50% 12% 12%/90% 90% 10% 10%}
+.happy .mouth,.love .mouth{width:22vw;height:10vh}
+.love{--c:#ff8fb8;--g:#ff4f8f}
+.sleepy .eye{height:3vh;opacity:.55}.sleepy .mouth{width:6vw;height:1vh;opacity:.5}
+.alert{--c:#ff6b6b;--g:#ff2a2a}.alert .eye{height:26vh;border-radius:30%}
+.alert .mouth{border-radius:0;height:0;width:12vw}
+.listening .eye{height:38vh;width:18vw}.listening .mouth{width:5vw;height:5vh;border:1.4vh solid var(--c);border-radius:50%}
+.surprised .eye{height:40vh;width:19vw}.surprised .mouth{width:7vw;height:9vh;border:1.4vh solid var(--c);border-radius:50%}
+.sad .eye{height:22vh;border-radius:12% 12% 50% 50%/10% 10% 90% 90%}
+.sad .mouth{border-bottom:0;border-top:1.4vh solid var(--c);border-radius:50% 50% 0 0}
+.speaking .mouth{border:1.4vh solid var(--c);border-radius:45%;width:11vw;animation:talk .32s infinite alternate ease-in-out}
+@keyframes talk{from{height:1vh}to{height:9vh}}
+#cap{position:fixed;left:6vw;right:6vw;bottom:3vh;text-align:center;color:#9adfff;font:600 4.2vh system-ui,"Noto Sans Devanagari",sans-serif;
+     opacity:0;transition:opacity .3s;text-shadow:0 0 1vw #000}
+#cap.on{opacity:.92}
+#off{position:fixed;top:2vh;right:2vw;color:#f66;font:2.4vh monospace;display:none}
+</style></head><body>
+<div id="face" class="idle"><div class="eyes" id="eyes"><div class="eye"></div><div class="eye"></div></div><div class="mouth"></div></div>
+<div id="cap"></div><div id="off">no link to EVE</div>
+<script>
+const face=document.getElementById('face'),eyes=document.getElementById('eyes'),cap=document.getElementById('cap'),off=document.getElementById('off');
+let expr='idle',misses=0;
+function show(e){if(e!==expr){face.className=e;expr=e}}
+async function poll(){
+  try{
+    const r=await fetch('/api/status',{cache:'no-store'});if(!r.ok)throw 0;
+    const s=await r.json();misses=0;off.style.display='none';
+    show(s.expression||'idle');
+    cap.textContent=s.caption||'';cap.className=s.caption?'on':'';
+    const o=s.face_offset;eyes.style.transform=o?`translate(${(o[0]*6).toFixed(1)}vw,${(o[1]*5).toFixed(1)}vh)`:'';
+  }catch(_){if(++misses>4){off.style.display='block';show('sleepy')}}
+}
+setInterval(poll,250);poll();
+(function blink(){if(expr==='idle'||expr==='happy'||expr==='listening'){face.classList.add('blink');setTimeout(()=>face.classList.remove('blink'),130)}
+  setTimeout(blink,2600+Math.random()*3200)})();
+(function drift(){if(expr==='idle'&&!eyes.style.transform){const x=(Math.random()*4-2).toFixed(1),y=(Math.random()*2-1).toFixed(1);
+  document.querySelectorAll('.eye').forEach(e=>e.style.transform=`translate(${x}vw,${y}vh)`)}
+  else document.querySelectorAll('.eye').forEach(e=>e.style.transform='');
+  setTimeout(drift,1800+Math.random()*2500)})();
+</script></body></html>

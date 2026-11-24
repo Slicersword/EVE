@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# One short command for everything.  Usage:  ./eve <word> [more]
+#   run | sim | face | stage [M04] [done] | status [full] | ctl <command> [key=value] | cfg ... | doctor
+#   i2c | cliff floor|edge|apply | mic | flash | test | estop
+cd "$(dirname "$0")" || exit 1
+PY=.venv/bin/python; [ -x "$PY" ] || PY=python3
+word="${1:-help}"; shift 2>/dev/null
+case "$word" in
+  run)    exec "$PY" -m eve3 "$@" ;;
+  sim)    exec "$PY" -m eve3 --sim "$@" ;;
+  face)   setsid nohup bash scripts/face_kiosk.sh >/dev/null 2>&1 & echo "Face started on the Pi screen." ;;
+  stage)  exec "$PY" tools/stage.py "$@" ;;
+  status) exec "$PY" tools/evectl.py status "$@" ;;
+  estop)  exec "$PY" tools/evectl.py estop ;;
+  ctl)    exec "$PY" tools/evectl.py "$@" ;;
+  cfg)    exec "$PY" tools/evecfg.py "$@" ;;
+  doctor) exec "$PY" tools/doctor.py ;;
+  i2c)    exec "$PY" tools/i2c_diag.py ;;
+  cliff)  exec "$PY" tools/calibrate_cliff.py "$@" ;;
+  mic)    exec "$PY" tools/mic_level.py ;;
+  flash)  exec bash scripts/flash_mega.sh "$@" ;;
+  test)   exec "$PY" -m unittest discover -s tests -t . "$@" ;;
+  *)      sed -n '2,5p' "$0" ;;
+esac

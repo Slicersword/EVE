@@ -1,0 +1,14 @@
+# Installed by scripts/install_service.sh at M17 (not before). Runs as the normal Pi user, never root.
+[Unit]
+Description=EVE V3 home robot
+After=network.target sound.target
+
+[Service]
+WorkingDirectory=@HERE@
+ExecStart=@HERE@/.venv/bin/python -m eve3
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

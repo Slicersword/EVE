@@ -1,0 +1,6 @@
+# Only hardware drivers. Everything else is the Python standard library.
+# Most come from apt (scripts/setup_pi.sh, venv uses --system-site-packages); pip adds the two Adafruit ones.
+pyserial>=3.5,<4
+smbus2>=0.4,<1
+adafruit-blinka>=8,<9
+adafruit-circuitpython-vl53l0x>=3,<4
