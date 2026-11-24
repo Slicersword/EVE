@@ -1,5 +1,7 @@
 # Build EVE from scratch
 
+**[Open the companion build website](https://eve-build-manual.emergys-solu-4734.chatgpt.site)**
+
 EVE is a four-wheel home robot built around a Raspberry Pi 4 and Arduino Mega 2560.
 It has a touchscreen face, a pan/tilt head, distance/cliff/tilt sensing, local voice,
 English/Hindi/Marathi commands, and optional local notes and reminders.

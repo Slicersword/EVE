@@ -12,7 +12,9 @@ It does not record anyone's robot as assembled or commissioned.
 | Source / syntax | Python compilation, Bash syntax, JavaScript syntax and diff whitespace checks passed |
 | Documentation site | 25 Markdown pages, 64 source listings; local links/fragments/assets/raw source consistency passed |
 | Browser QA | Desktop page layout and offline search checked in the local preview |
-| AVR target | Separate CI job configured for locked/enabled Mega 2560 variants, CLI 1.3.1 and AVR core 1.8.6; results must be read from the workflow |
+| Live simulation | Mega handshake, authenticated CLI chat, shipped motion refusal and safe shutdown passed |
+| GitHub CI | Python 3.11/3.12 host jobs, Mega target compilation and site validation passed in the linked run |
+| AVR target | Locked and enabled Mega 2560 variants compiled in CI using CLI 1.3.1 and AVR core 1.8.6 |
 | Raspberry Pi installation | Requires a real Pi 4 / Bookworm / arm64 system; not run on the development host |
 | Mega upload and bootloader | Requires the physical Mega; not performed |
 | Wiring, load, sensors and stop distance | Builder must measure and run the corresponding physical stages |
@@ -25,3 +27,7 @@ a successful upload still does not provide physical acceptance.
 For reproducible commands see [Testing](TESTING.md). Read the repository Actions
 results for the commit you intend to build. Optional Pages hosting must be enabled
 once as described in [Website](WEBSITE.md).
+
+CI evidence: [Verify EVE, commit 21b6c3b](https://github.com/Slicersword/EVE/actions/runs/45338206886).
+All four jobs completed successfully. This report's later text/link-only updates
+do not change the tested runtime or firmware.

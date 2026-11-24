@@ -1,5 +1,9 @@
 # The repository and companion website
 
+The [published build manual](https://eve-build-manual.emergys-solu-4734.chatgpt.site)
+is a public snapshot generated from this repository. Its footer identifies the
+GitHub source revision. It can also be rebuilt offline or hosted with GitHub Pages.
+
 The website is generated from the repository's Markdown and full source files.
 It uses static HTML, CSS, a local Markdown renderer and browser JavaScript. There
 is no backend, database, analytics, account requirement, paid API or external font/CDN.
