@@ -1,43 +1,40 @@
 ## Before M00: choose an installation route
 
-Target: 64-bit Raspberry Pi Bookworm with a working desktop login, SSH/PuTTY access and internet.
-The desktop must be running on the Pi for the face kiosk; PuTTY alone does not create a desktop session.
-Keep Bank B off. Substitute your real Pi login/IP and local ZIP path. Do not paste window labels or prose.
-If an existing ~/eve3 folder is present, preserve it and choose a new installation folder; these routes
-refuse to overwrite it. Do not mix this V3 tree into an old EVE_SOURCE directory.
+Target: Raspberry Pi 4, Raspberry Pi OS Desktop 64-bit Bookworm, Python 3.11, a
+working desktop login, SSH/PuTTY access and internet. Complete the Before you begin
+page first. PuTTY opens a terminal; the desktop must also be running on the Pi for the face.
 
-### Route A — clone this repository on the Pi
+Keep the Bank B actuator branch off. Substitute your real Pi username/IP and ZIP path.
+Labels such as **PuTTY 1** identify the window; they are not shell commands.
+
+### Route A — clone the repository on the Pi
 
 **PuTTY 1**
 
 ```bash
 sudo apt-get update && sudo apt-get install -y git
+git clone https://github.com/Slicersword/EVE.git "$HOME/eve3"
+cd "$HOME/eve3" || exit 1
+bash scripts/setup_pi.sh
 ```
 
-```bash
-git clone https://github.com/Slicersword/EVE.git "$HOME/eve3" && cd "$HOME/eve3" && bash scripts/retire_old.sh
-```
+The clone refuses an occupied destination. Choose a fresh folder instead of
+overwriting source or merging unknown files. The installer changes only required
+system packages/settings, creates the virtual environment, and installs the AVR
+toolchain; it does not upload firmware or start the robot.
 
-If the repository is private, use GitHub's supported authenticated clone flow. Do not paste credentials
-into a clone URL or this chat. Preview the old folders/services listed above before parking them.
-Only after confirming this is the intended old installation:
+Reconnect PuTTY once for the new groups to apply, then continue with M00.
 
-```bash
-cd "$HOME/eve3" && bash scripts/retire_old.sh --yes && bash scripts/setup_pi.sh
-```
+### Route B — transfer GitHub's complete ZIP
 
-Reconnect PuTTY, then continue with M00 below.
-
-### Route B — transfer the complete ZIP from Windows
-
-Download EVE_complete_build.zip from the provided deliverable, or GitHub's Code → Download ZIP.
-The extraction below accepts EVE/, EVE-main/ or the original EVE_SOURCE_V3/ archive root.
-This is an alternative to Route A, not an extra installation step.
+Download **Code → Download ZIP** from the repository and save it as `EVE-main.zip`.
+This is an alternative to Route A. Transfer it using WinSCP/SFTP, or PSCP installed
+with PuTTY. For PSCP, replace the Windows path, username and address below.
 
 **Windows PowerShell**
 
 ```powershell
-pscp "C:\path\to\EVE_complete_build.zip" PI_USER@PI_IP:EVE_complete_build.zip
+pscp "C:\path\to\EVE-main.zip" PI_USER@PI_IP:EVE-main.zip
 ```
 
 **PuTTY 1**
@@ -49,41 +46,50 @@ sudo apt-get update && sudo apt-get install -y unzip
 ```bash
 bash <<'EVE_INSTALL'
 set -euo pipefail
-if [ -e "$HOME/eve3" ]; then
-  echo "STOP: ~/eve3 exists. Preserve it and choose a fresh installation folder."
-  exit 1
-fi
+[ ! -e "$HOME/eve3" ] || { echo "STOP: choose a fresh destination; ~/eve3 already exists."; exit 1; }
 stage_dir=$(mktemp -d)
 trap 'rm -rf "$stage_dir"' EXIT
-unzip -q "$HOME/EVE_complete_build.zip" -d "$stage_dir"
-source_dir=""
-for candidate in EVE EVE-main EVE_SOURCE_V3; do
-  if [ -f "$stage_dir/$candidate/eve3/runtime.py" ]; then
-    source_dir="$stage_dir/$candidate"
-    break
-  fi
-done
-[ -n "$source_dir" ] || { echo "STOP: expected EVE source folder not found in ZIP"; exit 1; }
-mv "$source_dir" "$HOME/eve3"
+unzip -q "$HOME/EVE-main.zip" -d "$stage_dir"
+[ -f "$stage_dir/EVE-main/eve3/runtime.py" ] || { echo "STOP: expected the complete GitHub ZIP."; exit 1; }
+mv "$stage_dir/EVE-main" "$HOME/eve3"
 cd "$HOME/eve3"
 chmod +x eve scripts/*.sh tools/*.py
-bash scripts/retire_old.sh
+bash scripts/setup_pi.sh
 EVE_INSTALL
 ```
 
-Review the parking preview, then:
+Reconnect PuTTY, then continue with M00. ZIP installations have no Git history and
+cannot use the automatic fast-forward update helper. Keep a private backup and
+replace with a fresh full ZIP when updating.
+
+### Select the Mega port before uploading (M02)
+
+Leave motor power off. Identify the actual device; genuine Mega boards may use
+`ttyACM`, while USB-serial clones may use `ttyUSB`. Prefer a persistent by-id path.
 
 ```bash
-cd "$HOME/eve3" && bash scripts/retire_old.sh --yes && bash scripts/setup_pi.sh
+ls -l /dev/serial/by-id/ /dev/ttyUSB* /dev/ttyACM* 2>/dev/null || true
+arduino-cli board list
 ```
 
-Reconnect PuTTY, then continue with M00. The original V3 ZIP does not contain the new repository docs/fixes;
-use the complete repository ZIP for this version. ZIP installs do not have Git history or support git pull;
-use the Git route for ongoing source updates.
+If arduino-cli is not in PATH, use `"$HOME/bin/arduino-cli" board list`.
+Set the actual device path, replacing the example:
+
+```bash
+./eve cfg set serial.port /dev/ttyUSB0
+```
+
+The flasher and runtime both honor this setting. Reconnect the same Mega USB cable
+and verify permissions before repeating an upload.
 
 ### How the virtual environment works
 
-The package installer creates .venv with system-site-packages, so apt-installed Pi drivers remain available.
-The EVE launcher selects .venv/bin/python automatically. You do not need to activate it in each PuTTY window.
-System package/firmware tooling uses the system shell; do not run the robot as root. A group change requires
-logging out and back in; that is why M00 includes reconnecting PuTTY.
+The installer creates `.venv` with system-site-packages, so apt-installed Pi drivers
+remain available. The EVE launcher selects `.venv/bin/python` automatically; you
+do not need to activate it in each PuTTY window. System package/firmware tooling
+uses the shell. Run the robot as your normal user, not root.
+
+The installer targets Pi 4 / arm64 / Bookworm and stops early on another platform.
+Camera/display packages are installed for the complete reference build even if
+those features will be enabled at a later stage. Package installation requires
+internet; host tests and the generated documentation work without hardware.

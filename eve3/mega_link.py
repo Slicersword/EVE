@@ -7,8 +7,13 @@ BY_ID_GLOB = "/dev/serial/by-id/usb-1a86_USB*"       # CH340 on the Mega clone
 
 
 def find_port(configured: str | None) -> str:
+    # An explicit setting must win, especially when more than one USB serial board is attached.
+    if configured:
+        return configured
     hits = sorted(glob.glob(BY_ID_GLOB))
-    return hits[0] if hits else (configured or "/dev/ttyUSB0")
+    if len(hits) > 1:
+        raise ValueError("Multiple serial boards found; set serial.port to the Mega's by-id path")
+    return hits[0] if hits else "/dev/ttyUSB0"
 
 
 def open_serial(port: str, baud: int = 115200):

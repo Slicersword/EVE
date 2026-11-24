@@ -138,7 +138,8 @@ class BrainTests(unittest.TestCase):
         self.assertEqual(VOICE_COMMANDS, {"stop", "drive", "head_look", "sleep", "wake"})
 
     def test_offline_answers_in_each_language(self):
-        b = self.brain()
+        cfg = cfg_with(); cfg["behavior"]["utc_offset_minutes"] = 330
+        b = self.brain(cfg)
         self.assertEqual(b.respond("what time is it")["reply"], "It is 03:43.")
         self.assertIn("03:43", b.respond("किती वाजले")["reply"])
         self.assertEqual(b.respond("किती वाजले")["lang"], "mr")
@@ -146,6 +147,10 @@ class BrainTests(unittest.TestCase):
         self.assertTrue(b.respond("tell me a joke")["reply"])
         self.assertIn("Sorry", b.respond("explain quantum physics")["reply"])   # no model enabled -> honest fallback
         self.assertEqual(self.posts, [])                                        # and nothing was sent anywhere
+
+    def test_time_uses_configured_utc_offset(self):
+        cfg = cfg_with(); cfg["behavior"]["utc_offset_minutes"] = 0
+        self.assertEqual(self.brain(cfg).respond("what time is it")["reply"], "It is 22:13.")
 
     def test_remember_recall_remind(self):
         b = self.brain()
@@ -293,7 +298,8 @@ class CameraBehaviorTouchTests(unittest.TestCase):
 
     def test_behavior(self):
         clock = Clock(1_700_000_000.0 + 8 * 3600)                              # 11:43 IST
-        b = Behavior(cfg_with(), clock=clock)
+        cfg = cfg_with(); cfg["behavior"]["utc_offset_minutes"] = 330
+        b = Behavior(cfg, clock=clock)
         now = clock()
         self.assertEqual(b.tick(Context(last_interaction=now)), {"expression": "idle", "greet": False})
         out = b.tick(Context(presence=True, last_interaction=now))
@@ -312,7 +318,8 @@ class CameraBehaviorTouchTests(unittest.TestCase):
 
     def test_behavior_is_quiet_at_night(self):
         clock = Clock(1_700_000_000.0)                                         # 03:43 IST
-        b = Behavior(cfg_with(), clock=clock)
+        cfg = cfg_with(); cfg["behavior"]["utc_offset_minutes"] = 330
+        b = Behavior(cfg, clock=clock)
         self.assertTrue(b.is_night())
         self.assertEqual(b.tick(Context(presence=True, last_interaction=clock())), {"expression": "happy", "greet": False})
 

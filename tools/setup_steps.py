@@ -1,7 +1,7 @@
 """Copyable owner setup recipes. Explanations use the non-shell `you` label."""
 
 SETUP_STEPS = {'M00': [('you',
-          'Choose ONE installation route in the installation section below. Use a fresh ~/eve3 folder; '
+          'Choose ONE installation route in the installation section above. Use a fresh ~/eve3 folder; '
           'keep Bank B off. After the chosen route finishes, reconnect PuTTY once to apply the new '
           'groups.'),
          ('PuTTY 1', 'cd "$HOME/eve3" || exit 1\n./eve doctor\n./eve stage M00')],

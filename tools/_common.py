@@ -9,7 +9,8 @@ from eve3 import config  # noqa: E402
 
 
 def eve_running() -> bool:
-    lock = ROOT / "data" / "eve.lock"
+    cfg = config.load()
+    lock = config.data_path(cfg, os.path.join(cfg["storage"]["data_dir"], "eve.lock"))
     if not lock.exists():
         return False
     try:

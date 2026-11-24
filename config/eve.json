@@ -35,7 +35,7 @@
             "stt_model": "models/ggml-tiny.bin", "stt_language": "auto", "stt_timeout_s": 30,
             "silence_s": 0.7, "follow_up_s": 20},
   "behavior": {"enabled": true, "greet_cooldown_s": 600, "night_start_hour": 22, "night_end_hour": 7,
-               "utc_offset_minutes": 330},
+               "utc_offset_minutes": 0},
   "sleep": {"idle_minutes": 15},
   "integrations": {"web_tools_enabled": false},
   "network": {"host": "127.0.0.1", "port": 8765},

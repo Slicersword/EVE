@@ -1,0 +1,6 @@
+{
+  "robot": {"language": "en"},
+  "serial": {"port": "/dev/ttyUSB0"},
+  "behavior": {"utc_offset_minutes": 0},
+  "network": {"host": "127.0.0.1", "port": 8765}
+}

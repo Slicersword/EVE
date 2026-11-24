@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" role="img" aria-labelledby="title desc">
+<title id="title">EVE control paths</title><desc id="desc">User input, voice and touch, and Pi sensors feed the Pi runtime and safety gate. The USB link reaches Mega firmware, which also reads cliff and PIR sensors and controls drivers.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#70e5cb"/></marker></defs>
+<rect width="800" height="550" rx="16" fill="#101b28"/>
+<g fill="#142d3c" stroke="#476477" stroke-width="2"><rect x="20" y="30" width="230" height="65" rx="9"/><rect x="285" y="30" width="230" height="65" rx="9"/><rect x="550" y="30" width="230" height="65" rx="9"/><rect x="270" y="145" width="260" height="65" rx="9"/><rect x="270" y="255" width="260" height="65" rx="9"/><rect x="270" y="370" width="260" height="65" rx="9"/><rect x="570" y="370" width="210" height="65" rx="9"/><rect x="270" y="475" width="260" height="55" rx="9"/></g>
+<g stroke="#70e5cb" stroke-width="2" fill="none" marker-end="url(#arrow)"><path d="M135 95V120H340V145"/><path d="M400 95V145"/><path d="M665 95V120H460V145"/><path d="M400 210V255"/><path d="M400 320V370"/><path d="M570 402H530"/><path d="M400 435V475"/></g>
+<g fill="#e3ebf2" font-family="system-ui,sans-serif" font-size="18" text-anchor="middle"><text x="135" y="69">Face / CLI / control</text><text x="400" y="69">Voice / touch</text><text x="665" y="69">ToF / tilt sensors</text><text x="400" y="183">Pi runtime</text><text x="400" y="294">Pi safety gate</text><text x="400" y="410">Mega firmware</text><text x="675" y="410">Cliff / PIR</text><text x="400" y="510">Wheel / head drivers</text></g>
+<text x="417" y="351" fill="#a6b7c8" font-family="system-ui,sans-serif" font-size="15">USB serial</text>
+</svg>

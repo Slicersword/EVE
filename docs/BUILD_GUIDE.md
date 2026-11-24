@@ -1,84 +1,100 @@
-# Complete EVE build guide
+# The complete build sequence
 
-This guide covers the existing EVE robot from parts inspection to final attended acceptance.
-Software commands are consolidated in [Software setup](SETUP_GUIDE.md). Do not mark an item complete
-because it is present in the source code. The baseline is the supplied EVE_SOURCE_V3 archive dated
-23 November 2026; this repository does not import earlier calibration or commissioning records.
+This is a standalone reference build. Start with unassembled components and no
+commissioning records. Read [Before you begin](GETTING_STARTED.md), then follow
+the steps below. Copyable installation and test commands are in [Software setup](SETUP_GUIDE.md).
 
-## 1. Scope and parts
+## 1. Select and inspect the parts
 
-Use the [parts and wiring reference](HARDWARE.md) to identify every board and connector. The exact
-chassis dimensions, fastener sizes, motor ratings, battery capacities, display power load and microphone
-interface were not included in the archive. Inspect the existing build and record those details before
-replacement or replication. The list is a build inventory, not a verified shopping specification.
+Use [Parts and wiring](HARDWARE.md) as the electrical contract. Record exact module
+names, voltages, motor current, chassis layout and power ratings in [Build choices](DECISIONS.md).
+Check board labels and manufacturer datasheets; similar-looking boards can
+have different pin order, pull-ups and input voltages.
 
-This build uses two independent 5 V USB power banks. A later two-3S-pack design with monitoring and
-charging requires a separate electrical review and is not implemented here. INA219 stays disabled.
-Cooling fans are directly powered; there is no software-controlled fan module.
+The reference uses Pi 4 + Mega, two TB6612-compatible drivers, two 5 V unipolar
+geared steppers with ULN2003 boards, and two independent regulated 5 V supply domains.
+Motor models, brackets and bank capacity are selected against measured loads.
+No raw battery pack, charger control or battery monitoring is implemented.
 
-## 2. Mechanical assembly
+**Continue when:** all components have identified ratings, protection is selected,
+and the motors fit the driver's continuous/start/stall-current envelope.
 
-1. With all power unplugged, inspect the chassis, four motor mounts and wheel clearance. Secure the Pi,
-   Mega and driver boards on insulated standoffs, with no exposed underside shorting to the chassis.
-2. Secure the display for the intended 1024×600 landscape face. Keep display and USB leads strain-relieved.
-3. Fit the geared pan/tilt steppers and their matching ULN2003 drivers. Leave enough cable slack throughout
-   the proposed range. Use existing centre marks or add visible alignment marks for manual home.
-   There are no homing switches in this software. Do not force a geared motor by hand.
-4. Orient the three distance sensors as front-left, front-right and rear. Keep their optical windows clear.
-5. Mount the three cliff sensors front-left, rear-centre and front-right. Their usable height depends on the
-   real sensor, floor and adjustment. Establish it experimentally; the archive does not specify a valid height.
-6. Fix the MPU6050 rigidly to the chassis. Record which face is up. Position PIR, head/back touch pads and
-   camera/indicator where they can operate without obstruction.
-7. Secure speakers and microphone with cable clearance and physical separation. The current software
-   prevents self-listening by discarding microphone input during speech; it does not provide echo cancellation.
-8. Keep the Bank B motor-power switch accessible. Provide cooling and charger-side fan airflow without
-   cables touching a wheel, motor or fan. Inspect the original power protection arrangement.
+## 2. Assemble the chassis and head
 
-## 3. Wire with power disconnected
+Follow [Assembly](ASSEMBLY.md). Mount boards on insulated standoffs, provide wheel
+clearance and an accessible power cutoff, then fit sensors and the display.
+Mark a mechanically safe head centre. Stepper position is relative to a manually
+confirmed centre; there are no homing switches or position feedback.
 
-Follow [HARDWARE.md](HARDWARE.md). Pi BCM GPIO numbers and Mega D-pin numbers are different namespaces.
-Check board labels, signal voltage, polarity, continuity and common ground. Bank A and Bank B positive
-rails remain separate; join only the grounds required by the signal connections. Do not power motors
-or steppers from a Pi GPIO pin. Keep motor power off for initial firmware and sensor work.
+**Continue when:** nothing can short, wheels turn freely, the supported head holds
+safely when coils are released, and cables cannot snag through its proposed range.
 
-The code describes pin assignments. It cannot verify your actual board variant, motor current,
-regulator capacity, protection devices or electrical assembly.
+## 3. Wire with all supplies unplugged
 
-## 4. Install and commission software
+Connect ground and signal wiring using the Pi and Mega pin tables in [HARDWARE.md](HARDWARE.md).
+Wire one subsystem at a time and check continuity after each. Keep independent
+positive rails separate. Use Mega USB for serial; never connect Mega 5 V GPIO to Pi GPIO.
+Keep actuator power disconnected until the measurements and commissioning stages.
 
-Open [Software setup](SETUP_GUIDE.md). Use two PuTTY windows: one owns the runtime, the other sends
-commands. Installation offers Git clone and ZIP transfer routes. All commands use the installed virtual
-environment through the EVE launcher unless the guide explicitly installs system packages.
+**Continue when:** pin numbering, connector orientation, logic levels, common ground,
+polarity and cutoff operation have been independently checked.
 
-| Stage | Acceptance |
+## 4. Install and verify the software
+
+Prepare the supported OS and follow M00–M02 in [Software setup](SETUP_GUIDE.md).
+Use two SSH terminals: one runs EVE and the other sends commands. The Pi compiles
+and uploads the Mega sketch through USB; a separate Windows upload is unnecessary.
+
+**Continue when:** host tests pass, the face fills the Pi screen, and Mega telemetry
+reports a settings fingerprint that matches the Pi's configuration.
+
+## 5. Measure power and calibrate sensors
+
+Follow M03–M06. Measure the electrical loads with suitable test equipment and secure
+the chassis. Calibrate all three digital cliff channels over both a safe floor target
+and a controlled no-floor target. Verify each distance sensor and the IMU separately.
+
+**Continue when:** power flags have measurements behind them, all readings
+respond and remain fresh, and obstacle/cliff/tilt/stale-link/stop conditions block motion.
+
+## 6. Commission wheels and head
+
+Follow M07–M08 with all wheels on a stable support and cliff sensors over safe
+targets. Test direction and stop paths before moving to a level, enclosed floor area.
+Jog the head a few steps at a time, measure smaller safe limits, and test them again.
+Reverse and pivot remain disabled in the reference configuration.
+
+**Continue when:** every wheel turns in the expected direction, commands time out,
+the physical cutoff works, sensor failures stop motion, and head travel clears all cables.
+
+## 7. Add the companion features
+
+Follow M09–M16 for touch, local camera, memory, multilingual dialogue, speech,
+presence behavior, reminders and sleep/wake. Voice recognition downloads a separate
+local model. Optional camera tracking requires head commissioning first.
+Keep cloud AI disabled for private use; no external AI service is required.
+
+**Continue when:** each fitted feature passes its interactive test. Record deliberately
+omitted features in your worksheet rather than claiming full M00–M17 acceptance.
+
+## 8. Run acceptance and enable autostart
+
+Complete the M17 attended test and [acceptance record](TESTING.md). Install the
+service only after the foreground runtime works. Reboot with actuator power off,
+check the face and service, and verify that a fresh session/clear is needed for motion.
+
+Maintain local calibration/data privately. Use the update procedure to create a backup,
+fast-forward, test clean defaults, and regenerate the firmware header. A new pin map,
+calibration or firmware setting requires compile/upload and a matching fingerprint.
+
+## Stage map
+
+| Stages | Build outcome |
 |---|---|
-| M00 | Fresh install, prior runtime parked, software tests pass |
-| M01 | Face fills the Pi display without F11 |
-| M02 | New Mega firmware compiled/uploaded; live telemetry and matching settings ID |
-| M03 | Real bank voltage/current checks and stable Pi supply |
-| M04 | All three distance sensors and tilt respond; cliff floor/edge calibration |
-| M05 | Obstacle, cliff, tilt, stale-link and stop refusals observed |
-| M06 | Direct-powered fans work and temperatures stay acceptable |
-| M07 | Wheels tested on stable support, then in a contained area |
-| M08 | Manual head home, small jogs, physical soft-limit validation |
-| M09 | Touch response and back-hold emergency stop |
-| M10 | Local camera, indicator and optional gated tracking |
-| M11 | Explicit note save, persistence and erase |
-| M12 | English/Hindi/Marathi offline replies |
-| M13 | Speaker, local STT, wake phrase and stop phrase |
-| M14 | Presence greetings, idle and night behavior |
-| M15 | Timed reminder, once, including across restart |
-| M16 | Sleep/wake and optional trusted-LAN phone control |
-| M17 | 30-minute attended test, then service/face autostart and reboot check |
-
-M04 is an open physical blocker: earlier I2C scans found no devices. A software rewrite cannot establish
-that this wiring fault is repaired. Test the ToF sensors and MPU6050 on the robot before accepting motion.
-
-## 5. Final acceptance and maintenance
-
-The M17 test is an attended acceptance run, not proof of unattended autonomy. Observe supply, temperature,
-sensor freshness, direction, head clearance and every stop path. After reboot, motion must remain blocked
-until you begin a new session and clear. Preserve local settings/data in backups; never commit them.
-
-For updates, use the backup-and-fast-forward procedure in Software setup. Firmware-setting changes require
-regeneration, compilation, upload and a matching settings ID. Keep the previous two update backups.
+| M00–M02 | Installation, touchscreen face, Mega link and firmware |
+| M03–M06 | Measured supply, distance/tilt/cliff sensors, stop behavior, cooling |
+| M07–M08 | Lifted wheel tests, contained floor test, manual head home and limits |
+| M09–M10 | Touch pads, camera activity indicator and local detection |
+| M11–M13 | Explicit memory, three-language dialogue, speaker and local microphone/STT |
+| M14–M16 | Presence, reminders, sleep/wake and optional LAN control |
+| M17 | Attended acceptance, service installation and reboot check |

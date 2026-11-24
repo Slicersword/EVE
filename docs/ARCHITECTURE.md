@@ -4,17 +4,7 @@ One Python runtime owns the hardware. Web, CLI, voice and touch commands converg
 The Pi makes sensor-based decisions; the Mega independently enforces its cliff, heartbeat, enable and
 motion-lease rules. The Mega does not directly read the Pi's distance or IMU sensors.
 
-```mermaid
-flowchart TD
-  UI["Face / control page / PuTTY"] --> RT["Pi runtime"]
-  VO["Voice / touch"] --> RT
-  SE["ToF / IMU"] --> RT
-  RT --> SG["Safety gate"]
-  SG --> ML["Mega USB link"]
-  ML --> FW["Mega firmware"]
-  FW --> AC["Wheel / head drivers"]
-  CP["Cliff / PIR"] --> FW
-```
+![Pi and Mega control paths](assets/control-paths.svg)
 
 | Source | Responsibility |
 |---|---|
@@ -39,6 +29,9 @@ flowchart TD
 | tools/stage.py, setup_steps.py | Ordered stage checks and copyable owner recipes |
 | scripts/, systemd/ | Pi packages, flash, kiosk, speech dependencies, final autostart |
 | tests/ | Host software and firmware-harness tests |
+| tools/build_docs.mjs, tools/check_site.py | Repository-generated website and offline link/source validation |
+| site/assets/, tools/vendor/ | Website assets and vendored MIT Markdown renderer |
+| .github/workflows/ | Host/AVR/site checks and optional GitHub Pages deployment |
 
 ## Timing and motion
 

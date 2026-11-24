@@ -164,8 +164,8 @@ fetches main, uses a fast-forward merge, then runs checks. It does not install c
 reflash or start EVE. Review CHANGELOG after updating. It retains the last two successful update snapshots
 in ~/eve_backups. If checks fail it keeps the backup and stops for review; it does not silently reset files.
 ZIP installs require their own saved copy of the current source plus config/local.json and data before
-replacement; do not overlay unknown local edits. Pi-side virtual environments, downloaded models and old
-install parking folders are not included in these source/state backups.
+replacement; do not overlay unknown local edits. Pi-side virtual environments and
+downloaded models are not included in these source/state backups.
 
 To preview a backup without restoring private state:
 

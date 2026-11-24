@@ -3,6 +3,12 @@
 # Installs packages, switches I2C on, creates .venv. Does NOT flash the Mega, move anything or start EVE.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# Fail before package changes on an unsupported platform.
+. /etc/os-release
+[ "${VERSION_CODENAME:-}" = bookworm ] && [ "$(dpkg --print-architecture)" = arm64 ] \
+  && grep -q 'Raspberry Pi 4' /proc/device-tree/model 2>/dev/null \
+  || { echo "Target: Raspberry Pi 4, Raspberry Pi OS Desktop 64-bit Bookworm. See docs/GETTING_STARTED.md."; exit 1; }
+[ "$(id -u)" -ne 0 ] || { echo "Run as your normal Pi user; the installer invokes sudo where needed."; exit 1; }
 chmod +x eve scripts/*.sh tools/*.py 2>/dev/null || true
 sudo apt-get update
 sudo apt-get install -y python3-venv python3-dev python3-smbus2 python3-serial python3-gpiozero python3-lgpio python3-libgpiod \
@@ -15,10 +21,14 @@ python3 -m venv --system-site-packages .venv
 sudo usermod -aG i2c,dialout,gpio,video,audio "$USER"
 if ! command -v arduino-cli >/dev/null && [ ! -x "$HOME/bin/arduino-cli" ]; then
   mkdir -p "$HOME/bin"
-  curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR="$HOME/bin" sh
+  installer=$(mktemp)
+  trap 'rm -f "$installer"' EXIT
+  curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/v1.3.1/install.sh -o "$installer"
+  BINDIR="$HOME/bin" sh "$installer" 1.3.1
 fi
 ACLI="$(command -v arduino-cli || echo "$HOME/bin/arduino-cli")"
-"$ACLI" core list 2>/dev/null | grep -q '^arduino:avr' || { "$ACLI" core update-index && "$ACLI" core install arduino:avr; }
+"$ACLI" core update-index
+"$ACLI" core install arduino:avr@1.8.6
 mkdir -p data && chmod 700 data
 .venv/bin/python tools/doctor.py
 echo

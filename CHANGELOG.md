@@ -1,21 +1,21 @@
 # Change log
 
-## 2026-11-24 — Git repository and complete build documentation
+## Standalone reference build — 24 November 2026
 
-- Organized supplied V3 source at repository root, preserving the Pi/Mega hardware pin contract.
-- Added full build/inventory/assembly/wiring, architecture, safety, privacy, troubleshooting and limitation docs.
-- Replaced machine-specific paths and mixed prose/commands with portable Git/ZIP setup routes and copyable recipes.
-- Fixed stage checks treating zero tilt/zero sample age as missing; M03 now reads actual zero supply flags.
-- Kiosk uses merged owner port settings. Last-flashed header is recorded only after successful upload.
-- Microphone transcription refuses disk fallback when its RAM directory is unavailable.
-- Simulation disables physical IO/audio/cloud and isolates its data; normal commissioning flags are unchanged.
-- Added CI for host checks and AVR compilation; no workflow flashes a device.
-- Added regression tests for setup boundaries, simulation isolation and audio directory failure.
-- No hardware is marked commissioned. I2C diagnosis and full-duplex audio remain open.
-
-## 2026-11-23 — Supplied EVE V3 baseline
-
-Fresh standard-library-first rebuild in EVE_SOURCE_V3: one Python runtime, new Mega firmware, safety gates,
-face, local sensors/camera/voice/memory, optional model adapters and M00–M17 tools.
-The supplied handover reported 105 host tests and no Pi deployment/firmware flash for V3.
-Historical notes are retained in docs/HANDOVER.md and docs/adr/; current status is in docs/KNOWN_LIMITATIONS.md.
+- Added a complete newcomer path: prerequisites, fresh OS, parts, assembly, wiring,
+  installation, ordered M00–M17 tests, acceptance, maintenance and troubleshooting.
+- Removed migration scripts, personal handover material and inherited progress claims.
+- Added a hardware/build-choice worksheet and safe local configuration example.
+- Corrected executable permissions and added Git ignore protection for local data,
+  settings, credentials, downloaded models and generated output.
+- Made runtime and flasher honor the same explicitly configured Mega serial device.
+- Validated configuration structure, numeric types, pins, PWM assignments, addresses,
+  private-data locations and timing; local settings are written with private permissions.
+- Made runtime-lock and I2C diagnostic behavior respect configured paths/pins.
+- Used UTC as the neutral timezone default; local offset remains adjustable.
+- Added Pi/platform checks and pinned the AVR toolchain inputs.
+- Added regression coverage for configuration, serial selection, locks and upload failure.
+- Added dependency-free repository-to-website generation, offline search, full source
+  listings, copy buttons, accessible navigation and responsive/print styles.
+- Added CI for Python host tests, real-sketch harness, locked/enabled Mega target
+  compilation, generated files and website validation; optional GitHub Pages deployment.

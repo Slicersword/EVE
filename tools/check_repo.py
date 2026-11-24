@@ -41,6 +41,15 @@ def main():
     for path in [ROOT / 'README.md', ROOT / 'docs/SETUP_GUIDE.md', ROOT / 'tools/setup_steps.py']:
         if 'OneDrive - ' in path.read_text():
             failures.append(f'{path.name}: machine-specific owner path')
+    example = json.loads((ROOT / 'config/local.example.json').read_text())
+    config.validate(config.deep_merge(cfg, example))
+    for filename in ['eve', *[str(p.relative_to(ROOT)) for p in (ROOT / 'scripts').glob('*.sh')]]:
+        if not (ROOT / filename).stat().st_mode & 0o111:
+            failures.append(f'{filename}: executable bit missing')
+    for required in ('.gitignore', '.github/workflows/verify.yml', '.github/workflows/pages.yml',
+                     'tools/build_docs.mjs', 'tools/check_site.py'):
+        if not (ROOT / required).is_file():
+            failures.append(f'Missing repository build support: {required}')
     if failures:
         for issue in failures:
             print('FAIL:', issue)

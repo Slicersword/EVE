@@ -37,7 +37,7 @@ def main():
     check("program arduino-cli (M02)", shutil.which("arduino-cli") or os.path.exists(os.path.expanduser("~/bin/arduino-cli")),
           "bash scripts/setup_pi.sh")
     check("I2C switched on (/dev/i2c-1)", os.path.exists("/dev/i2c-1"), "sudo raspi-config nonint do_i2c 0 && sudo reboot")
-    ports = glob.glob("/dev/serial/by-id/usb-1a86_*") + glob.glob("/dev/ttyUSB*")
+    ports = glob.glob("/dev/serial/by-id/*") + glob.glob("/dev/ttyUSB*") + glob.glob("/dev/ttyACM*")
     check("Mega USB cable seen" + (f" ({ports[0]})" if ports else ""), ports, "plug the Mega into a Pi USB port")
     try:
         mine = {grp.getgrgid(g).gr_name for g in os.getgroups()}

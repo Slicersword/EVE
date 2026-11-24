@@ -9,7 +9,7 @@ if "$PY" -c 'import sys; sys.path.insert(0,"tools"); from _common import eve_run
 fi
 ACLI="$(command -v arduino-cli || echo "$HOME/bin/arduino-cli")"
 [ -x "$ACLI" ] || { echo "arduino-cli not found: bash scripts/setup_pi.sh"; exit 1; }
-PORT="$(ls /dev/serial/by-id/usb-1a86_* 2>/dev/null | head -n1 || true)"; PORT="${PORT:-/dev/ttyUSB0}"
+PORT="$("$PY" -c 'from eve3.config import load; from eve3.mega_link import find_port; print(find_port(load()["serial"]["port"]))')"
 [ -e "$PORT" ] || { echo "Mega not found on USB ($PORT). Check the cable."; exit 1; }
 "$PY" tools/gen_header.py
 "$ACLI" compile --fqbn arduino:avr:mega firmware/eve_controller

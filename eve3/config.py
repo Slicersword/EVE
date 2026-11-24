@@ -4,7 +4,7 @@ Updates replace eve.json only, so calibration and commissioning flags in local.j
 Validation fails closed: a bad value stops start-up instead of being guessed.
 """
 from __future__ import annotations
-import copy, json, os
+import copy, json, math, os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -19,6 +19,8 @@ class ConfigError(ValueError):
 
 
 def deep_merge(base: dict, extra: dict) -> dict:
+    if not isinstance(base, dict) or not isinstance(extra, dict):
+        raise ConfigError("Configuration and local overrides must be JSON objects")
     out = copy.deepcopy(base)
     for key, value in extra.items():
         if isinstance(value, dict) and isinstance(out.get(key), dict):
@@ -47,6 +49,83 @@ def _no_secrets(node, path=""):
 
 
 def validate(cfg: dict) -> dict:
+    """Reject malformed values before opening GPIO, serial or generating a firmware header."""
+    try:
+        _need(isinstance(cfg, dict), "Configuration must be a JSON object")
+        _check_values(cfg)
+        return _validate(cfg)
+    except (KeyError, TypeError, AttributeError, OverflowError) as exc:
+        raise ConfigError(f"Missing or malformed configuration field: {exc}") from exc
+
+
+def _check_values(cfg):
+    # Validate types against the public defaults, including disabled optional features.
+    # bool is deliberately not a number here; NaN/Infinity are never valid JSON settings.
+    defaults = json.loads((ROOT / "config/eve.json").read_text(encoding="utf-8"))
+
+    def walk(value, expected, path):
+        if isinstance(expected, dict):
+            _need(isinstance(value, dict), f"{path}: expected object")
+            _need(not (set(value) - set(expected) - ({"_root"} if not path else set())),
+                  f"{path or 'config'}: unknown setting")
+            for key, template in expected.items():
+                walk(value[key], template, f"{path}.{key}" if path else key)
+        elif isinstance(expected, list):
+            _need(isinstance(value, list), f"{path}: expected list")
+            for item in value:
+                walk(item, expected[0], path)
+        elif type(expected) is bool:
+            _need(type(value) is bool, f"{path}: expected true/false")
+        elif type(expected) in (int, float):
+            _need(type(value) in (int, float) and math.isfinite(value), f"{path}: expected finite number")
+            if type(expected) is int:
+                _need(type(value) is int, f"{path}: expected whole number")
+        else:
+            _need(isinstance(value, str), f"{path}: expected text")
+    walk(cfg, defaults, "")
+    _need(cfg["serial"]["baud"] == 115200, "serial.baud must be 115200 (fixed in Mega firmware)")
+    _need(bool(cfg["serial"]["port"]), "serial.port: set the actual Mega device path")
+    _need(0 <= cfg["serial"]["settle_s"] <= 10 and 0 < cfg["serial"]["ack_timeout_s"] <= 2,
+          "serial settle/ACK timing out of range")
+    _need(1 <= cfg["drive"]["ramp_per_second"] <= 10000 and 0 <= cfg["drive"]["reverse_deadtime_ms"] <= 2000,
+          "drive ramp/deadtime out of range")
+    sensors = cfg["sensors"]
+    _need(sensors["imu_address"] in (0x68, 0x69), "sensors.imu_address must be 104 or 105")
+    addresses = sensors["tof_addresses"]
+    _need(len(addresses) == 3 and len(set(addresses)) == 3
+          and all(0x08 <= a <= 0x77 and a not in (0x29, sensors["imu_address"]) for a in addresses),
+          "sensors.tof_addresses: need three distinct usable addresses, excluding 0x29 and the IMU")
+    _need(sensors["tof_range_mm"] == [30, 1000], "sensors.tof_range_mm is fixed at [30, 1000]")
+    gpio = sensors["tof_xshut"] + [cfg["touch"]["head_gpio"], cfg["touch"]["back_gpio"], cfg["camera"]["led_gpio"]]
+    _need(len(sensors["tof_xshut"]) == 3 and len(set(gpio)) == len(gpio)
+          and all(4 <= p <= 27 for p in gpio), "Pi GPIO assignments must be distinct BCM4..27 (I2C pins reserved)")
+    pins = cfg["pins"]["mega"]
+    for key, length in (("left", 7), ("right", 7), ("pan", 4), ("tilt", 4), ("cliff", 3)):
+        _need(len(pins[key]) == length, f"pins.mega.{key}: need {length} pins")
+    all_pins = sum((pins[k] for k in ("left", "right", "pan", "tilt", "cliff")), []) + [pins["pir"]]
+    _need(len(all_pins) == len(set(all_pins)) and all(2 <= p <= 53 for p in all_pins),
+          "Mega pins must be distinct D2..D53 (USB serial pins reserved)")
+    _need(all(pins[k][i] in (*range(2, 14), 44, 45, 46) for k in ("left", "right") for i in (3, 6)),
+          "Wheel PWM pins must support analogWrite on Mega 2560")
+    _need(cfg["robot"]["language"] in ("en", "hi", "mr"), "robot.language: choose en, hi or mr")
+    _need(-720 <= cfg["behavior"]["utc_offset_minutes"] <= 840, "behavior.utc_offset_minutes out of range")
+    _need(all(cfg["camera"][k] in (-1, 1) for k in ("tracking_pan_sign", "tracking_tilt_sign")),
+          "camera tracking signs must be -1 or 1")
+    for value in (cfg["storage"]["data_dir"], cfg["memory"]["db"], cfg["ai"]["cloud"]["key_file"]):
+        _need((value == "data" or value.startswith("data/")) and ".." not in Path(value).parts,
+              "Runtime data, memory and key paths must stay under ignored data/")
+    v = cfg["voice"]
+    _need(v["sample_rate"] == 16000 and 0 < v["silence_s"] <= 5 and 0 < v["max_utterance_s"] <= 30
+          and 0 <= v["vad_rms"] <= 32768 and 1 <= v["stt_timeout_s"] <= 120,
+          "voice capture timing/rate/threshold invalid (sample_rate must be 16000)")
+    c = cfg["camera"]
+    _need(16 <= c["width"] <= 1920 and 16 <= c["height"] <= 1080 and 1 <= c["process_fps"] <= 30,
+          "camera dimensions/frame rate out of range")
+    _need(0 < cfg["touch"]["hold_stop_s"] <= 5 and 1 <= cfg["sleep"]["idle_minutes"] <= 1440,
+          "touch/sleep timing out of range")
+
+
+def _validate(cfg: dict) -> dict:
     _no_secrets(cfg)
     _need(cfg["hardware"].get("ina219_enabled") is False, "hardware.ina219_enabled must be false (INA219 removed)")
     com = cfg["commissioning"]
@@ -117,6 +196,7 @@ def save_local(root: Path | str, patch: dict) -> dict:
     validate(deep_merge(base, merged_local))
     tmp = local.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(merged_local, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    tmp.chmod(0o600)
     os.replace(tmp, local)
     return merged_local
 

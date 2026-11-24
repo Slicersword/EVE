@@ -49,5 +49,5 @@ For a lifted wheel test, keep cliff sensors over a suitable safe floor target at
 If wheels and sensors cannot both be arranged safely, stop and improve the support. Do not bridge pins,
 copy fake calibration or disable a gate to make a motor spin.
 
-The historical I2C fault is still open. Do not declare it repaired from unit tests, a successful flash,
-a manually set stage record or old progress reported for a previous software version.
+Each new build must demonstrate live I2C/sensor behavior. Unit tests, a successful
+flash and a manually recorded stage cannot establish the condition of real wiring.

@@ -50,12 +50,12 @@ def c_tests(cfg):
 
 
 STAGES = {
- "M00": dict(title="Foundation: install, old EVE parked, self-tests", needs=[], run=False, checks=[
+ "M00": dict(title="Foundation: fresh install and self-tests", needs=[], run=False, checks=[
         ("config loads and is valid", lambda c: True, "fix or delete config/local.json"),
         ("virtual environment exists", lambda c: (ROOT / ".venv").exists(), "bash scripts/setup_pi.sh"),
         ("all software self-tests pass (takes ~30 s)", c_tests, "./eve test   and send me the output"),
     ], steps=SETUP_STEPS['M00'], test="Bank B (motor power) stays OFF for M00-M02. `./eve doctor` shows PASS for config, venv and Python. "
-            "The old EVE no longer starts (its folders are parked in ~/eva_old_<date>)."),
+            "The source is in a fresh folder; no hardware commissioning flags have been set."),
  "M01": dict(title="Face on the screen", needs=["M00"], run=True, checks=[
         ("EVE is running and answers", lambda c: st()["version"].startswith("3."), "PuTTY 1:  ./eve run"),
     ], steps=SETUP_STEPS['M01'],
@@ -223,7 +223,7 @@ def guide() -> str:
            "Two PuTTY windows: **PuTTY 1** runs EVE (`./eve run`, Ctrl+C stops safely), **PuTTY 2** is for commands.",
            "Replace `PI_IP` with the Pi's address. For each stage: run the commands, then `./eve stage Mxx`, do the test "
            "yourself, then `./eve stage Mxx done`.", "",
-           "Rules: stages in order, never skip. Bank B stays OFF until M07 except for the attended electrical measurements at M03. A software PASS is not a "
+           "Rules: stages in order, never skip. The Bank B actuator branch stays OFF until M07 except for attended electrical measurements at M03. The audio branch may be powered separately for speaker tests. A software PASS is not a "
            "physical test. The Bank B switch is the physical motor-power stop; software stop needs a working runtime/link.", "",
            (ROOT / "docs" / "setup" / "INSTALLATION.md").read_text().rstrip(), ""]
     for key, stage in STAGES.items():

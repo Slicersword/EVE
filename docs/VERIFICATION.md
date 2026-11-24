@@ -1,17 +1,27 @@
-# Repository verification — 24 November 2026
+# Verification record
+
+This record describes software evidence for the standalone reference build.
+It does not record anyone's robot as assembled or commissioned.
 
 | Check | Observed result |
 |---|---|
-| Supplied baseline host suite | 105 tests passed before modifications |
-| Repository host suite | 111 tests passed, including real-sketch fake-core harness and new regressions |
-| Generated-file / defaults / documentation checks | Passed |
-| Python compilation and shell syntax | Passed |
-| Live simulated runtime | HTTP status and token-authenticated CLI chat passed; physical features disabled; motion blocked |
-| Fast-forward update fixture | Passed: owner calibration/data preserved, header regenerated, clean-default tests run, two backups retained |
-| Real Pi, wiring and sensor diagnosis | Not performed |
-| Real AVR toolchain compile/upload | Not performed locally; separate CI compilation configured |
-| Physical commissioning | No stage or commissioning flag confirmed |
-| GitHub Actions run | Not observed locally; requires successful push and a workflow run |
+| Linux host suite (Python 3.12) | 122 tests passed, including real-sketch fake-core harness |
+| Configuration/upload regressions | Explicit port precedence, rejected unsafe settings, private local file mode, configured lock path, fake upload success/failure passed |
+| Public defaults | All readiness flags false; drive/head disabled; cliff calibration unset; external AI off |
+| Generated files | Firmware header and M00–M17 software guide match generators |
+| Source / syntax | Python compilation, Bash syntax, JavaScript syntax and diff whitespace checks passed |
+| Documentation site | 25 Markdown pages, 64 source listings; local links/fragments/assets/raw source consistency passed |
+| Browser QA | Desktop page layout and offline search checked in the local preview |
+| AVR target | Separate CI job configured for locked/enabled Mega 2560 variants, CLI 1.3.1 and AVR core 1.8.6; results must be read from the workflow |
+| Raspberry Pi installation | Requires a real Pi 4 / Bookworm / arm64 system; not run on the development host |
+| Mega upload and bootloader | Requires the physical Mega; not performed |
+| Wiring, load, sensors and stop distance | Builder must measure and run the corresponding physical stages |
 
-These checks are specific to source behavior. They do not close the historical I2C fault, establish
-safe stopping distance, measure current, validate a bootloader or prove full-duplex voice capability.
+Host tests use fakes/temp state and do not set public commissioning flags.
+The upload regression uses a fake CLI and pseudoterminal, not a connected board.
+The real sketch harness exercises logic; target compilation checks the AVR build;
+a successful upload still does not provide physical acceptance.
+
+For reproducible commands see [Testing](TESTING.md). Read the repository Actions
+results for the commit you intend to build. Optional Pages hosting must be enabled
+once as described in [Website](WEBSITE.md).

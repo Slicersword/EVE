@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""M04 - why do the I2C sensors not answer? Read-only test, moves nothing. Run with EVE STOPPED.
+"""M04 - I2C diagnosis. Changes sensor shutdown GPIOs, moves no motors. Run with EVE STOPPED.
 
   python3 tools/i2c_diag.py
 
@@ -51,7 +51,7 @@ def names(addresses) -> str:
     return ", ".join(f"0x{a:02X}" + (f" ({EXPECT[a]})" if a in EXPECT else " (unknown device)") for a in addresses) or "NOTHING"
 
 
-def advice(all_off: list[int], per_sensor: list[bool], lines_high: bool) -> list[str]:
+def advice(all_off: list[int], per_sensor: list[bool], lines_high: bool, xshut=XSHUT, physical=PHYS) -> list[str]:
     """Pure function (tested): measurements -> what to do."""
     out = []
     if not lines_high:
@@ -69,7 +69,7 @@ def advice(all_off: list[int], per_sensor: list[bool], lines_high: bool) -> list
                    "open if the board has a pull-down), or set sensors.imu_address to 105.")
     for i, seen in enumerate(per_sensor):
         if not seen:
-            out.append(f"Distance sensor {WHO[i]} never answered when its XSHUT (BCM{XSHUT[i]}, pin {PHYS[i]}) was released. "
+            out.append(f"Distance sensor {WHO[i]} never answered when its XSHUT (BCM{xshut[i]}, pin {physical[i]}) was released. "
                        "Check its VIN -> 3.3 V, GND, SDA -> pin 3, SCL -> pin 5 and the XSHUT wire.")
     if not all_off and not any(per_sensor) and lines_high:
         out.append("The whole bus is silent but the lines look healthy: most likely SDA and SCL are swapped, the sensors "
@@ -78,7 +78,13 @@ def advice(all_off: list[int], per_sensor: list[bool], lines_high: bool) -> list
 
 
 def main() -> int:
-    from _common import eve_running
+    from _common import config, eve_running
+    cfg = config.load()
+    xshut = cfg["sensors"]["tof_xshut"]
+    physical_map = {4:7, 5:29, 6:31, 7:26, 8:24, 9:21, 10:19, 11:23, 12:32, 13:33,
+                    14:8, 15:10, 16:36, 17:11, 18:12, 19:35, 20:38, 21:40, 22:15,
+                    23:16, 24:18, 25:22, 26:37, 27:13}
+    physical = [physical_map[p] for p in xshut]
     if eve_running():
         print("Stop EVE first (Ctrl+C in PuTTY 1). This test needs the I2C bus for itself."); return 2
     print("== 1. I2C switched on? ==")
@@ -91,14 +97,14 @@ def main() -> int:
     levels = sh(["pinctrl", "get", "2,3"]).strip()
     print(levels)
     lines_high = levels.count("| hi") >= 2
-    for pin in XSHUT:
+    for pin in xshut:
         sh(["pinctrl", "set", str(pin), "op", "dl"])            # hold LOW = sensor off
     time.sleep(0.1)
     print("\n== 3. All three distance sensors held OFF - only the MPU-6050 (0x68) should answer ==")
     all_off = scan()
     print(names(all_off))
     per_sensor = []
-    for i, pin in enumerate(XSHUT):
+    for i, pin in enumerate(xshut):
         sh(["pinctrl", "set", str(pin), "ip", "pn"])            # release (no Pi pull); the board's pull-up wakes it
         time.sleep(0.1)
         now = scan()
@@ -107,12 +113,13 @@ def main() -> int:
         print("answers:", names(now), "| new:", names(new))
         per_sensor.append(0x29 in new)
         sh(["pinctrl", "set", str(pin), "op", "dl"])
-    for pin in XSHUT:
+    for pin in xshut:
         sh(["pinctrl", "set", str(pin), "ip", "pn"])            # leave the lines released
     print("\n== RESULT ==")
-    for item in advice(all_off, per_sensor, lines_high):
+    result = advice(all_off, per_sensor, lines_high, xshut, physical)
+    for item in result:
         print("-", item)
-    return 0
+    return 0 if result == ["All four devices answered. I2C wiring is good - continue with M04."] else 1
 
 
 if __name__ == "__main__":
