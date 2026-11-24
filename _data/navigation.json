@@ -1,0 +1,132 @@
+[
+  [
+    "Start here",
+    [
+      [
+        "index.html",
+        "README.md",
+        "Overview"
+      ],
+      [
+        "docs/CAPABILITIES.html",
+        "docs/CAPABILITIES.md",
+        "What EVE can do"
+      ],
+      [
+        "docs/GETTING_STARTED.html",
+        "docs/GETTING_STARTED.md",
+        "Before you begin"
+      ],
+      [
+        "docs/PROGRESS.html",
+        "docs/PROGRESS.md",
+        "My build progress"
+      ]
+    ]
+  ],
+  [
+    "Build the robot",
+    [
+      [
+        "docs/BUILD_GUIDE.html",
+        "docs/BUILD_GUIDE.md",
+        "Build sequence"
+      ],
+      [
+        "docs/HARDWARE.html",
+        "docs/HARDWARE.md",
+        "Your parts"
+      ],
+      [
+        "docs/ASSEMBLY.html",
+        "docs/ASSEMBLY.md",
+        "Assembly"
+      ],
+      [
+        "docs/WIRING.html",
+        "docs/WIRING.md",
+        "Wire every part"
+      ],
+      [
+        "docs/SETUP_GUIDE.html",
+        "docs/SETUP_GUIDE.md",
+        "Software & calibration"
+      ],
+      [
+        "docs/TESTING.html",
+        "docs/TESTING.md",
+        "Testing & acceptance"
+      ],
+      [
+        "docs/OPERATING.html",
+        "docs/OPERATING.md",
+        "Daily use & backups"
+      ]
+    ]
+  ],
+  [
+    "Make it yours",
+    [
+      [
+        "docs/CONFIGURATION.html",
+        "docs/CONFIGURATION.md",
+        "Configuration"
+      ],
+      [
+        "docs/DECISIONS.html",
+        "docs/DECISIONS.md",
+        "Build choices"
+      ],
+      [
+        "docs/TROUBLESHOOTING.html",
+        "docs/TROUBLESHOOTING.md",
+        "Troubleshooting"
+      ]
+    ]
+  ],
+  [
+    "Reference",
+    [
+      [
+        "docs/ARCHITECTURE.html",
+        "docs/ARCHITECTURE.md",
+        "Architecture"
+      ],
+      [
+        "docs/SAFETY.html",
+        "docs/SAFETY.md",
+        "Safety"
+      ],
+      [
+        "docs/PRIVACY.html",
+        "docs/PRIVACY.md",
+        "Privacy"
+      ],
+      [
+        "docs/KNOWN_LIMITATIONS.html",
+        "docs/KNOWN_LIMITATIONS.md",
+        "Limitations"
+      ],
+      [
+        "docs/VERIFICATION.html",
+        "docs/VERIFICATION.md",
+        "Verification"
+      ],
+      [
+        "docs/WEBSITE.html",
+        "docs/WEBSITE.md",
+        "Website & updates"
+      ],
+      [
+        "code.html",
+        null,
+        "Source code"
+      ],
+      [
+        "CHANGELOG.html",
+        "CHANGELOG.md",
+        "Changes"
+      ]
+    ]
+  ]
+]

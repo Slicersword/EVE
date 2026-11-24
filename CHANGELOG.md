@@ -1,5 +1,23 @@
 # Change log
 
+## Detailed hardware guide and optional progress — 24 November 2026
+
+- Matched the inventory and wiring to N20/TB6612 wheels, 28BYJ-48 head motors,
+  TCRT5000 digital cliff modules, two TTP233 touch pads, two INMP441 microphones,
+  Camera Module 3 and PAM8610 with 4 Ω / 3 W speakers.
+- Kept two 5 V banks as the main path and INA219 disabled. Added the selected
+  5 V-to-9 V audio boost branch and supply/output-limit acceptance requirements;
+  the optional BMS/battery/charger system remains outside the power-bank build.
+- Added per-terminal wiring, feature/limits tables, beginner terminal guidance,
+  daily operating/backup instructions and expanded troubleshooting.
+- Added a Pi 4 capture-only I2S overlay, a stereo-to-mono ALSA profile, backed-up
+  setup helpers and both-microphone testing instructions without changing playback.
+- Report speech-process failures accurately instead of clearing their error state.
+- Added opt-in browser-local build progress: 44 tasks, notes, completion dates,
+  next task, filters, pause/reset and validated export/import backups.
+- Added a self-contained source viewer and shared navigation for the live/offline guides.
+- Added notebook and I2S configuration regression checks plus overlay compilation in CI.
+
 ## GitHub Pages hosting
 
 - Made https://slicersword.github.io/EVE/ the primary build website.

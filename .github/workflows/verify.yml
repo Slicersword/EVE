@@ -56,6 +56,13 @@ jobs:
       - run: node tools/build_docs.mjs
       - run: python tools/check_site.py
       - run: node --check site/assets/site.js
+      - run: node --check site/assets/progress.js && node --check site/assets/progress-state.js && node --check site/assets/source-browser.js
+      - run: node --test tests/progress.test.mjs
+      - name: Compile Pi microphone Device Tree overlay
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y device-tree-compiler
+          dtc -@ -I dts -O dtb -o /tmp/eve-inmp441.dtbo config/eve-inmp441-overlay.dts
       - uses: actions/upload-artifact@v4
         with:
           name: eve-documentation-offline

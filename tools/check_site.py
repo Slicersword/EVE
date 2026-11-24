@@ -37,6 +37,37 @@ def check(directory, base_path='', search_file='assets/search-data.js'):
              if not p.is_relative_to(directory / 'raw')}
     if not (directory / 'index.html').is_file():
         return ['No index.html; run node tools/build_docs.mjs first'], 0
+    # The notebook's instruction links are inserted by JS; validate them as real page links too.
+    progress_page = directory / 'docs/PROGRESS.html'
+    if progress_page in pages:
+        try:
+            progress_script = (directory / search_file).with_name('progress-data.js').read_text().strip()
+            if not progress_script.startswith('window.EVE_BUILD_PROGRESS='):
+                raise ValueError('Missing progress data assignment')
+            manifest = json.loads(progress_script.removeprefix('window.EVE_BUILD_PROGRESS=').rstrip(';\n'))
+            ids = set()
+            for group in manifest['groups']:
+                for task in group['tasks']:
+                    if task['id'] in ids:
+                        raise ValueError(f'Duplicate task {task["id"]}')
+                    ids.add(task['id'])
+                    if not task['href'].startswith('docs/') or '://' in task['href'] or '..' in task['href']:
+                        raise ValueError('Progress instruction must be an internal documentation link')
+                    pages[progress_page].links.append('../' + task['href'])
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            failures.append(f'Build progress data invalid: {exc}')
+    code_page = pages.get(directory / 'code.html')
+    if code_page and 'source-browser' in code_page.ids:
+        try:
+            source_script = (directory / 'source-data.js').read_text().strip()
+            if not source_script.startswith('window.EVE_SOURCE='):
+                raise ValueError('Missing public source assignment')
+            published = json.loads(source_script.removeprefix('window.EVE_SOURCE=').rstrip(';\n'))
+            expected = json.loads((ROOT / '_data/source_files.json').read_text())
+            if published != expected:
+                raise ValueError('Hosted source viewer differs from the checked source snapshot')
+        except (OSError, ValueError) as exc:
+            failures.append(f'Public source viewer invalid: {exc}')
     for path, page in pages.items():
         failures.extend(f'{path.relative_to(directory)}: duplicate id {i}' for i in page.duplicates)
         for value in page.links + page.assets:

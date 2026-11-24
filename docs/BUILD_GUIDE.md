@@ -6,14 +6,16 @@ the steps below. Copyable installation and test commands are in [Software setup]
 
 ## 1. Select and inspect the parts
 
-Use [Parts and wiring](HARDWARE.md) as the electrical contract. Record exact module
+Use [Your parts](HARDWARE.md) and [every connection](WIRING.md) as the electrical contract. Record exact module
 names, voltages, motor current, chassis layout and power ratings in [Build choices](DECISIONS.md).
 Check board labels and manufacturer datasheets; similar-looking boards can
 have different pin order, pull-ups and input voltages.
 
 The reference uses Pi 4 + Mega, two TB6612-compatible drivers, two 5 V unipolar
 geared steppers with ULN2003 boards, and two independent regulated 5 V supply domains.
-Motor models, brackets and bank capacity are selected against measured loads.
+The listed N20 motors run from the 5 V rail; brackets and bank capacity are verified
+against measured loads. The PAM8610 has a separate regulated 9 V boost branch;
+its output must be limited for the 3 W speakers. Two INMP441 microphones use I2S.
 No raw battery pack, charger control or battery monitoring is implemented.
 
 **Continue when:** all components have identified ratings, protection is selected,
@@ -31,7 +33,7 @@ safely when coils are released, and cables cannot snag through its proposed rang
 
 ## 3. Wire with all supplies unplugged
 
-Connect ground and signal wiring using the Pi and Mega pin tables in [HARDWARE.md](HARDWARE.md).
+Connect each part using the terminal tables in [Wire every part](WIRING.md).
 Wire one subsystem at a time and check continuity after each. Keep independent
 positive rails separate. Use Mega USB for serial; never connect Mega 5 V GPIO to Pi GPIO.
 Keep actuator power disconnected until the measurements and commissioning stages.
@@ -88,6 +90,9 @@ fast-forward, test clean defaults, and regenerate the firmware header. A new pin
 calibration or firmware setting requires compile/upload and a matching fingerprint.
 
 ## Stage map
+
+Use [My build progress](PROGRESS.md) to record each preparation, wiring and M-stage
+task, keep notes and export a backup. It starts empty and does not change robot settings.
 
 | Stages | Build outcome |
 |---|---|

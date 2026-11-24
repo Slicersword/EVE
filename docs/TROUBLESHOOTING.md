@@ -91,6 +91,41 @@ Do not change readiness flags to hide a fault.
 | Pages website not updated | Check Verify EVE and its Publish GitHub Pages job; fix any failed render/link check; follow Website |
 | Website shows an older revision | Rebuild and republish its host; the footer/build-info identifies the source snapshot |
 
+## Two INMP441 microphones and the audio boost
+
+| Symptom | Check and recovery |
+|---|---|
+| INMP441 absent from I2C scan | Expected: it is an I2S microphone. Use the M13 I2S/ALSA setup and hardware capture list |
+| EVEINMP441 card missing after setup | Confirm reboot, correct Pi 4 overlay in the real boot config, successful dtc compile and no conflicting I2S overlay; inspect boot/kernel errors before retrying |
+| eve_mic device unknown | Run the user-audio helper without sudo for the same normal user that runs EVE; inspect arecord -L and the named PCM in that user's .asoundrc |
+| Invalid format/channels on hardware capture | INMP441 needs 64 clocks per stereo frame. Use S32_LE/48 kHz/two channels for direct hardware tests and eve_mic for converted mono input |
+| One microphone silent | With power off inspect that module's 3.3 V, GND, SCK, WS and SD. Confirm one L/R low and the other high; test channels separately |
+| Two mics distort or collide | Both may be driving the same time slot; opposite L/R selections are required on shared SD |
+| SD connected to BCM21 | Move it with power off to BCM20 physical 38; BCM21 physical 40 is Pi I2S output |
+| Captures noise, motor clicks or repeated false speech | Shorten/secure signal leads, separate motors/audio, verify supply decoupling and grounds, then recalibrate quiet/speech threshold; keep half-duplex limits in mind |
+| PAM8610 silent on 5 V | It requires 7–15 V. Use the selected, verified 5 V-to-9 V boost branch; a buck cannot step up |
+| Boost output correct unloaded but sags with speech | Check 5 V input current limit, converter continuous/thermal rating, connectors and Bank B total load. A no-load meter reading is insufficient |
+| Speaker crackles, smells, heats or distorts | Switch audio off. Verify output limit, speaker load/rating, clipping and supply; the amplifier can exceed 3 W |
+| Amplifier speaker negative looks like ground | It is a bridged output, not an audio reference. Do not join negatives or ground them; use proper differential measurement equipment |
+| Speech feature reports command exited | Test espeak-ng and the chosen playback session/output directly; the runtime now preserves a failed process result instead of reporting successful output |
+| Touch pad stays on after release | Check TTP233 suffix/jumpers: toggle, delay-off or active-low mode is incompatible with the expected direct active-high Q output |
+| Cliff board only has A0 | This firmware needs a digital threshold output. Identify the module's D0/DO or use a reviewed interface; analogue output is not a substitute |
+
+## Website progress and source viewer
+
+| Symptom | Check and recovery |
+|---|---|
+| Cannot tick a progress task | Choose Start tracking on this device; Pause intentionally locks editing |
+| Checkmarks missing on another device/browser | There is no automatic account sync. Export JSON from the original browser and import it on the destination |
+| Progress lost after clearing browsing data | Import your last export. Without a backup, cleared local storage cannot be recovered from GitHub |
+| Session-only storage notice | Browser/private-mode policy or quota prevents persistence. Export before closing the page; changing permissions does not recover an already lost session |
+| Import rejected | Use the original EVE JSON export, schema version 1, with recognized task IDs and bounded notes. Rejection leaves current data unchanged |
+| Imported notes look like HTML | Notes are displayed as plain text; code/HTML in notes is never executed |
+| Another tab has different counts | Reload before editing; simultaneous tabs do not merge. The latest save wins |
+| Source viewer has no matches | Clear the file filter. Filter names such as firmware, voice.py or config |
+| Source viewer or notebook never loads | Enable JavaScript and reload the full site. Keep all exported assets together offline; the static offline source pages also work without the interactive viewer |
+| Website check says source snapshot stale | Regenerate the source snapshot after code/assets change, then run repository/site checks before pushing |
+
 ## Gather useful evidence
 
 Record the stage, expected and observed behavior, component models, source revision,

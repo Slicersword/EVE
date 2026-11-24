@@ -1,5 +1,6 @@
 """Check hosted subpaths without weakening the offline export's relative-path rules."""
 from pathlib import Path
+import json
 import sys
 import tempfile
 import unittest
@@ -35,6 +36,18 @@ class HostedDocumentationTests(unittest.TestCase):
             root = Path(tmp); self.fixture(root)
             failures, _ = check(root, search_file='search-data.js')
             self.assertTrue(any('path escapes' in failure for failure in failures))
+
+    def test_dynamic_progress_instruction_links_are_checked(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); self.fixture(root)
+            (root / 'docs/PROGRESS.html').write_text('<div id="build-progress"></div>')
+            manifest = {'groups': [{'tasks': [{'id': 'test', 'href': 'docs/guide.html#setup'}]}]}
+            data = root / 'progress-data.js'
+            data.write_text('window.EVE_BUILD_PROGRESS=' + json.dumps(manifest) + ';\n')
+            self.assertEqual(check(root, '/EVE/', 'search-data.js')[0], [])
+            manifest['groups'][0]['tasks'][0]['href'] = 'docs/guide.html#missing'
+            data.write_text('window.EVE_BUILD_PROGRESS=' + json.dumps(manifest) + ';\n')
+            self.assertTrue(any('missing fragment' in issue for issue in check(root, '/EVE/', 'search-data.js')[0]))
 
 
 if __name__ == '__main__':

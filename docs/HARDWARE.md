@@ -1,163 +1,83 @@
-# Parts, power and wiring reference
+# Your EVE parts and connection map
 
-Source of truth: shipped `config/eve.json` and generated `firmware/eve_controller/eve_config.h`.
-This documents the reference EVE pin contract; inspect actual board labels and voltage requirements before
-connecting power. No electrical measurements or physical acceptance are supplied by this repository.
+This inventory uses the specified hardware. Quantities below are required by the
+current code; inspect the actual board labels and ratings before wiring. No item
+is presumed installed or tested. [Wire every part](WIRING.md) gives the complete
+terminal-to-terminal connections, power branches, checks and manufacturer references.
 
-## Build inventory
+## Core and user interface
 
-| Item | Quantity | Details supported by the source |
+| Part | Required quantity | Role / connection |
 |---|---:|---|
-| Raspberry Pi 4B | 1 | Target: 2 GB RAM, 64-bit Bookworm; SSD storage supported |
-| Touch display | 1 | 1024×600 HDMI display plus USB touch; exact power connection must be checked |
-| Arduino Mega 2560 | 1 | USB serial, normally CH340 at /dev/ttyUSB0, 115200 baud |
-| Wheel motors | 4 | Two motors per side; ratings and stall current must be measured |
-| Dual-channel wheel drivers | 2 | Firmware uses TB6612-style STBY/AIN/BIN/PWM interface; verify actual boards |
-| Pan/tilt geared stepper motors | 2 | Five-wire motors with matching ULN2003 pinout; exact model/rating not specified |
-| ULN2003 stepper drivers | 2 | Four logic inputs per axis |
-| GY-530 / VL53L0X ToF boards | 3 | Shared I2C; separate XSHUT control |
-| MPU6050 tilt/IMU board | 1 | Same I2C bus; default address 0x68 |
-| KY-033 digital cliff sensors | 3 | Digital output to Mega, individually calibrated |
-| PIR presence sensor | 1 | Digital input to Mega |
-| TTP223-style touch pads | 2 | Momentary active-high logic to Pi; confirm actual modules |
-| Pi-compatible camera | 1 | picamera2 implementation; exact model/interface not specified |
-| Camera activity LED | 1 | BCM25 control with appropriate current limiting/driver |
-| Microphone / speakers / amplifier | 1 input, 1 output set | ALSA capture/playback; choose supported devices and verify their power requirements |
-| Independent 5 V USB power banks | 2 | Bank A Pi-side; Bank B actuator/audio-side; current capacity requires verification |
-| Direct-powered cooling fans | As needed | Pi fan; any charger-side fan wired according to charger instructions |
-| Chassis, switch/protection, leads, mounts | To suit dimensions/load | Record ratings, dimensions and quantities in the build worksheet |
+| Raspberry Pi 4 Model B | 1 | Main runtime, I2C sensors, I2S microphones, camera and face |
+| 64 GB+ A2 / High-Endurance microSD | 1 | Supported starting storage; image with Pi OS Desktop 64-bit Bookworm |
+| 7-inch HDMI IPS touchscreen, 1024×600 | 1 | HDMI picture plus USB touch; confirm model's separate power requirements |
+| Micro-HDMI-to-HDMI lead | 1 | Pi HDMI0 to display |
+| USB touch data lead | 1 | Pi USB-A to display TOUCH port |
+| Pi 4 thermal kit | 1 | Heatsink mounted without shorts or blocked airflow |
+| 4010 brushless 5 V two-wire fan | As required | Direct-powered cooling; no software PWM fan module |
+| Arduino Mega 2560 | 1 | USB serial motor/digital sensor controller |
+| USB-A-to-USB-B data cable | 1 | Pi to Mega; carries logic power and serial |
+| TTP233 touch modules | 2 | Head and back; direct/momentary active-high Q output at Pi-safe voltage |
 
-This repository does not supply CAD/STL files, a dimensioned chassis drawing, a PCB schematic or verified
-part purchase links. Select parts using [Build choices](DECISIONS.md) before purchasing.
+## Motors, sensors and audio
 
-## Power boundaries
+| Part | Required quantity | Role / condition |
+|---|---:|---|
+| N20 geared DC motors, 6 V / 100 RPM | 4 | One motor per H-bridge channel; 5 V rail derates speed/torque; stall current still needed |
+| TB6612FNG dual H-bridge boards | 2 | Left pair and right pair; all channels occupied by wheels |
+| 28BYJ-48 5 V steppers | 2 | Pan and tilt; verify connector sequence, head balance and unpowered retention |
+| ULN2003 / ULN2003A stepper boards | 2 | Matching five-pin motor socket and four logic inputs per board |
+| VL53L0X breakout boards | 3 | Front-left, front-right, rear distance; accessible XSHUT and Pi-safe I2C |
+| TCRT5000 IR reflex tracking modules | 3 | Front-left, rear-centre, front-right cliff; digital OUT/D0 required |
+| MPU6050 IMU breakout | 1 | Tilt sensing; fixed to the base, shared Pi I2C |
+| HC-SR501 PIR | 1 | Presence input to Mega; identify labelled terminals |
+| INMP441 I2S MEMS microphones | 2 | Shared clock/frame/data with opposite L/R slot selection |
+| Raspberry Pi Camera Module 3 + Pi 4 ribbon | 1 | CSI/Picamera2; correct 15-pin cable |
+| Physical camera shutter/cover | 1 | Independent image barrier |
+| Camera activity LED + suitable resistor/driver | 1 circuit | Required by the camera procedure; verify this ancillary part is available |
+| PAM8610 stereo amplifier board | 1 | Analogue input; needs its own 9 V boost branch from the 5 V bank |
+| 4 Ω / 3 W full-range speakers | 2 for stereo | Separate bridged outputs; maximum output must be limited and verified |
 
-- **Bank A:** Pi via USB-C; display and Pi fan only if their combined load is verified.
-- **Bank B:** wheel driver motor rails, stepper motor supply and audio branch, subject to measured load.
-- Keep independent bank positive rails separate. Establish common ground between the relevant Pi/Mega,
-  sensor and motor-driver logic grounds. Check that no board unintentionally backfeeds USB.
-- Wire driver logic supplies according to the identified board; logic supply and motor supply are distinct.
-- Pi GPIO-connected signals must be compatible with 3.3 V logic. Verify module pull-ups/output levels;
-  a board accepting 5 V on VIN does not prove every output is Pi-safe.
-- Verify polarity, a working Bank B cutoff, protection arrangement and supply capacity before enabling actuators.
-- INA219 is disabled. Battery state and automatic low-battery shutdown are unavailable. Never connect a raw
-  3S pack to the 5 V paths described here.
+## Power and mechanical items
 
-## Pi GPIO / I2C wiring
-
-Physical numbering refers to the Pi's 40-pin header. All runtime GPIO settings use **BCM** numbering.
-
-| Function | BCM | Physical pin | Connection / expected behavior |
-|---|---:|---:|---|
-| Shared SDA | 2 | 3 | SDA of all three ToF boards and MPU6050 |
-| Shared SCL | 3 | 5 | SCL of all three ToF boards and MPU6050 |
-| 3.3 V sensor reference | — | 1 or 17 | Existing sensor VIN/VCC arrangement must be compatible; check board variant |
-| Ground example | — | 6 | Common sensor/logic ground; other Pi GND pins also available |
-| Front-left ToF XSHUT | 5 | 29 | Held low to disable; released as input to enable |
-| Front-right ToF XSHUT | 6 | 31 | Held low to disable; released as input to enable |
-| Rear ToF XSHUT | 13 | 33 | Held low to disable; released as input to enable |
-| Head touch output | 27 | 13 | Active-high momentary input |
-| Back touch output | 22 | 15 | Tap wakes/listens; one-second hold requests emergency stop |
-| Camera activity LED | 25 | 22 | LED through suitable resistor/driver, never a bare high-current load |
-
-XSHUT is deliberately never driven high by the Pi. The sensor breakout's own pull-up releases the
-sensor. Verify this matches the actual breakout. Initially each ToF answers at 0x29; startup enables one
-at a time and changes addresses to 0x30, 0x31, 0x32. A later standalone scan can differ after shutdown/reset.
-The MPU6050 default is 0x68; AD0-high boards may use 0x69 (configure only after identification).
-
-## Mega wheel-driver pins
-
-Each side uses one dual-channel driver. A and B drive the two motors on that side.
-
-| Driver signal | Left Mega D pin | Right Mega D pin |
-|---|---:|---:|
-| STBY | 8 | 9 |
-| AIN1 | 22 | 26 |
-| AIN2 | 23 | 27 |
-| PWMA | 2 | 4 |
-| BIN1 | 24 | 28 |
-| BIN2 | 25 | 29 |
-| PWMB | 3 | 5 |
-
-Connect each motor to its driver's corresponding A/B motor outputs. Software sends one signed speed
-per side, used for both motors. Confirm actual forward polarity during the lifted M07 test.
-This is not an L298N wiring table; identify the fitted driver before applying the pin contract.
-
-## Mega head and digital sensors
-
-| Function | Mega D pins | Order |
+| Part | Required quantity / status | Acceptance requirement |
 |---|---|---|
-| Pan ULN2003 IN1–IN4 | 30, 31, 32, 33 | Four-input half-step sequence |
-| Tilt ULN2003 IN1–IN4 | 34, 35, 36, 37 | Four-input half-step sequence |
-| PIR OUT | 38 | Presence |
-| Cliff digital OUT | 39, 40, 41 | Front-left, rear-centre, front-right |
+| Regulated 5 V USB power banks | 2, main build | Bank A Pi/display/logic; Bank B motors/head/boost input; actual per-port current ratings needed |
+| Regulated 5 V-to-9 V boost converter | 1, additional audio part | Documented continuous output, suitable input current and load-tested 9 V; see wiring guide |
+| Actuator cutoff and branch protection | To measured load | Cuts wheel and stepper positive power independently of Pi software |
+| Separate audio switch/protection | 1 branch | Lets amplifier be isolated while testing/rewiring |
+| Wire/connectors/insulation/distribution | To measured load | Rated current, secure returns and strain relief; no motor current on breadboards |
+| Chassis, wheels, motor/head brackets, standoffs | To selected geometry | No dimensioned CAD/STL supplied; record dimensions and safe travel |
+| 20 A BMS, lithium packs, charger, buck converters | Optional future conversion | Not used by this two-bank guide; no charging circuit or battery monitoring is assumed |
+| INA219 current sensors | Not used | Code/dependency disabled; leave unwired |
 
-Keep stepper power on the verified external motor supply, not a GPIO output. Select a supported geared
-assembly that holds its load when coils are released; firmware releases coils after stopping.
-Manual centre marking is required; there is no automatic homing sensor.
+A BMS is not a charger. The BMS's 20 A label does not identify 2S/3S configuration
+or approve its cells, charger, wiring or load. Complete a separate matched design
+before any battery conversion. Raw battery voltage never connects to the 5 V rails.
 
-## Sensor order matters
+## Signal map at a glance
 
-| Data | Index 0 | Index 1 | Index 2 |
-|---|---|---|---|
-| distance_mm / XSHUT / ToF address | Front-left | Front-right | Rear |
-| cliff_raw / edge_level / Mega D pin | Front-left | Rear-centre | Front-right |
-
-Do not copy ToF order into cliff calibration. Default range acceptance is 30–1000 mm. Forward obstruction
-stopping uses the first two distance values; the rear value must still be valid/fresh. Reverse and pivot
-remain disabled because the build has no verified all-direction cliff coverage.
-
-## Connect power and ground by branch
-
-| Connection | Reference route | Check before applying power |
+| Subsystem | Controller and signals | Detailed connections |
 |---|---|---|
-| Pi power | Bank A regulated 5 V to USB-C | Pi 4 supply guidance is 5 V / 3 A; include all attached loads in your budget |
-| Mega logic | Pi USB to Mega USB | USB carries serial and logic power; no Bank B positive connection to Mega 5 V/VIN |
-| Driver VCC (logic) | Mega 5 V to each TB6612 logic VCC | Identified module must accept 5 V logic and supply; STBY must default low |
-| Driver VM (motors) | Protected Bank B 5 V actuator branch through cutoff | Board/motors/current and local decoupling must be suitable |
-| ULN2003 motor supply | Same switched actuator branch | Correct rated 5 V motor/board, connector pinout and flyback/common connection |
-| Amplifier | Separately switched/accessible Bank B audio branch | Rated voltage, current and ground; actuator cutoff still cuts all motor rails |
-| ToF/IMU supply | Pi-side supply compatible with identified breakout | Supply input rating and SDA/SCL pull-ups compatible with Pi 3.3 V |
-| Touch-pad supply | Pi 3.3 V for 3.3 V-compatible pads | Outputs stay at Pi-safe logic levels; no 5 V pull-up |
-| Cliff/PIR supply | Mega-side supply matching each module | Digital output levels meet Mega input specifications |
-| Signal ground | Pi/Mega GND, sensor GND and Bank B/driver GND common | No motor return current through a thin sensor/USB ground path |
+| Left TB6612 | Mega STBY D8, AIN1/2 D22/23, PWMA D2, BIN1/2 D24/25, PWMB D3 | [Wheels](WIRING.md#wheel-drivers-and-four-motors) |
+| Right TB6612 | Mega STBY D9, AIN1/2 D26/27, PWMA D4, BIN1/2 D28/29, PWMB D5 | [Wheels](WIRING.md#wheel-drivers-and-four-motors) |
+| Pan / tilt ULN2003 | Pan IN1–4 D30/31/32/33; tilt D34/35/36/37 | [Head](WIRING.md#pan-and-tilt) |
+| Cliff / PIR | Cliff D39/D40/D41; PIR D38 | [Cliff](WIRING.md#three-cliff-sensors) · [PIR](WIRING.md#presence-sensor) |
+| ToF + MPU6050 | Pi SDA BCM2 physical 3; SCL BCM3 physical 5 | [Distance](WIRING.md#three-distance-sensors) · [Tilt](WIRING.md#tilt-sensor-mpu6050) |
+| ToF XSHUT | BCM5/6/13 physical 29/31/33 | [Distance](WIRING.md#three-distance-sensors) |
+| Touch head / back | BCM27/22 physical 13/15 | [Touch](WIRING.md#head-and-back-touch) |
+| Two INMP441 | SCK BCM18 physical 12; WS BCM19 physical 35; SD BCM20 physical 38 | [Audio](WIRING.md#microphone-amplifier-and-speakers) |
+| Camera LED | BCM25 physical 22, current-limited | [Camera](WIRING.md#camera-and-activity-led) |
 
-Do not join Bank A positive to Bank B positive. Do not connect Bank B directly to
-Mega 5 V while the Pi's USB cable supplies it. Route high-current returns to the
-power distribution point and use the common logic ground for signal reference.
-The reference has no direct Pi-to-Mega GPIO connection.
+Pi signals use **BCM** numbering; Mega signals use the printed **D** numbers.
+Physical Pi pin 2 is 5 V, not BCM2/SDA. All grounds must provide a suitable reference
+without routing motor current through delicate logic leads.
 
-For TB6612 breakouts, connect motor outputs AO1/AO2 and BO1/BO2 (some label them
-A01/A02 and B01/B02) to one motor per channel. Never connect an output to a supply
-rail. Match continuous and startup/stall load to the actual board's thermal rating;
-the chip's short peak rating is not a continuous board rating.
+The pin contract is defined in `config/eve.json` and the generated
+`firmware/eve_controller/eve_config.h`. Open **Source code** in the website menu to read either file. If a local
+pin override is deliberately made, update the private wiring record and reflash
+compiled changes before any motion. Shipped defaults stay locked.
 
-## Unpowered wiring checklist
-
-1. Identify pin 1 and the component side of the Pi header; BCM2 is physical pin 3,
-   while physical pin 2 is a 5 V supply. Never substitute one numbering scheme for the other.
-2. Connect ground, then power distribution with supplies unplugged. Check polarity,
-   shorts and continuity with a meter before plugging in either bank.
-3. Connect one sensor's SDA/SCL and its own XSHUT; repeat for each ToF and the MPU6050.
-   Verify breakout schematics and idle bus voltage. A bare sensor and a regulated,
-   level-shifted breakout have different supply/logic requirements.
-4. Connect digital sensors to Mega in the table's order. Connect touch and LED only
-   through compatible Pi-side interfaces and an appropriate LED series resistor.
-5. Wire STBY/direction/PWM and each ULN2003's IN1–IN4. Leave motor power off. Do not
-   use the Pi header to supply motor current.
-6. Connect HDMI/USB touch and Mega USB; connect the CSI camera only while the Pi is
-   unpowered, using its connector's documented orientation. USB webcams need a different adapter.
-7. Inspect loose strands, exposed conductors, fuses, strain relief and the physical
-   cutoff. Then begin M00 with only the Pi/logic domain powered.
-
-## Manufacturer references
-
-- [Raspberry Pi power and initial setup](https://www.raspberrypi.com/documentation/computers/getting-started.html)
-- [Pi GPIO electrical behavior](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html)
-- [Arduino Mega 2560](https://docs.arduino.cc/hardware/mega-2560)
-- [SparkFun TB6612FNG hookup and board details](https://learn.sparkfun.com/tutorials/tb6612fng-hookup-guide/all)
-- [ST VL53L0X datasheet](https://www.st.com/resource/en/datasheet/vl53l0x.pdf)
-- [ST multiple-VL53L0X application note](https://www.st.com/resource/en/application_note/dm00280486.pdf)
-
-These establish device interfaces. Your breakout's schematic, ratings and protection
-still control how that particular board is connected.
+Continue with [Assembly](ASSEMBLY.md), [every connection](WIRING.md), the
+[inspection](WIRING.md#unpowered-inspection) and [Software setup](SETUP_GUIDE.md).

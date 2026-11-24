@@ -29,6 +29,10 @@ def main():
                                cwd=ROOT, text=True, capture_output=True, check=True).stdout
     if generated != (ROOT / 'docs/SETUP_GUIDE.md').read_text():
         failures.append('SETUP_GUIDE.md is stale; regenerate it from tools/stage.py')
+    snapshot = subprocess.run([sys.executable, str(ROOT / 'tools/build_source_index.py'), '--check'],
+                              cwd=ROOT, text=True, capture_output=True)
+    if snapshot.returncode:
+        failures.append(snapshot.stderr.strip() or 'Public source viewer snapshot is stale')
     checked = 0
     for doc in [ROOT / 'README.md', ROOT / 'CONTRIBUTING.md', *sorted((ROOT / 'docs').rglob('*.md'))]:
         for target in re.findall(r'\[[^\]]*\]\(([^)]+)\)', doc.read_text()):

@@ -140,7 +140,10 @@ SETUP_STEPS = {'M00': [('you',
           './eve ctl say "नमस्ते" lang=hi\n'
           './eve ctl say "नमस्कार" lang=mr'),
          ('you',
-          'Stop EVE with Ctrl+C in PuTTY 1. The first voice install requires internet and downloads '
+          'The PAM8610 uses the verified regulated 9 V boost branch, with a measured output limit '
+          'for the 3 W speakers. Stop EVE with Ctrl+C in PuTTY 1. Complete the INMP441 I2S '
+          'setup in the reference section below, including reboot and both-channel tests. '
+          'The first voice install requires internet and downloads '
           'whisper.cpp and its model.'),
          ('PuTTY 1', 'bash scripts/install_voice.sh && ./eve mic'),
          ('you',

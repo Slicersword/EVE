@@ -26,12 +26,23 @@ For the website, Node 22 is the CI target; no npm dependencies are downloaded:
 node tools/build_docs.mjs
 python3 tools/check_site.py
 node --check site/assets/site.js
+node --test tests/progress.test.mjs
 ```
 
 The site check validates local files, links, fragments, source listings and offline
 asset references. CI publishes the generated site as an artifact even when Pages
 hosting is unavailable. A separate job checks the actual Jekyll Pages rendering.
 See [Website](WEBSITE.md).
+
+The progress tests cover empty defaults, persistence, dates, notes, export/import,
+invalid input and blocked storage. The I2S setup tests prove configuration preservation,
+backup behavior and the 32-bit stereo capture profile. CI also compiles its Device Tree
+overlay. These checks do not prove physical microphone operation; accept both channels
+and real speech at M13. With device-tree-compiler installed, compile locally without installing:
+
+```bash
+dtc -@ -I dts -O dtb -o /tmp/eve-inmp441.dtbo config/eve-inmp441-overlay.dts
+```
 
 ## Simulation without electronics
 

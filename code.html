@@ -3,15 +3,19 @@ layout: manual
 title: Source code
 ---
 <h1>Complete EVE source code</h1>
-<p>All build code is stored in the same GitHub repository as this website. Open a folder below to read its full files or use GitHub’s Code → Download ZIP to keep a complete local copy.</p>
-<table>
-<thead><tr><th>Source</th><th>Contents</th></tr></thead>
-<tbody>
-<tr><td><a href="https://github.com/Slicersword/EVE/tree/main/eve3">Pi runtime</a></td><td>Robot control, sensors, face, local voice and memory</td></tr>
-<tr><td><a href="https://github.com/Slicersword/EVE/tree/main/firmware">Mega firmware</a></td><td>Controller sketch, generated settings and host harness</td></tr>
-<tr><td><a href="https://github.com/Slicersword/EVE/tree/main/tools">Tools</a></td><td>Calibration, diagnostics, configuration and offline site builder</td></tr>
-<tr><td><a href="https://github.com/Slicersword/EVE/tree/main/scripts">Setup scripts</a></td><td>Pi installation, flashing, kiosk, voice and updates</td></tr>
-<tr><td><a href="https://github.com/Slicersword/EVE/tree/main/config">Configuration examples</a></td><td>Safe public defaults and a local override example</td></tr>
-<tr><td><a href="https://github.com/Slicersword/EVE/tree/main/tests">Tests</a></td><td>Runtime, firmware and setup regression tests</td></tr>
-</tbody></table>
-<p>The offline documentation build also includes complete embedded source listings and raw-file downloads. Download the <strong>eve-documentation-offline</strong> artifact from a successful <a href="https://github.com/Slicersword/EVE/actions/workflows/verify.yml">Verify EVE</a> run, or build it using the website instructions.</p>
+<p>Read and copy every public build file here. These listings are generated from the same repository snapshot as this guide, including Pi code, Mega firmware, configuration examples, installation scripts and tests. No GitHub API request, account or AI service is needed to load a listing.</p>
+<div id="source-browser">
+  <label for="source-search">Filter by file or folder</label>
+  <input id="source-search" type="search" placeholder="Try: voice.py, firmware, config…" autocomplete="off">
+  <label for="source-file">Choose a source file</label>
+  <select id="source-file" aria-describedby="source-count"></select>
+  <p id="source-count" data-source-count aria-live="polite"></p>
+  <h2 data-source-path class="source-title">Loading source files…</h2>
+  <button type="button">Download this file</button>
+  <pre><code>Loading the repository source snapshot…</code></pre>
+</div>
+<noscript><p>Enable JavaScript for this viewer, or browse <a href="https://github.com/Slicersword/EVE">the repository on GitHub</a>. The offline export also provides individual static source pages.</p></noscript>
+<p>To install, use the complete repository ZIP or Git clone route in Software setup. Individual downloaded files do not preserve folders or executable permissions. Private config/local.json, tokens, runtime data and downloaded models are excluded.</p>
+<p>Keep a full offline copy by downloading <strong>eve-documentation-offline</strong> from a successful <a href="https://github.com/Slicersword/EVE/actions/workflows/verify.yml">Verify EVE</a> run. It includes individual full source pages and raw-file downloads.</p>
+<script src="{{ site.baseurl }}/source-data.js"></script>
+<script src="{{ site.baseurl }}/site/assets/source-browser.js"></script>

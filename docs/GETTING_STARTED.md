@@ -26,6 +26,12 @@ placing it across a supply can short the supply.
 
 ## Choose the supported platform
 
+You do not need an Arduino IDE on Windows or a paid AI service. The Pi installer
+installs the Python environment, Pi drivers, Chromium, espeak-ng, ALSA tools,
+Device Tree compiler and Arduino CLI/core. Local speech recognition downloads a
+separate multilingual model at M13. Initial installation needs internet; normal
+local operation does not require a cloud AI subscription.
+
 The software target is **Raspberry Pi 4B, Raspberry Pi OS Desktop (64-bit), Bookworm,
 Python 3.11**, plus **Arduino Mega 2560**. A 2 GB Pi is the basic runtime target;
 optional local speech/model latency must be measured. The display target is
@@ -57,6 +63,21 @@ The Pi's display needs a real desktop session. SSH/PuTTY opens a terminal only.
 tunnel for viewing the Pi's control page from another computer without RDP.
 
 ## Recognize a successful stage
+
+An **SSH/PuTTY window** is a terminal controlling the Pi over the network. Open two
+sessions to the same Pi: PuTTY 1 keeps EVE running and PuTTY 2 runs checks. Changing
+folders in one session does not change the other; each begins in its own home folder.
+The `$` prompt is not part of a command. Copy only the contents of a code block,
+replace labelled placeholders, then press Enter. Ctrl+C stops a running foreground
+program in that window. `sudo` asks Linux to run the named system task with elevated
+privileges; the installer calls it when needed. Never paste example passwords or
+tokens into a public page or your browser notebook.
+
+If Windows cannot connect, first check the Pi is powered, both devices are on the
+intended network, SSH is enabled and the IP/username are correct. Router IP addresses
+can change; reserve the Pi's address if desired. An SSH tunnel in Software setup
+lets the PC view the Pi's control page without installing RDP. It does not replace
+the logged-in Pi desktop used by the robot's physical touchscreen.
 
 `PASS` means the named software check passed. `TODO` or `MISSING` tells you what
 still needs attention. A missing optional camera/voice package matters when you

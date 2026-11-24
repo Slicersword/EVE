@@ -43,9 +43,10 @@ class Speaker:
         self.speaking = True
         try:
             # list arguments + "--": the text can never be read as an option or a shell command
-            self._run([self.command, "-v", voice, "-s", str(self.speed), "--", text],
-                      timeout=30, check=False, capture_output=True)
-            self.last_error = ""
+            result = self._run([self.command, "-v", voice, "-s", str(self.speed), "--", text],
+                               timeout=30, check=False, capture_output=True)
+            code = getattr(result, "returncode", 0)
+            self.last_error = f"speech command exited {code}" if code else ""
         except Exception as exc:
             self.last_error = type(exc).__name__
         finally:

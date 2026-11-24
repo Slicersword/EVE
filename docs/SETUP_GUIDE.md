@@ -1,6 +1,6 @@
 # EVE V3 - software setup, testing and calibration
 
-Generated from tools/stage.py (`./eve stage guide`). On the Pi everything lives in `~/eve3`.
+Generated from tools/stage.py (`./eve stage guide`). On the Pi everything lives in `~/eve3`. See [every connection](WIRING.md) and [build progress](PROGRESS.md).
 Two PuTTY windows: **PuTTY 1** runs EVE (`./eve run`, Ctrl+C stops safely), **PuTTY 2** is for commands.
 Replace `PI_IP` with the Pi's address. For each stage: run the commands, then `./eve stage Mxx`, do the test yourself, then `./eve stage Mxx done`.
 
@@ -102,6 +102,8 @@ Camera/display packages are installed for the complete reference build even if
 those features will be enabled at a later stage. Package installation requires
 internet; host tests and the generated documentation work without hardware.
 
+<a id="m00"></a>
+
 ## M00 - Foundation: fresh install and self-tests
 
 Choose ONE installation route in the installation section above. Use a fresh ~/eve3 folder; keep Bank B off. After the chosen route finishes, reconnect PuTTY once to apply the new groups.
@@ -119,6 +121,8 @@ Automatic checks (`./eve stage M00`): config loads and is valid; virtual environ
 **Your test:** Bank B (motor power) stays OFF for M00-M02. `./eve doctor` shows PASS for config, venv and Python. The source is in a fresh folder; no hardware commissioning flags have been set.
 
 Then: `./eve stage M00 done`
+
+<a id="m01"></a>
 
 ## M01 - Face on the screen
 
@@ -147,6 +151,8 @@ Automatic checks (`./eve stage M01`): EVE is running and answers.
 
 Then: `./eve stage M01 done`
 
+<a id="m02"></a>
+
 ## M02 - Mega link + new firmware
 
 Needs: M01 done.
@@ -172,6 +178,8 @@ Automatic checks (`./eve stage M02`): Mega connected; Mega online (heartbeat + t
 **Your test:** PuTTY 1 prints `Mega connected. Firmware id ... matches.` `./eve status` shows Mega online and `Cliff raw` with three 0/1 numbers. Pull the Mega USB plug: within 1 s status says OFFLINE; plug in: it comes back by itself.
 
 Then: `./eve stage M02 done`
+
+<a id="m03"></a>
 
 ## M03 - Power: two USB banks measured
 
@@ -211,9 +219,11 @@ Stop EVE with Ctrl+C in PuTTY 1, then restart to load your confirmations.
 
 Automatic checks (`./eve stage M03`): Pi supply flags readable and zero; Bank A confirmed by you; Bank B confirmed by you; motor current confirmed by you.
 
-**Your test:** 1) Bank A alone powers Pi + screen + fan for 10 min with the face running: `vcgencmd get_throttled` stays `throttled=0x0`. 2) Bank B: with a multimeter check 5 V polarity at the motor-driver and head-driver power pins, that the switch cuts it, and that Bank B GND is joined to Mega/Pi GND. 3) Bank B does not switch itself off with all motor boards connected and idle. 4) Independently measure/verify the combined motor, head and audio load against Bank B and driver/wiring ratings using a controlled electrical test with the chassis secured. Idle voltage alone is not a current test. If load/current verification is unavailable, leave motor_current_verified false and stop. Only then confirm the three flags. After restart `session_start` answers OK.
+**Your test:** 1) Bank A alone powers Pi + screen + fan for 10 min with the face running: `vcgencmd get_throttled` stays `throttled=0x0`. 2) Bank B: with a multimeter check 5 V polarity at the motor-driver and head-driver power pins, that the switch cuts it, and that Bank B GND is joined to Mega/Pi GND. 3) Bank B does not switch itself off with all motor boards connected and idle. 4) Independently measure/verify the combined motor, head and boost-converter input/audio load against Bank B and driver/wiring ratings using a controlled electrical test with the chassis secured. Idle voltage alone is not a current test. If load/current verification is unavailable, leave motor_current_verified false and stop. Only then confirm the three flags. After restart `session_start` answers OK.
 
 Then: `./eve stage M03 done`
+
+<a id="m04"></a>
 
 ## M04 - Sensors: 3 distance + tilt + 3 cliff
 
@@ -272,6 +282,8 @@ Automatic checks (`./eve stage M04`): distance sensors all give numbers; tilt se
 
 Then: `./eve stage M04 done`
 
+<a id="m05"></a>
+
 ## M05 - Safety: it must refuse when anything is wrong
 
 Needs: M04 done.
@@ -293,6 +305,8 @@ Automatic checks (`./eve stage M05`): wheels are blocked (nothing is commissione
 
 Then: `./eve stage M05 done`
 
+<a id="m06"></a>
+
 ## M06 - Cooling (physical check)
 
 Needs: M05 done.
@@ -305,9 +319,11 @@ vcgencmd measure_temp
 
 Automatic checks (`./eve stage M06`): Pi temperature below 75 C.
 
-**Your test:** The Pi fan spins whenever the Pi is on. After 15 min with the face running the temperature stays under 70 C. The charger-side fan runs while charging. No software controls the fans.
+**Your test:** The Pi fan spins whenever the Pi is on. After 15 min with the face running the temperature stays under 70 C. Any optional charger-side fan follows its separately reviewed supply arrangement. No software controls the fans.
 
 Then: `./eve stage M06 done`
+
+<a id="m07"></a>
 
 ## M07 - Wheels (lifted first)
 
@@ -368,6 +384,8 @@ Automatic checks (`./eve stage M07`): firmware.drive_enabled is on; safe test ar
 **Your test:** Each drive_test turns all four wheels FORWARD for 1 second and stops by itself. If a wheel turns backward, switch everything off and swap that motor's two wires. During a test: `./eve estop` stops at once; covering a front distance sensor with your hand stops it; putting a finger under a cliff sensor is NOT a test - instead lift the robot so a cliff sensor sees no floor: it stops and latches. Reverse and pivot are refused. Only after that: confirm drive_verified, then try `./eve ctl drive left=100 right=100 seconds=1` on the floor in the closed area.
 
 Then: `./eve stage M07 done`
+
+<a id="m08"></a>
 
 ## M08 - Head pan / tilt
 
@@ -431,6 +449,8 @@ Automatic checks (`./eve stage M08`): firmware.head_enabled is on; firmware matc
 
 Then: `./eve stage M08 done`
 
+<a id="m09"></a>
+
 ## M09 - Touch pads
 
 Needs: M08 done.
@@ -446,6 +466,8 @@ Automatic checks (`./eve stage M09`): touch pads started.
 **Your test:** Pat the head pad: the face turns pink/happy for 3 s. Tap the back pad: listening face. Hold the back pad 1 second: EMERGENCY STOP appears in PuTTY 1 and status shows latched.
 
 Then: `./eve stage M09 done`
+
+<a id="m10"></a>
 
 ## M10 - Camera (local only)
 
@@ -479,6 +501,8 @@ Automatic checks (`./eve stage M10`): camera switched on in config; camera runni
 
 Then: `./eve stage M10 done`
 
+<a id="m11"></a>
+
 ## M11 - Memory
 
 Needs: M10 done.
@@ -506,6 +530,8 @@ Automatic checks (`./eve stage M11`): memory on.
 
 Then: `./eve stage M11 done`
 
+<a id="m12"></a>
+
 ## M12 - Brain: offline answers (+ optional on-Pi model)
 
 Needs: M11 done.
@@ -527,6 +553,8 @@ Automatic checks (`./eve stage M12`): answers a question.
 
 Then: `./eve stage M12 done`
 
+<a id="m13"></a>
+
 ## M13 - Voice: speaking and hearing
 
 Needs: M12 done.
@@ -539,7 +567,7 @@ Needs: M12 done.
 ./eve ctl say "नमस्कार" lang=mr
 ```
 
-Stop EVE with Ctrl+C in PuTTY 1. The first voice install requires internet and downloads whisper.cpp and its model.
+The PAM8610 uses the verified regulated 9 V boost branch, with a measured output limit for the 3 W speakers. Stop EVE with Ctrl+C in PuTTY 1. Complete the INMP441 I2S setup in the reference section below, including reboot and both-channel tests. The first voice install requires internet and downloads whisper.cpp and its model.
 
 **PuTTY 1**
 
@@ -567,6 +595,8 @@ Automatic checks (`./eve stage M13`): speaker has no error; whisper installed; m
 
 Then: `./eve stage M13 done`
 
+<a id="m14"></a>
+
 ## M14 - Behaviour
 
 Needs: M13 done.
@@ -582,6 +612,8 @@ Automatic checks (`./eve stage M14`): behaviour on.
 **Your test:** Leave the room for a minute and walk back in: PIR shows True and she greets once (not again for 10 minutes; silent between 22:00 and 07:00). A hand closer than 30 cm gives a surprised face. After 15 quiet minutes the face goes sleepy; a touch or her name wakes her.
 
 Then: `./eve stage M14 done`
+
+<a id="m15"></a>
 
 ## M15 - Reminders
 
@@ -599,6 +631,8 @@ Automatic checks (`./eve stage M15`): can list reminders.
 **Your test:** After one minute she says the reminder aloud, once. A reminder set before a restart still fires after it.
 
 Then: `./eve stage M15 done`
+
+<a id="m16"></a>
 
 ## M16 - Extras: sleep, phone control page
 
@@ -619,6 +653,8 @@ Automatic checks (`./eve stage M16`): web tools are off unless you chose otherwi
 **Your test:** Sleep gives the sleepy face and wake brings her back. If you enabled the control page: it shows live status, the red EMERGENCY STOP works, and a wrong token shows no data. Leave network.host at 127.0.0.1 if you do not need phone control.
 
 Then: `./eve stage M16 done`
+
+<a id="m17"></a>
 
 ## M17 - Whole robot + start at boot
 
@@ -652,6 +688,98 @@ Automatic checks (`./eve stage M17`): everything commissioned; firmware matches;
 **Your test:** During the 30 minutes: no under-voltage (`Pi supply flags 0x0`), STOP works by voice, back-pad hold and `./eve estop`; she never drives after the session ends. After the reboot the face and EVE come up by themselves and nothing moves until you start a session and clear.
 
 Then: `./eve stage M17 done`
+
+## INMP441 I2S setup at M13
+
+Complete the [two-microphone wiring](WIRING.md#microphone-amplifier-and-speakers)
+with power off. Mic 1 L/R is GND; Mic 2 L/R is 3.3 V. Both SD signals share BCM20;
+BCM18 is SCK and BCM19 is WS. Keep Bank B actuator power off and stop EVE/service
+before changing audio configuration. This profile targets Pi 4 Bookworm only.
+
+The INMP441 has no I2C control address. It needs an ALSA I2S capture card before
+`arecord` or the robot can hear it. The supplied capture-only Device Tree overlay
+uses the kernel's passive ADAU7002 I2S endpoint; it does not require an ADAU7002 chip
+or a downloaded third-party kernel driver. It creates a separate EVEINMP441 card
+so the Pi analogue output can remain available for the PAM8610. This is a software
+profile to be accepted on the actual hardware, not a claim of a completed microphone test.
+
+**PuTTY 1 — EVE stopped**
+
+```bash
+cd "$HOME/eve3" || exit 1
+sudo apt-get install -y device-tree-compiler
+sudo python3 tools/setup_i2s_mic.py --boot
+sudo reboot
+```
+
+The helper backs up boot configuration, compiles/installs eve-inmp441.dtbo and adds
+one marked block under an all-model section. It refuses known conflicting I2S audio
+overlays instead of replacing another device. If it stops, review the named overlay;
+do not stack multiple audio devices on the same I2S pins. It does not start recording,
+enable the microphone, change readiness flags or set playback defaults.
+
+Reconnect PuTTY after reboot. As your normal Pi user, **without sudo**:
+
+```bash
+cd "$HOME/eve3" || exit 1
+python3 tools/setup_i2s_mic.py --user-audio
+arecord -l
+arecord -L
+```
+
+Look for EVEINMP441 in the hardware list and eve_mic in the named device list. The
+helper preserves the rest of ~/.asoundrc and adds only the named capture PCM, with
+a backup if that file already exists. Its hardware stream is fixed to S32_LE,
+48 kHz, 2 channels: 64 bit clocks per stereo frame. The plug layer averages the
+two slots and converts to EVE's S16_LE, 16 kHz mono format. A plain hw device at
+16-bit mono does not satisfy the microphone's clock/frame requirements.
+
+First prove a native stereo stream opens for three seconds, discarding the audio:
+
+```bash
+arecord -D hw:CARD=EVEINMP441,DEV=0 -f S32_LE -r 48000 -c 2 -t raw -d 3 > /dev/null
+./eve cfg set voice.capture_device eve_mic
+./eve mic
+```
+
+No sample file is created by these tests. Follow the quiet and speech prompts;
+record the suggested threshold. Repeat the speech test speaking close to each mic
+in turn so a working second mic cannot conceal a disconnected first mic. If needed,
+a stereo recording can be inspected privately using the temporary-RAM route below.
+Do not enable voice capture until both microphones respond and speech is clearly
+above quiet noise.
+
+For a short optional **private audio test**, with the runtime stopped and the
+accepted amplifier at low volume, the following records in /dev/shm and removes
+its own clip on exit. This is a deliberate recording test, not a permanent log:
+
+```bash
+bash <<'EVE_MIC_TEST'
+set -euo pipefail
+clip=$(mktemp /dev/shm/eve-mic-check-XXXXXX.wav)
+trap 'rm -f "$clip"' EXIT
+arecord -D hw:CARD=EVEINMP441,DEV=0 -f S32_LE -r 48000 -c 2 -d 5 "$clip"
+aplay "$clip"
+EVE_MIC_TEST
+```
+
+Speak near Mic 1 for the first half, then Mic 2. Their opposite channel slots should
+be audible in the expected left/right outputs. Do not run this playback through an
+unverified amplifier or assume a mixed mono result proves both mics. If an input is
+silent, power down and inspect L/R, SD, 3.3 V, ground and slot conflict first.
+
+Select the Pi desktop's **Headphones / analogue** playback output, not HDMI. From
+an SSH session in the same logged-in user's desktop environment, `pactl list short
+sinks` lists outputs and `pactl set-default-sink ACTUAL_SINK_NAME` selects the actual
+name; do not paste that placeholder literally. If pactl cannot reach a sound server,
+use desktop audio settings or diagnose the user's audio session. Verify real sound
+with the M13 speech commands and the amplifier's output limit before acceptance.
+
+If boot audio breaks, keep actuator power off, remove only the marked EVE INMP441
+block from /boot/firmware/config.txt using an editor, and reboot. Restore its printed
+backup instead only if you have made no other settings changes since. Likewise
+remove only the marked user-audio block, or review its backup, to undo ~/.asoundrc.
+The generated overlay can remain unused; never delete unrelated audio settings.
 
 ## Optional settings and daily operation
 
@@ -845,6 +973,7 @@ After editing recipes/stages:
 
 ```bash
 python3 tools/stage.py guide > docs/SETUP_GUIDE.md
+python3 tools/build_source_index.py
 ```
 
 After editing compiled defaults:

@@ -17,7 +17,7 @@ performing each hands-on acceptance test.
 | Web integrations | Helpers exist but are not connected to conversation; no general web-browsing feature |
 | Autonomy | Bounded commands and optional face tracking; no SLAM, docking or route navigation |
 | Self-modification | No autonomous source editing or execution of model output |
-| Battery system | Regulated 5 V supplies/banks only; no SOC/current monitoring, charging control or bare 3S support |
+| Battery system | Two regulated 5 V banks; no SOC/current monitoring, charging control or bare 3S support; PAM8610 uses a separately verified 9 V boost branch |
 | Head position | Manual reference, no encoder/homing switch; loss of steps is undetected; coils release after stopping |
 | Mechanical design | No CAD/STL or universal chassis/fastener dimensions; use the assembly guide and record your choices |
 | Platform | Pi OS Desktop Bookworm / Pi 4 reference target; other hardware/OS needs separate validation |

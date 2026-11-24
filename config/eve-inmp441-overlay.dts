@@ -1,0 +1,42 @@
+/dts-v1/;
+/plugin/;
+
+/* Pi 4 capture-only I2S card, separate from the analogue playback card.
+ * INMP441 has no control bus. The in-tree ADAU7002 codec supplies a passive
+ * stereo-I2S ALSA endpoint; it does not imply that an ADAU7002 chip is fitted.
+ * config/alsa-inmp441.conf fixes the 64-clock frame required by INMP441.
+ * Hardware acceptance (both channels, level and speech) is still required.
+ */
+/ {
+    compatible = "brcm,bcm2711";
+
+    fragment@0 {
+        target = <&i2s>;
+        __overlay__ { status = "okay"; };
+    };
+
+    fragment@1 {
+        target-path = "/";
+        __overlay__ {
+            eve_mic_codec: eve-mic-codec {
+                compatible = "adi,adau7002";
+                #sound-dai-cells = <0>;
+                status = "okay";
+            };
+
+            eve-mic-sound {
+                compatible = "simple-audio-card";
+                simple-audio-card,name = "EVEINMP441";
+                simple-audio-card,format = "i2s";
+                simple-audio-card,bitclock-master = <&eve_mic_cpu>;
+                simple-audio-card,frame-master = <&eve_mic_cpu>;
+                simple-audio-card,widgets = "Microphone", "Microphone Jack";
+                simple-audio-card,routing = "PDM_DAT", "Microphone Jack";
+                status = "okay";
+
+                eve_mic_cpu: simple-audio-card,cpu { sound-dai = <&i2s>; };
+                simple-audio-card,codec { sound-dai = <&eve_mic_codec>; };
+            };
+        };
+    };
+};

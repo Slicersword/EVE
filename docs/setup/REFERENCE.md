@@ -1,3 +1,95 @@
+## INMP441 I2S setup at M13
+
+Complete the [two-microphone wiring](../WIRING.md#microphone-amplifier-and-speakers)
+with power off. Mic 1 L/R is GND; Mic 2 L/R is 3.3 V. Both SD signals share BCM20;
+BCM18 is SCK and BCM19 is WS. Keep Bank B actuator power off and stop EVE/service
+before changing audio configuration. This profile targets Pi 4 Bookworm only.
+
+The INMP441 has no I2C control address. It needs an ALSA I2S capture card before
+`arecord` or the robot can hear it. The supplied capture-only Device Tree overlay
+uses the kernel's passive ADAU7002 I2S endpoint; it does not require an ADAU7002 chip
+or a downloaded third-party kernel driver. It creates a separate EVEINMP441 card
+so the Pi analogue output can remain available for the PAM8610. This is a software
+profile to be accepted on the actual hardware, not a claim of a completed microphone test.
+
+**PuTTY 1 — EVE stopped**
+
+```bash
+cd "$HOME/eve3" || exit 1
+sudo apt-get install -y device-tree-compiler
+sudo python3 tools/setup_i2s_mic.py --boot
+sudo reboot
+```
+
+The helper backs up boot configuration, compiles/installs eve-inmp441.dtbo and adds
+one marked block under an all-model section. It refuses known conflicting I2S audio
+overlays instead of replacing another device. If it stops, review the named overlay;
+do not stack multiple audio devices on the same I2S pins. It does not start recording,
+enable the microphone, change readiness flags or set playback defaults.
+
+Reconnect PuTTY after reboot. As your normal Pi user, **without sudo**:
+
+```bash
+cd "$HOME/eve3" || exit 1
+python3 tools/setup_i2s_mic.py --user-audio
+arecord -l
+arecord -L
+```
+
+Look for EVEINMP441 in the hardware list and eve_mic in the named device list. The
+helper preserves the rest of ~/.asoundrc and adds only the named capture PCM, with
+a backup if that file already exists. Its hardware stream is fixed to S32_LE,
+48 kHz, 2 channels: 64 bit clocks per stereo frame. The plug layer averages the
+two slots and converts to EVE's S16_LE, 16 kHz mono format. A plain hw device at
+16-bit mono does not satisfy the microphone's clock/frame requirements.
+
+First prove a native stereo stream opens for three seconds, discarding the audio:
+
+```bash
+arecord -D hw:CARD=EVEINMP441,DEV=0 -f S32_LE -r 48000 -c 2 -t raw -d 3 > /dev/null
+./eve cfg set voice.capture_device eve_mic
+./eve mic
+```
+
+No sample file is created by these tests. Follow the quiet and speech prompts;
+record the suggested threshold. Repeat the speech test speaking close to each mic
+in turn so a working second mic cannot conceal a disconnected first mic. If needed,
+a stereo recording can be inspected privately using the temporary-RAM route below.
+Do not enable voice capture until both microphones respond and speech is clearly
+above quiet noise.
+
+For a short optional **private audio test**, with the runtime stopped and the
+accepted amplifier at low volume, the following records in /dev/shm and removes
+its own clip on exit. This is a deliberate recording test, not a permanent log:
+
+```bash
+bash <<'EVE_MIC_TEST'
+set -euo pipefail
+clip=$(mktemp /dev/shm/eve-mic-check-XXXXXX.wav)
+trap 'rm -f "$clip"' EXIT
+arecord -D hw:CARD=EVEINMP441,DEV=0 -f S32_LE -r 48000 -c 2 -d 5 "$clip"
+aplay "$clip"
+EVE_MIC_TEST
+```
+
+Speak near Mic 1 for the first half, then Mic 2. Their opposite channel slots should
+be audible in the expected left/right outputs. Do not run this playback through an
+unverified amplifier or assume a mixed mono result proves both mics. If an input is
+silent, power down and inspect L/R, SD, 3.3 V, ground and slot conflict first.
+
+Select the Pi desktop's **Headphones / analogue** playback output, not HDMI. From
+an SSH session in the same logged-in user's desktop environment, `pactl list short
+sinks` lists outputs and `pactl set-default-sink ACTUAL_SINK_NAME` selects the actual
+name; do not paste that placeholder literally. If pactl cannot reach a sound server,
+use desktop audio settings or diagnose the user's audio session. Verify real sound
+with the M13 speech commands and the amplifier's output limit before acceptance.
+
+If boot audio breaks, keep actuator power off, remove only the marked EVE INMP441
+block from /boot/firmware/config.txt using an editor, and reboot. Restore its printed
+backup instead only if you have made no other settings changes since. Likewise
+remove only the marked user-audio block, or review its backup, to undo ~/.asoundrc.
+The generated overlay can remain unused; never delete unrelated audio settings.
+
 ## Optional settings and daily operation
 
 Use these after the relevant M-stage has passed. Any setting change needs a runtime restart; settings
@@ -190,6 +282,7 @@ After editing recipes/stages:
 
 ```bash
 python3 tools/stage.py guide > docs/SETUP_GUIDE.md
+python3 tools/build_source_index.py
 ```
 
 After editing compiled defaults:

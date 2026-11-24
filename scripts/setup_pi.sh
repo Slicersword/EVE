@@ -12,7 +12,7 @@ cd "$(dirname "$0")/.."
 chmod +x eve scripts/*.sh tools/*.py 2>/dev/null || true
 sudo apt-get update
 sudo apt-get install -y python3-venv python3-dev python3-smbus2 python3-serial python3-gpiozero python3-lgpio python3-libgpiod \
-  python3-picamera2 python3-opencv opencv-data i2c-tools raspi-utils espeak-ng alsa-utils g++ git cmake curl
+  python3-picamera2 python3-opencv opencv-data i2c-tools raspi-utils espeak-ng alsa-utils device-tree-compiler g++ git cmake curl
 sudo apt-get install -y chromium || sudo apt-get install -y chromium-browser
 sudo raspi-config nonint do_i2c 0
 python3 -m venv --system-site-packages .venv

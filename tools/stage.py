@@ -79,7 +79,7 @@ STAGES = {
     test="1) Bank A alone powers Pi + screen + fan for 10 min with the face running: `vcgencmd get_throttled` stays "
          "`throttled=0x0`. 2) Bank B: with a multimeter check 5 V polarity at the motor-driver and head-driver power pins, "
          "that the switch cuts it, and that Bank B GND is joined to Mega/Pi GND. 3) Bank B does not switch itself off with "
-         "all motor boards connected and idle. 4) Independently measure/verify the combined motor, head and audio "
+         "all motor boards connected and idle. 4) Independently measure/verify the combined motor, head and boost-converter input/audio "
          "load against Bank B and driver/wiring ratings using a controlled electrical test with the chassis secured. "
          "Idle voltage alone is not a current test. If load/current verification is unavailable, leave motor_current_verified "
          "false and stop. Only then confirm the three flags. After restart `session_start` answers OK."),
@@ -107,7 +107,7 @@ STAGES = {
         ("Pi temperature below 75 C", lambda c: float(subprocess.run(["vcgencmd", "measure_temp"], capture_output=True, text=True).stdout.split("=")[1].split("'")[0]) < 75, "check the Pi fan"),
     ], steps=SETUP_STEPS['M06'],
     test="The Pi fan spins whenever the Pi is on. After 15 min with the face running the temperature stays under 70 C. "
-         "The charger-side fan runs while charging. No software controls the fans."),
+         "Any optional charger-side fan follows its separately reviewed supply arrangement. No software controls the fans."),
  "M07": dict(title="Wheels (lifted first)", needs=["M06"], run=True, checks=[
         ("firmware.drive_enabled is on", lambda c: c["firmware"]["drive_enabled"], "./eve cfg set firmware.drive_enabled true ; stop EVE ; ./eve flash"),
         ("safe test area confirmed", lambda c: flag(c, "contained_ground_area"), "./eve cfg confirm contained_ground_area"),
@@ -219,7 +219,7 @@ def show(key):
 
 def guide() -> str:
     out = ["# EVE V3 - software setup, testing and calibration", "",
-           "Generated from tools/stage.py (`./eve stage guide`). On the Pi everything lives in `~/eve3`.",
+           "Generated from tools/stage.py (`./eve stage guide`). On the Pi everything lives in `~/eve3`. See [every connection](WIRING.md) and [build progress](PROGRESS.md).",
            "Two PuTTY windows: **PuTTY 1** runs EVE (`./eve run`, Ctrl+C stops safely), **PuTTY 2** is for commands.",
            "Replace `PI_IP` with the Pi's address. For each stage: run the commands, then `./eve stage Mxx`, do the test "
            "yourself, then `./eve stage Mxx done`.", "",
@@ -227,7 +227,7 @@ def guide() -> str:
            "physical test. The Bank B switch is the physical motor-power stop; software stop needs a working runtime/link.", "",
            (ROOT / "docs" / "setup" / "INSTALLATION.md").read_text().rstrip(), ""]
     for key, stage in STAGES.items():
-        out += [f"## {key} - {stage['title']}", ""]
+        out += [f'<a id="{key.lower()}"></a>', "", f"## {key} - {stage['title']}", ""]
         if stage["needs"]:
             out += [f"Needs: {', '.join(stage['needs'])} done.", ""]
         for where, text in stage["steps"]:
@@ -238,7 +238,9 @@ def guide() -> str:
                 out += [f"**{where}**", "", f"```{language}", text, "```", ""]
         out += ["Automatic checks (`./eve stage " + key + "`): " + "; ".join(c[0] for c in stage["checks"]) + ".", ""]
         out += ["**Your test:** " + stage["test"], "", f"Then: `./eve stage {key} done`", ""]
-    out += [(ROOT / "docs" / "setup" / "REFERENCE.md").read_text().rstrip(), ""]
+    # Included recipes live one directory deeper than this generated page.
+    reference = (ROOT / "docs" / "setup" / "REFERENCE.md").read_text().rstrip()
+    out += [reference.replace('](../WIRING.md', '](WIRING.md'), ""]
     return "\n".join(out).rstrip() + "\n"
 
 

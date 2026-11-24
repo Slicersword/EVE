@@ -9,20 +9,51 @@ No hardware test or completed stage is assumed.
 | Choice | Reference contract | Record before proceeding |
 |---|---|---|
 | Wheel drivers | Two TB6612FNG-compatible dual-channel boards with STBY/AIN/BIN/PWM | Exact manufacturer/module, logic supply, continuous/peak current and cooling |
-| Four DC motors | Matched geared motors, one per channel, suitable for regulated 5 V rail | Model, rated voltage, load/stall current, gear ratio, wheel diameter and mass |
-| Two head motors | 5-wire 5 V unipolar geared steppers with matching ULN2003 | Winding/connector order, bracket, load, safe travel, and unpowered retention |
-| Power | Independent regulated 5 V Bank A and Bank B, shared logic ground | Output ratings, cable drop, actual peak/continuous current, protection and cutoff |
+| Four DC motors | N20 6 V / 100 RPM, one per channel, operated at 5 V | Exact variant's load/stall current, wheel diameter, mass and resulting speed/torque |
+| Two head motors | 28BYJ-48 5 V with matching ULN2003/ULN2003A | Winding/connector order, bracket, load, safe travel, and unpowered retention |
+| Power | Two regulated 5 V USB banks, shared logic ground; separate 9 V boost for audio | Printed per-port ratings, cable drop, actual peak/continuous current, protection and cutoff |
 | Display | HDMI + USB-touch, target 1024×600 | Model, power input/load and mounting dimensions |
 | Distance boards | Three VL53L0X breakouts with separate XSHUT | Breakout supply range, pull-ups/level shifting and safe XSHUT voltage |
 | Tilt board | MPU6050 on Pi I2C | Module supply/logic ratings, AD0 state, fixed mounting and orientation |
-| Cliff boards | Three digital KY-033 outputs to Mega | Supply/output polarity, final height and tests on each intended floor |
-| Camera | Picamera2-supported CSI camera | Model, cable orientation, indicator circuit and clearance |
-| Audio | ALSA input/output; amplifier powered from verified audio branch | Device identifiers, supply/current and sound level |
+| Cliff boards | Three TCRT5000 IR reflex tracking modules, digital OUT/D0 to Mega | Identify digital terminal, supply/output polarity, final height and tests on each intended floor |
+| Touch | Two TTP233 modules | Exact suffix/jumper mode: direct/momentary active-high Q, 3.3 V-compatible |
+| Camera | Camera Module 3, Pi 4 CSI ribbon and physical shutter | Cable orientation, indicator circuit and clearance |
+| Microphones | Two INMP441 I2S modules | Opposite L/R slots, both-channel test, ALSA EVEINMP441/eve_mic setup and threshold |
+| Amplifier | PAM8610 with added regulated 5 V-to-9 V boost, 4 Ω / 3 W speakers | Exact converter continuous/peak ratings and efficiency, bank input current, measured safe output limit |
 | Structure | Four-wheel base with safe head retention | Dimensions, mass, fasteners, sensor placement and cable routing |
 
 Stop at the relevant stage if a required rating is unknown. An L298N, bipolar stepper
 driver, USB-only webcam or raw 3S pack needs an explicitly reviewed implementation;
 renaming a configuration value does not provide compatibility.
+
+The main build choice is **two 5 V power banks**, not the optional lithium packs.
+INA219 remains disabled and unwired. A 20 A BMS does not define a charging system;
+cell series count, matching charger, protection and a different power review would
+all be needed before a later conversion. A buck is not the amplifier's boost converter.
+
+## Private build record
+
+Use the [progress notebook](PROGRESS.md) notes or a printed sheet. Fill this in with
+actual labels and measurements; blank values mean unverified, not zero.
+
+| Record | Your value / evidence |
+|---|---|
+| Bank A model, port rating, cable, loaded voltage/current | ____________________ |
+| Bank B model, port rating, cable, combined peak/current | ____________________ |
+| Audio boost model, input rating, measured 9 V load result | ____________________ |
+| Driver-board manufacturer and continuous/current limits | ____________________ |
+| N20 variant, current evidence, wheel diameter, robot mass | ____________________ |
+| Display model and power/data wiring verified from its manual | ____________________ |
+| ToF/IMU breakout supply and SDA/SCL pull-up rail | ____________________ |
+| TCRT digital pin, height, each floor type, floor/edge values | ____________________ |
+| TTP233 exact suffix, output mode and measured logic level | ____________________ |
+| Mic left/right result, quiet/speech levels, VAD threshold | ____________________ |
+| Amplifier volume/output limit for each speaker | ____________________ |
+| Head centre marks, safe pan/tilt limits and retention result | ____________________ |
+| Source revision, firmware ID, stopping distance and date | ____________________ |
+
+Keep tokens, passwords, personal notes and identifying network details out of a
+public repository. Website notes/export files are your private build record.
 
 ## Software and user preferences
 

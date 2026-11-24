@@ -254,6 +254,13 @@ class VoiceTests(unittest.TestCase):
         self.assertFalse(sp.say("", "en"))
         self.assertLessEqual(len(voice.clean_speech("x" * 999)), 300)
 
+    def test_speaker_reports_nonzero_exit_without_exposing_speech(self):
+        from types import SimpleNamespace
+        speaker = voice.Speaker(cfg_with(), run=lambda *args, **kwargs: SimpleNamespace(returncode=2))
+        speaker.speak_now("private words", "en")
+        self.assertEqual(speaker.last_error, "speech command exited 2")
+        self.assertFalse(speaker.speaking)
+
     def test_transcribe_deletes_the_clip(self):
         seen = {}
         class R: stdout = " hello eve \n"

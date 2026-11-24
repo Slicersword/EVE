@@ -20,3 +20,10 @@ preserve owner settings. Do not introduce a software-controlled fan module or IN
 
 The owner has not chosen a project license; do not add one without an explicit decision. Check licenses
 for any new dependencies and models. Never include copyrighted third-party weights as project-owned assets.
+
+The hosted/offline navigation uses _data/navigation.json. Optional browser progress
+uses stable IDs in _data/build_progress.json and must never change robot settings.
+After public code/assets change, run `python3 tools/build_source_index.py` to refresh
+the live source viewer, then repository/site checks. The checker rejects stale snapshots.
+Run `node --test tests/progress.test.mjs` after notebook changes. Do not include private
+state or the generated source snapshot itself in that snapshot's inputs.

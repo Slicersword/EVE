@@ -1,0 +1,293 @@
+{
+  "schemaVersion": 1,
+  "groups": [
+    {
+      "id": "prepare",
+      "title": "1 \u00b7 Identify and prepare",
+      "tasks": [
+        {
+          "id": "parts",
+          "title": "Identify every fitted component",
+          "detail": "Record board labels, power ratings and connector names; resolve unknown parts before wiring.",
+          "href": "docs/DECISIONS.html"
+        },
+        {
+          "id": "tools",
+          "title": "Prepare tools and the test area",
+          "detail": "Multimeter, insulated wiring, stable wheel support and an accessible motor-power cutoff.",
+          "href": "docs/GETTING_STARTED.html#skills-and-tools"
+        },
+        {
+          "id": "power-plan",
+          "title": "Record the power budget",
+          "detail": "Keep independent positive rails separate and verify all supply, cable and driver ratings.",
+          "href": "docs/WIRING.html#power-distribution"
+        },
+        {
+          "id": "platform",
+          "title": "Prepare the Pi operating system and SSH",
+          "detail": "Select supported 64-bit Bookworm Desktop, create your login, enable SSH and connect from your computer.",
+          "href": "docs/GETTING_STARTED.html#prepare-a-fresh-pi"
+        }
+      ]
+    },
+    {
+      "id": "assembly",
+      "title": "2 \u00b7 Assemble and wire with power off",
+      "tasks": [
+        {
+          "id": "chassis",
+          "title": "Mount the base, four motors and wheels",
+          "detail": "Secure fasteners, low-mounted supplies and insulated board supports.",
+          "href": "docs/ASSEMBLY.html#base-and-wheels"
+        },
+        {
+          "id": "head-mount",
+          "title": "Mount and balance the pan/tilt head",
+          "detail": "Verify unpowered retention and cable clearance; mark the manual centre.",
+          "href": "docs/ASSEMBLY.html#display-and-head"
+        },
+        {
+          "id": "sensor-mount",
+          "title": "Place and label all sensors",
+          "detail": "Label the different ToF and cliff orders, fix the IMU to the base and check floor clearance.",
+          "href": "docs/ASSEMBLY.html#place-the-sensors"
+        },
+        {
+          "id": "pi-power",
+          "title": "Wire the Pi, display and storage",
+          "detail": "Use the correct USB-C power, micro-HDMI, USB touch and storage ports.",
+          "href": "docs/WIRING.html#pi-display-and-storage"
+        },
+        {
+          "id": "mega-usb",
+          "title": "Connect the Mega by USB",
+          "detail": "Use a data-capable cable; leave motor power off and avoid positive-rail backfeeding.",
+          "href": "docs/WIRING.html#mega-usb-and-logic"
+        },
+        {
+          "id": "left-driver",
+          "title": "Wire the left wheel driver and two motors",
+          "detail": "Match the identified board interface, all seven signals, logic supply, motor supply and returns.",
+          "href": "docs/WIRING.html#wheel-drivers-and-four-motors"
+        },
+        {
+          "id": "right-driver",
+          "title": "Wire the right wheel driver and two motors",
+          "detail": "Use the separate right-side signal mapping; one motor per channel.",
+          "href": "docs/WIRING.html#wheel-drivers-and-four-motors"
+        },
+        {
+          "id": "pan-wire",
+          "title": "Wire the pan stepper and ULN2003",
+          "detail": "Confirm the five-wire motor connector and IN1\u2013IN4 order D30\u2013D33.",
+          "href": "docs/WIRING.html#pan-and-tilt"
+        },
+        {
+          "id": "tilt-wire",
+          "title": "Wire the tilt stepper and ULN2003",
+          "detail": "Confirm the motor connector and IN1\u2013IN4 order D34\u2013D37; test without a falling load.",
+          "href": "docs/WIRING.html#pan-and-tilt"
+        },
+        {
+          "id": "tof-wire",
+          "title": "Wire all three distance sensors",
+          "detail": "Shared SDA/SCL plus individual XSHUT; validate breakout voltage and pull-ups first.",
+          "href": "docs/WIRING.html#three-distance-sensors"
+        },
+        {
+          "id": "imu-wire",
+          "title": "Wire the tilt/IMU board",
+          "detail": "Shared I2C, identified supply, AD0 address and a fixed base mounting.",
+          "href": "docs/WIRING.html#tilt-sensor-mpu6050"
+        },
+        {
+          "id": "cliff-wire",
+          "title": "Wire and label the three cliff sensors",
+          "detail": "Digital OUT to D39/D40/D41; use front-left, rear-centre, front-right order.",
+          "href": "docs/WIRING.html#three-cliff-sensors"
+        },
+        {
+          "id": "pir-wire",
+          "title": "Wire the presence sensor",
+          "detail": "Identify actual pin labels, supply and output level; OUT goes to D38.",
+          "href": "docs/WIRING.html#presence-sensor"
+        },
+        {
+          "id": "touch-wire",
+          "title": "Wire both touch pads",
+          "detail": "Use Pi-safe active-high momentary outputs on BCM27 and BCM22.",
+          "href": "docs/WIRING.html#head-and-back-touch"
+        },
+        {
+          "id": "camera-wire",
+          "title": "Connect the camera and its indicator",
+          "detail": "Power off for CSI ribbon work; current-limit the visible activity LED.",
+          "href": "docs/WIRING.html#camera-and-activity-led"
+        },
+        {
+          "id": "audio-wire",
+          "title": "Connect microphone, amplifier and speakers",
+          "detail": "Choose the matching USB/analogue interface and check amplifier output isolation.",
+          "href": "docs/WIRING.html#microphone-amplifier-and-speakers"
+        },
+        {
+          "id": "fan-wire",
+          "title": "Connect direct-powered cooling",
+          "detail": "Match fan voltage and connector polarity; keep fans off signal GPIO pins.",
+          "href": "docs/WIRING.html#cooling-and-charging"
+        },
+        {
+          "id": "inspection",
+          "title": "Pass the unpowered wiring inspection",
+          "detail": "Check continuity, shorts, rail separation, connectors, current paths and cutoff before power-on.",
+          "href": "docs/WIRING.html#unpowered-inspection"
+        }
+      ]
+    },
+    {
+      "id": "software",
+      "title": "3 \u00b7 Install, calibrate and commission",
+      "tasks": [
+        {
+          "id": "m00",
+          "title": "M00 \u00b7 Foundation",
+          "detail": "Install dependencies, verify a fresh locked configuration and pass software self-tests.",
+          "href": "docs/SETUP_GUIDE.html#m00"
+        },
+        {
+          "id": "m01",
+          "title": "M01 \u00b7 Face on the display",
+          "detail": "Verify the real Pi desktop, fullscreen kiosk and changing expressions.",
+          "href": "docs/SETUP_GUIDE.html#m01"
+        },
+        {
+          "id": "m02",
+          "title": "M02 \u00b7 Mega link and firmware",
+          "detail": "Flash the correct device, verify fingerprint and test USB disconnect/reconnect.",
+          "href": "docs/SETUP_GUIDE.html#m02"
+        },
+        {
+          "id": "m03",
+          "title": "M03 \u00b7 Measured power",
+          "detail": "Verify both rails, loaded supply flags, switch function and motor/driver current ratings.",
+          "href": "docs/SETUP_GUIDE.html#m03"
+        },
+        {
+          "id": "m04",
+          "title": "M04 \u00b7 Distance, tilt and cliff calibration",
+          "detail": "Verify all three ranges, tilt, fresh telemetry and individual floor/edge calibration.",
+          "href": "docs/SETUP_GUIDE.html#m04"
+        },
+        {
+          "id": "m05",
+          "title": "M05 \u00b7 Stop and fault behavior",
+          "detail": "Prove obstacle, cliff, tilt, stale-link and emergency-stop behavior before enabling motion.",
+          "href": "docs/SETUP_GUIDE.html#m05"
+        },
+        {
+          "id": "m06",
+          "title": "M06 \u00b7 Cooling",
+          "detail": "Measure temperature after a sustained face/runtime session.",
+          "href": "docs/SETUP_GUIDE.html#m06"
+        },
+        {
+          "id": "m07",
+          "title": "M07 \u00b7 Wheels",
+          "detail": "Use lifted short tests first, prove automatic and emergency stops, then a contained floor test.",
+          "href": "docs/SETUP_GUIDE.html#m07"
+        },
+        {
+          "id": "m08",
+          "title": "M08 \u00b7 Pan/tilt head",
+          "detail": "Establish manual home, measure travel and prove small jogs and stop behavior.",
+          "href": "docs/SETUP_GUIDE.html#m08"
+        },
+        {
+          "id": "m09",
+          "title": "M09 \u00b7 Touch pads",
+          "detail": "Verify head response, back tap and one-second back hold emergency stop.",
+          "href": "docs/SETUP_GUIDE.html#m09"
+        },
+        {
+          "id": "m10",
+          "title": "M10 \u00b7 Local camera",
+          "detail": "Verify Picamera2, activity LED, local eye following and separately gated head tracking.",
+          "href": "docs/SETUP_GUIDE.html#m10"
+        },
+        {
+          "id": "m11",
+          "title": "M11 \u00b7 Local notes",
+          "detail": "Save, list, persist through restart and erase an explicit note.",
+          "href": "docs/SETUP_GUIDE.html#m11"
+        },
+        {
+          "id": "m12",
+          "title": "M12 \u00b7 Local dialogue",
+          "detail": "Test English, Hindi and Marathi commands; keep optional model/cloud settings deliberate.",
+          "href": "docs/SETUP_GUIDE.html#m12"
+        },
+        {
+          "id": "m13",
+          "title": "M13 \u00b7 Voice input and output",
+          "detail": "Identify ALSA devices, test all speech languages, calibrate mic and verify half-duplex behavior.",
+          "href": "docs/SETUP_GUIDE.html#m13"
+        },
+        {
+          "id": "m14",
+          "title": "M14 \u00b7 Companion behavior",
+          "detail": "Verify presence greeting, cooldown, night hours, sleepy face and wake behavior.",
+          "href": "docs/SETUP_GUIDE.html#m14"
+        },
+        {
+          "id": "m15",
+          "title": "M15 \u00b7 Reminders",
+          "detail": "Set a short reminder, restart and verify one delivery at the correct time.",
+          "href": "docs/SETUP_GUIDE.html#m15"
+        },
+        {
+          "id": "m16",
+          "title": "M16 \u00b7 Sleep and control access",
+          "detail": "Verify sleep/wake and authorized control access using the intended local/tunnel route.",
+          "href": "docs/SETUP_GUIDE.html#m16"
+        },
+        {
+          "id": "m17",
+          "title": "M17 \u00b7 Whole robot and startup",
+          "detail": "Complete attended acceptance, prove no automatic motion on restart and test autostart.",
+          "href": "docs/SETUP_GUIDE.html#m17"
+        }
+      ]
+    },
+    {
+      "id": "operate",
+      "title": "4 \u00b7 Keep a usable, recoverable build",
+      "tasks": [
+        {
+          "id": "daily",
+          "title": "Practice the daily start and stop procedure",
+          "detail": "Start with motor power off, inspect status, begin an attended session and shut down cleanly.",
+          "href": "docs/OPERATING.html#daily-start"
+        },
+        {
+          "id": "backup",
+          "title": "Back up the Pi configuration and local data",
+          "detail": "Keep private calibration, notes and stage records out of the public repository.",
+          "href": "docs/OPERATING.html#backup-and-restore"
+        },
+        {
+          "id": "offline",
+          "title": "Keep an offline copy of the full guide",
+          "detail": "Download the generated documentation artifact, extract it and verify local navigation.",
+          "href": "docs/WEBSITE.html"
+        },
+        {
+          "id": "export-progress",
+          "title": "Export this progress notebook",
+          "detail": "Keep the downloaded JSON with your build records so you can restore on another device.",
+          "href": "docs/PROGRESS.html#save-move-or-recover-your-progress"
+        }
+      ]
+    }
+  ]
+}

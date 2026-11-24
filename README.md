@@ -6,6 +6,11 @@ EVE is a four-wheel home robot built around a Raspberry Pi 4 and Arduino Mega 25
 It has a touchscreen face, a pan/tilt head, distance/cliff/tilt sensing, local voice,
 English/Hindi/Marathi commands, and optional local notes and reminders.
 
+Read [what every feature does](docs/CAPABILITIES.md), follow [terminal-by-terminal
+wiring](docs/WIRING.md), and use the optional [build progress notebook](docs/PROGRESS.md)
+to save checkmarks, notes and measurements in your browser. Export/import backups
+let you keep progress across devices; no account or subscription is needed.
+
 Start with no saved progress: identify your parts, assemble and wire the robot,
 install the software, then test one stage at a time. All commissioning flags ship
 false, actuator outputs are disabled, and cliff calibration is unset.
@@ -32,10 +37,12 @@ setup and diagnostic tools, configuration examples, host tests, and the source f
 the companion website. The website is generated directly from these documents and
 source files; it includes offline search, copy buttons and full source listings.
 
-The reference design uses two independent regulated 5 V USB supplies/banks and two
-TB6612-style dual motor drivers. Confirm your motor current and actual board
-variants before wiring. A bare 3S battery and an L298N board require different
-power and driver implementations.
+The hardware path uses two regulated 5 V USB banks, two TB6612FNG wheel drivers,
+four N20 motors, two 28BYJ-48/ULN2003 head drives, TCRT5000 cliff modules, two TTP233
+touch pads, two INMP441 I2S microphones, Camera Module 3 and a PAM8610 amplifier.
+The PAM8610 needs an added regulated 5 V-to-9 V boost branch and a verified volume
+limit for the 4 Ω / 3 W speakers. Confirm actual bank/current and breakout ratings
+before wiring. The optional lithium/BMS system and INA219 are not part of this build.
 
 ## Verification and limits
 
@@ -56,6 +63,7 @@ runs locally; external AI and network integrations are disabled by default.
 ## Find help or change a setting
 
 - [Troubleshooting](docs/TROUBLESHOOTING.md): installation, power, I2C, serial, motion, face and audio.
+- [Daily use and backups](docs/OPERATING.md): start, stop, status, private state recovery and maintenance.
 - [Configuration](docs/CONFIGURATION.md): local overrides, languages, timezone, optional features.
 - [Safety](docs/SAFETY.md) and [privacy](docs/PRIVACY.md): operating boundaries and data handling.
 - [Architecture](docs/ARCHITECTURE.md): source layout and Pi/Mega responsibilities.

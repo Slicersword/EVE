@@ -47,17 +47,17 @@ private build worksheet before drilling or ordering brackets.
 | Head/back touch | Insulate signal pads from metalwork; use momentary active-high modules |
 | Camera and LED | Pi-compatible camera with a nearby visible activity indicator |
 
-KY-033 height depends on surface and trimmer setting. Test dark/light flooring,
+TCRT5000 module height depends on surface and trimmer setting. Test dark/light flooring,
 transitions and ambient light at the final mounting height. Place the front sensors
 far enough ahead of the wheels that measured stopping distance fits inside the margin.
 Do not test on a real staircase. Use a secured chassis and a removable floor target.
 
 ## Audio and final inspection
 
-Mount a supported microphone and amplified speakers with physical separation and
+Mount the two INMP441 microphones and amplified speakers with physical separation and
 strain relief. Keep motor leads away from audio/sensor leads. The supported voice
 path is half-duplex; it does not cancel speaker echo for simultaneous listening.
 
 Check all fasteners, insulation, wheel clearance, head retention, sensor visibility,
 airflow and cutoff reach. Make the first wiring checks with all supplies unplugged.
-Continue with [Parts and wiring](HARDWARE.md), then [Software setup](SETUP_GUIDE.md).
+Continue with [Wire every part](WIRING.md), then [Software setup](SETUP_GUIDE.md).
