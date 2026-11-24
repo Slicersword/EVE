@@ -30,7 +30,8 @@ node --check site/assets/site.js
 
 The site check validates local files, links, fragments, source listings and offline
 asset references. CI publishes the generated site as an artifact even when Pages
-deployment is disabled. See [Website](WEBSITE.md).
+hosting is unavailable. A separate job checks the actual Jekyll Pages rendering.
+See [Website](WEBSITE.md).
 
 ## Simulation without electronics
 

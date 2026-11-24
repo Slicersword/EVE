@@ -10,7 +10,7 @@ It does not record anyone's robot as assembled or commissioned.
 | Public defaults | All readiness flags false; drive/head disabled; cliff calibration unset; external AI off |
 | Generated files | Firmware header and M00–M17 software guide match generators |
 | Source / syntax | Python compilation, Bash syntax, JavaScript syntax and diff whitespace checks passed |
-| Documentation site | 25 Markdown pages, 64 source listings; local links/fragments/assets/raw source consistency passed |
+| Documentation site | Markdown pages and complete offline source listings; local links/fragments/assets/raw source consistency checked |
 | Browser QA | Desktop page layout and offline search checked in the local preview |
 | Live simulation | Mega handshake, authenticated CLI chat, shipped motion refusal and safe shutdown passed |
 | GitHub CI | Python 3.11/3.12 host jobs, Mega target compilation and site validation passed in the linked run |
@@ -25,8 +25,8 @@ The real sketch harness exercises logic; target compilation checks the AVR build
 a successful upload still does not provide physical acceptance.
 
 For reproducible commands see [Testing](TESTING.md). Read the repository Actions
-results for the commit you intend to build. Optional Pages hosting must be enabled
-once as described in [Website](WEBSITE.md).
+results for the commit you intend to build. GitHub Pages publishes directly from
+main as described in [Website](WEBSITE.md); it requires no ChatGPT hosting service.
 
 CI evidence: [Verify EVE, commit 21b6c3b](https://github.com/Slicersword/EVE/actions/runs/45338206886).
 All four jobs completed successfully. This report's later text/link-only updates

@@ -1,0 +1,8 @@
+---
+layout: manual
+title: Build EVE from scratch
+source_path: README.md
+permalink: /
+---
+{% capture overview %}{% include_relative README.md %}{% endcapture %}
+{{ overview | markdownify | replace: '.md"', '.html"' | replace: '.md#', '.html#' }}

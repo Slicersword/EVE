@@ -1,5 +1,12 @@
 # Change log
 
+## GitHub Pages hosting
+
+- Made https://slicersword.github.io/EVE/ the primary build website.
+- Added a Jekyll layout and search generated directly from the repository documents.
+- Used the existing main/root Pages publishing setup, without ChatGPT hosting or keys.
+- Preserved the offline export and added validation of the actual Pages rendering.
+
 ## Standalone reference build — 24 November 2026
 
 - Added a complete newcomer path: prerequisites, fresh OS, parts, assembly, wiring,

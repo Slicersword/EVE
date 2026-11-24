@@ -22,7 +22,7 @@ performing each hands-on acceptance test.
 | Mechanical design | No CAD/STL or universal chassis/fastener dimensions; use the assembly guide and record your choices |
 | Platform | Pi OS Desktop Bookworm / Pi 4 reference target; other hardware/OS needs separate validation |
 | Simulation | Fake serial/sensors only; physical features disabled and state isolated under data/sim |
-| Website | Static offline-capable snapshot; Pages synchronization starts after one-time repository settings |
+| Website | GitHub Pages renders main automatically; a separate static builder provides the offline version |
 | Licensing | Project license unselected; third-party licenses are retained |
 
 Some stage checks confirm availability only. Dialogue, reminders, sleep/wake,

@@ -38,7 +38,7 @@ renaming a configuration value does not provide compatibility.
 | Local language model | Off; basic offline replies work alone | Separate on-Pi loopback server/model, with measured RAM/latency |
 | Cloud | Off | Keep off for private operation; regex redaction is incomplete |
 | Reverse/pivot | Off | Requires additional coverage and a separate physical review |
-| Website | Static generated files, works offline | Free GitHub Pages or another static host |
+| Website | GitHub Pages from main, independent of ChatGPT; separate offline build | Keep the public repository and Pages enabled |
 | Project license | Not selected | Maintainer must choose before representing this as open-source licensed |
 
 See [Configuration](CONFIGURATION.md) for practical changes. Copy this table into

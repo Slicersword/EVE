@@ -46,7 +46,8 @@ def main():
     for filename in ['eve', *[str(p.relative_to(ROOT)) for p in (ROOT / 'scripts').glob('*.sh')]]:
         if not (ROOT / filename).stat().st_mode & 0o111:
             failures.append(f'{filename}: executable bit missing')
-    for required in ('.gitignore', '.github/workflows/verify.yml', '.github/workflows/pages.yml',
+    for required in ('.gitignore', '.github/workflows/verify.yml', '_config.yml',
+                     '_layouts/manual.html', 'index.html', 'search-data.js', 'code.html',
                      'tools/build_docs.mjs', 'tools/check_site.py'):
         if not (ROOT / required).is_file():
             failures.append(f'Missing repository build support: {required}')

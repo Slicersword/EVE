@@ -13,6 +13,7 @@ __pycache__/
 third_party/
 models/
 dist/
+_site/
 node_modules/
 *.log
 .DS_Store

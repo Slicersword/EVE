@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Validate the built documentation without network access or robot hardware."""
 from html.parser import HTMLParser
+import argparse
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 import json
@@ -29,10 +30,11 @@ class Page(HTMLParser):
             self.assets.append(attrs['href'])
 
 
-def check(directory):
+def check(directory, base_path='', search_file='assets/search-data.js'):
     directory = Path(directory).resolve()
     failures, checked = [], 0
-    pages = {p.resolve(): Page(p.read_text(encoding='utf-8')) for p in directory.rglob('*.html')}
+    pages = {p.resolve(): Page(p.read_text(encoding='utf-8')) for p in directory.rglob('*.html')
+             if not p.is_relative_to(directory / 'raw')}
     if not (directory / 'index.html').is_file():
         return ['No index.html; run node tools/build_docs.mjs first'], 0
     for path, page in pages.items():
@@ -44,9 +46,14 @@ def check(directory):
                     failures.append(f'{path.name}: external asset {value}')
                 continue
             if url.path.startswith('/'):
-                failures.append(f'{path.name}: absolute path breaks offline/subpath hosting: {value}')
-                continue
-            target = (path.parent / unquote(url.path)).resolve() if url.path else path
+                if not base_path or not url.path.startswith(base_path):
+                    failures.append(f'{path.name}: path escapes the configured site: {value}')
+                    continue
+                target = (directory / unquote(url.path[len(base_path):])).resolve()
+            else:
+                target = (path.parent / unquote(url.path)).resolve() if url.path else path
+            if target.is_dir():
+                target = target / 'index.html'
             if not target.is_relative_to(directory) or not target.is_file():
                 failures.append(f'{path.relative_to(directory)}: missing file {value}')
             elif url.fragment and target in pages and unquote(url.fragment) not in pages[target].ids:
@@ -55,11 +62,11 @@ def check(directory):
     for name in ('config/local.json', 'data/token', 'data/eve.db'):
         if (directory / 'raw' / name).exists():
             failures.append(f'Private runtime file published: {name}')
-    search = directory / 'assets/search-data.js'
-    if not search.is_file() or not search.read_text().startswith('window.EVE_SEARCH='):
+    search = directory / search_file
+    if not search.is_file() or not search.read_text().lstrip().startswith('window.EVE_SEARCH='):
         failures.append('Offline search data missing')
     else:
-        entries = json.loads(search.read_text().removeprefix('window.EVE_SEARCH=').rstrip(';\n'))
+        entries = json.loads(search.read_text().lstrip().removeprefix('window.EVE_SEARCH=').rstrip(';\n'))
         for entry in entries:
             if not (directory / entry['url']).is_file():
                 failures.append(f'Search points to missing page: {entry["url"]}')
@@ -73,7 +80,12 @@ def check(directory):
 
 
 def main():
-    failures, checked = check(ROOT / 'dist')
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('directory', nargs='?', default='dist')
+    parser.add_argument('--base-path', default='')
+    parser.add_argument('--search-file', default='assets/search-data.js')
+    args = parser.parse_args()
+    failures, checked = check(ROOT / args.directory, args.base_path, args.search_file)
     for failure in failures:
         print('FAIL:', failure)
     if failures:

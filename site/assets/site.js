@@ -1,6 +1,15 @@
 'use strict';
 const script = document.currentScript;
-const siteRoot = new URL('../', script.src);
+const siteRoot = new URL(script.dataset.siteRoot || '../', script.src);
+const generatedToc = document.querySelector('[data-generate-toc]');
+if (generatedToc) {
+  document.querySelectorAll('.prose h2[id]').forEach(heading => {
+    const link = document.createElement('a');
+    link.href = '#' + heading.id;
+    link.textContent = heading.textContent;
+    generatedToc.append(link);
+  });
+}
 const menu = document.querySelector('#menu');
 menu.addEventListener('click', () => {
   const expanded = menu.getAttribute('aria-expanded') !== 'true';

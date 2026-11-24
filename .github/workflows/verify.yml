@@ -61,3 +61,21 @@ jobs:
           name: eve-documentation-offline
           path: dist/
           include-hidden-files: true
+  github-pages:
+    name: Validate GitHub Pages rendering
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Render the same Jekyll source used by GitHub Pages
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: .
+          destination: ./_site
+      - run: python tools/check_site.py _site --base-path /EVE/ --search-file search-data.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eve-github-pages-rendered
+          path: _site/

@@ -30,6 +30,7 @@ const files = dir => fs.readdirSync(path.join(root, dir), { withFileTypes: true 
 });
 const docs = ['README.md', 'CONTRIBUTING.md', 'SECURITY.md', 'CHANGELOG.md', ...files('docs').filter(f => f.endsWith('.md'))];
 const sources = ['eve', 'requirements.txt', 'config/eve.json', 'config/local.example.json',
+  '_config.yml', '_layouts/manual.html', 'index.html', 'search-data.js', 'code.html',
   ...['eve3', 'firmware', 'tools', 'scripts', 'systemd', 'tests', '.github'].flatMap(files)
     .filter(f => !f.includes('__pycache__') && !f.includes('/vendor/') && !f.endsWith('.pyc'))].sort();
 const sourceRoute = source => `source/${source}.html`;

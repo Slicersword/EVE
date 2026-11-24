@@ -1,0 +1,38 @@
+title: Build EVE
+description: Step-by-step EVE home robot build manual
+url: https://slicersword.github.io
+baseurl: /EVE
+repository: Slicersword/EVE
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+plugins:
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-titles-from-headings
+relative_links:
+  enabled: true
+  collections: true
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: manual
+exclude:
+  - dist
+  - _site
+  - data
+  - config
+  - eve3
+  - firmware
+  - scripts
+  - systemd
+  - tests
+  - tools
+  - third_party
+  - models
+  - node_modules
+  - eve
+  - requirements.txt
