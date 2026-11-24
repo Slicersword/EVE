@@ -10,8 +10,10 @@ is separate from this website.
 
 The repository already has GitHub Pages enabled for **main / root**. GitHub's
 built-in Jekyll build renders the Markdown under docs using the manual layout,
-local styles and JavaScript. Each push to main triggers a new Pages build.
-The deployment appears in Actions as **pages build and deployment**.
+local styles and JavaScript. Each push to main triggers **Verify EVE**, which checks
+the code and rendered pages, then runs **Publish GitHub Pages** with the validated
+artifact. GitHub's built-in **pages build and deployment** may also render the
+same branch source; both use the same Jekyll documents and layout.
 
 The guide, search index, navigation and code snippets come from the same commit.
 The footer shows the GitHub source revision. No separate copy needs to be uploaded
@@ -26,7 +28,7 @@ intended GitHub Free setup. GitHub's service terms and usage limits still apply.
 2. If changing the generated software guide, update its recipes and regenerate it
    with the commands below.
 3. Commit and push to main through GitHub or a local Git checkout.
-4. Wait for the successful **pages build and deployment** run. Open its deployment
+4. Wait for **Verify EVE → Publish GitHub Pages** to succeed. Open its deployment
    URL and refresh the page. The footer identifies the published revision.
 
 ```bash
@@ -44,7 +46,7 @@ out of commits.
 |---|---|
 | Provider | GitHub Pages |
 | Repository | Slicersword/EVE, public |
-| Publishing source | Deploy from a branch |
+| Publishing source | Main/root Jekyll source; validated Actions artifact deployment |
 | Branch / folder | main / root |
 | Website configuration | _config.yml |
 | Shared page layout | _layouts/manual.html |

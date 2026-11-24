@@ -88,7 +88,7 @@ Do not change readiness flags to hide a fault.
 | Reminder silent / late | Runtime and speaker must be running; check pending reminder, UTC offset and output device |
 | Autostart fails | First prove foreground operation, then inspect user-service logs, source path and desktop login |
 | Website search or styles absent offline | Keep all of dist together and open index.html; rebuild/validate after source changes |
-| Pages website not updated | Check the built-in pages build and deployment run; source must be main/root; follow Website |
+| Pages website not updated | Check Verify EVE and its Publish GitHub Pages job; fix any failed render/link check; follow Website |
 | Website shows an older revision | Rebuild and republish its host; the footer/build-info identifies the source snapshot |
 
 ## Gather useful evidence

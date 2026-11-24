@@ -75,7 +75,29 @@ jobs:
           source: .
           destination: ./_site
       - run: python tools/check_site.py _site --base-path /EVE/ --search-file search-data.js
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
       - uses: actions/upload-artifact@v4
         with:
           name: eve-github-pages-rendered
           path: _site/
+  deploy-github-pages:
+    name: Publish GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [host, avr, docs, github-pages]
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy the validated GitHub Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@v4

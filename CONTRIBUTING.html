@@ -1,0 +1,7 @@
+---
+layout: manual
+title: Contributing to EVE
+source_path: CONTRIBUTING.md
+---
+{% capture guide %}{% include_relative CONTRIBUTING.md %}{% endcapture %}
+{{ guide | markdownify | replace: '.md"', '.html"' | replace: '.md#', '.html#' }}
