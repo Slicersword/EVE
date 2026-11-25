@@ -6,8 +6,10 @@
   $('#back').href = '/control#' + encodeURIComponent(token);
   let epoch = null, available = false, snapshot = {}, lastStatus = 0, lastStop = -1;
   let musicURL = null, audioContext = null, analyser = null, level = null, wanted = false;
-  let musicGeneration = 0, wasDucked = false, lastFace = '', polling = false, priorityBusy = false, voiceState = 'disabled';
+  let musicGeneration = 0, wasDucked = false, polling = false, priorityBusy = false, voiceState = 'disabled';
   const media = $('#music');
+  const musicFace = EveFace.mount($('#musicFace'));
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const note = s => { $('#notice').textContent = String(s || ''); };
   async function api(path, body, timeout = 4000) {
     const abort = new AbortController(), timer = setTimeout(() => abort.abort(), timeout);
@@ -196,10 +198,15 @@
     finally { polling = false; }
   }
   function animate() {
-    if (analyser && !media.paused && available) { analyser.getByteFrequencyData(level); const rms = level.reduce((a,b) => a+b,0)/level.length/255;
-      const face = rms > .12 ? 'speaking' : 'happy'; if (face !== lastFace) { $('#musicFace').innerHTML = window.EvaFaceArt.svg(face); lastFace = face; }
-      $('#musicFace').style.transform = `scale(${1 + Math.min(.06,rms*.1)}) rotate(${Math.sin(media.currentTime*3)*rms*3}deg)`;
-    } else { $('#musicFace').style.transform = ''; if (lastFace !== 'idle') { $('#musicFace').innerHTML = window.EvaFaceArt.svg('idle'); lastFace = 'idle'; } }
+    if (analyser && !media.paused && available) {
+      analyser.getByteFrequencyData(level);
+      const rms = level.reduce((a, b) => a + b, 0) / level.length / 255;
+      musicFace.show(rms > .12 ? 'speaking' : 'happy');
+      musicFace.look(reduceMotion.matches ? 0 : Math.sin(media.currentTime * 3) * rms * 5);
+    } else {
+      musicFace.show('idle');
+      musicFace.look();
+    }
   }
   window.addEventListener('pagehide', () => { pauseMusic(true); if (musicURL) URL.revokeObjectURL(musicURL); });
   document.addEventListener('visibilitychange', () => { if(document.hidden) pauseMusic(true); });

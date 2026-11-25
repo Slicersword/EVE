@@ -2,15 +2,16 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>EVE expression studio</title>
+<link rel="stylesheet" href="/eve-face.css">
 <style>
 body{background:#101721;color:#edf7ff;font:16px system-ui;margin:0;padding:24px}
 main{max-width:560px;margin:auto}a{color:#81e9db}
 select,button{font:inherit;padding:10px;margin:6px;background:#152b35;color:inherit;border:1px solid #80adba;border-radius:6px}
-svg{width:min(100%,360px);display:block;margin:auto}
+#preview{margin:14px 0;border-radius:9px}
 </style></head><body><main>
 <a href="/">Return to face</a>
 <h1>Expression studio</h1>
-<p>Preview the original EVE faces and sounds. Audio plays on this device. Use the studio with EVE's live speech and microphone disabled to avoid overlap.</p>
+<p>Try EVE's touchscreen expressions with their original sound cues. Audio plays on this device. Turn off EVE's live speech and microphone for the sound check.</p>
 <div id="preview"></div>
 <label for="expression">Expression</label>
 <select id="expression"></select>
@@ -18,22 +19,22 @@ svg{width:min(100%,360px);display:block;margin:auto}
 <button id="stop">Stop sound</button>
 <p id="notice" role="status"></p>
 </main>
-<script src="/eva-face-art.js"></script>
+<script src="/eve-face.js"></script>
 <script src="/expression-audio.js"></script>
 <script>
 const picker = document.querySelector('#expression');
-const preview = document.querySelector('#preview');
+const preview = EveFace.mount(document.querySelector('#preview'));
 const play = document.querySelector('#play');
 function show() {
   EveExpressionAudio.stop();
-  preview.innerHTML = EvaFaceArt.svg(picker.value);
+  preview.show(picker.value);
 }
 picker.onchange = show;
 play.onclick = () => EveExpressionAudio.preview(picker.value);
 document.querySelector('#stop').onclick = () => EveExpressionAudio.stop();
 window.addEventListener('pagehide', () => EveExpressionAudio.stop());
 EveExpressionAudio.load().then(pack => {
-  for (const name of pack.expressions) picker.add(new Option(EvaFaceArt.title(name), name));
+  for (const name of pack.expressions) picker.add(new Option(EveFace.title(name), name));
   picker.value = 'happy';
   show();
   play.disabled = false;

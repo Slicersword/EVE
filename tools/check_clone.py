@@ -62,7 +62,7 @@ def check_runtime():
 
         try:
             for path in ("/", "/control", "/home", "/home.js", "/home.css", "/expressions",
-                         "/eva-face-art.js", "/expression-audio.js", "/expression-assets.json"):
+                         "/eve-face.js", "/eve-face.css", "/eva-face-art.js", "/expression-audio.js", "/expression-assets.json"):
                 assert fetch(path), path
             assert fetch("/sfx/happy.wav").startswith(b"RIFF")
             rejected("/sfx/%2e%2e/expressions.json", 404)

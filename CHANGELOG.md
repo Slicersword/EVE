@@ -1,5 +1,11 @@
 # Change log
 
+## Consistent expression styling
+
+- Use the same eyes-and-mouth display for all 90 expressions on the Pi, in the
+  Expression Studio and Home, and in the build guide preview. Keep the red Alert
+  signal and pair each expression with its original sound cue.
+
 ## Eyes and controls preview
 
 - Preview EVE’s touchscreen face, all 90 expressions and selected original sounds

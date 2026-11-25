@@ -16,6 +16,8 @@ PAGES = {"/": "face.html", "/control": "control.html", "/expressions": "expressi
 EXPRESSION_ASSETS = {
     "/home.css": ("home.css", "text/css"),
     "/home.js": ("home.js", "text/javascript"),
+    "/eve-face.css": ("eve-face.css", "text/css"),
+    "/eve-face.js": ("eve-face.js", "text/javascript"),
     "/eva-face-art.js": ("eva-face-art.js", "text/javascript"),
     "/expression-audio.js": ("expression-audio.js", "text/javascript"),
     "/expression-assets.json": ("expressions.json", "application/json"),

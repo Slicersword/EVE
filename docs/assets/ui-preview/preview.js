@@ -7,14 +7,13 @@
   const stop = document.querySelector('#eve-preview-stop');
   const status = document.querySelector('#eve-preview-status');
   const directions = document.querySelectorAll('[data-eve-preview-direction]');
-  const { screen, expressions, core, samples } = window.EveKioskPreview;
-  const art = window.EvaFaceArt;
-  const coreNames = new Set(core);
-  let blinkTimer;
+  const { screen, expressions, samples } = window.EveKioskPreview;
+  const { mount, title } = window.EveFace;
+  let display;
   let audio;
 
   for (const name of expressions) {
-    expression.add(new Option(art.title(name), name));
+    expression.add(new Option(title(name), name));
   }
   expression.value = 'idle';
 
@@ -27,41 +26,21 @@
   }
 
   function render() {
-    const doc = frame.contentDocument;
-    const face = doc?.querySelector('#face');
-    const extended = doc?.querySelector('#extended');
-    if (!face || !extended) return;
-    clearTimeout(blinkTimer);
     stopSound();
     const name = expression.value;
-    const isCore = coreNames.has(name);
-    face.hidden = !isCore;
-    face.className = isCore ? name : 'idle';
-    extended.hidden = isCore;
-    extended.innerHTML = isCore ? '' : art.svg(name);
-    doc.querySelector('#eyes').style.transform = '';
-    frame.title = 'EVE touchscreen showing ' + art.title(name);
-    expression.disabled = false;
-    blink.disabled = !isCore || name === 'sleepy';
-    for (const button of directions) button.disabled = !isCore;
+    display.show(name);
+    display.look();
+    frame.title = 'EVE touchscreen showing ' + title(name);
     play.disabled = !Object.hasOwn(samples, name);
     status.textContent = play.disabled
       ? 'Sound samples are available for Happy, Love, and Surprised.'
-      : 'Play the original ' + art.title(name) + ' cue.';
+      : 'Play the original ' + title(name) + ' cue.';
   }
 
   expression.addEventListener('change', render);
-  blink.addEventListener('click', () => {
-    const face = frame.contentDocument.querySelector('#face');
-    face.classList.add('blink');
-    clearTimeout(blinkTimer);
-    blinkTimer = setTimeout(() => face.classList.remove('blink'), 160);
-  });
+  blink.addEventListener('click', () => display.blink());
   for (const button of directions) {
-    button.addEventListener('click', () => {
-      frame.contentDocument.querySelector('#eyes').style.transform =
-        'translateX(' + button.dataset.evePreviewDirection + 'vw)';
-    });
+    button.addEventListener('click', () => display.look(Number(button.dataset.evePreviewDirection), 0));
   }
   play.addEventListener('click', async () => {
     const name = expression.value;
@@ -82,6 +61,13 @@
   });
   stop.addEventListener('click', stopSound);
   window.addEventListener('pagehide', stopSound);
-  frame.addEventListener('load', render);
+  frame.addEventListener('load', () => {
+    const face = frame.contentDocument?.querySelector('#face');
+    if (!face) return;
+    display = mount(face);
+    render();
+    expression.disabled = blink.disabled = false;
+    for (const button of directions) button.disabled = false;
+  });
   frame.srcdoc = screen;
 })();
