@@ -16,6 +16,7 @@ td:first-child{color:#7d93a8;white-space:nowrap;width:38%}
 small{color:#7d93a8}
 </style></head><body><main>
 <h1>EVE control</h1>
+<p><a href="/expressions" style="color:inherit">Expression studio and sound preview</a> · <a id="home-link" href="/home" style="color:inherit">EVE at home</a></p>
 <button id="estop">EMERGENCY STOP</button>
 <div id="msg"></div>
 <h2>Status</h2><table id="st"></table>
@@ -48,6 +49,7 @@ let token=location.hash.slice(1)||'';
 const $=id=>document.getElementById(id),msg=$('msg');
 if(!token){token=prompt('EVE token (on the Pi: python3 tools/evectl.py token)')||''}
 history.replaceState(null,'',location.pathname);
+$('home-link').href = '/home#token=' + encodeURIComponent(token);
 async function cmd(name,args){
   try{const r=await fetch('/api/command',{method:'POST',headers:{'Content-Type':'application/json','X-EVE-Token':token},body:JSON.stringify({name,args:args||{}})});
     const j=await r.json();msg.textContent=(j.ok?'OK: ':'NO: ')+(typeof j.message==='string'?j.message:JSON.stringify(j.message));msg.className=j.ok?'ok':'bad';return j}
@@ -55,7 +57,16 @@ async function cmd(name,args){
 }
 $('estop').onclick=()=>cmd('estop');
 document.querySelectorAll('[data-cmd]').forEach(b=>b.onclick=()=>cmd(b.dataset.cmd,JSON.parse(b.dataset.args||'{}')));
-['idle','happy','love','sleepy','surprised','sad','listening','alert'].forEach(n=>{const b=document.createElement('button');b.textContent=n;b.onclick=()=>cmd('expression',{name:n});$('expr').appendChild(b)});
+fetch('/expression-assets.json').then(r => r.json()).then(pack => {
+  const choices = document.createElement('select');
+  choices.setAttribute('aria-label', 'Face expression');
+  for (const name of pack.expressions) choices.add(new Option(name.replaceAll('_', ' '), name));
+  choices.value = 'happy';
+  const show = document.createElement('button');
+  show.textContent = 'Show expression';
+  show.onclick = () => cmd('expression', {name: choices.value});
+  $('expr').append(choices, show);
+}).catch(() => { $('expr').textContent = 'Expression catalog unavailable'; });
 const acts={
   chat:async()=>{const t=$('chat').value;if(!t)return;const j=await cmd('chat',{text:t});if(j.ok){msg.textContent='EVE: '+(j.message.reply||'(no words)');$('chat').value=''}},
   say:()=>cmd('say',{text:$('say').value,lang:$('lang').value}),

@@ -1,0 +1,565 @@
+{
+  "expressions": [
+    "idle",
+    "listening",
+    "thinking",
+    "speaking",
+    "happy",
+    "sleepy",
+    "alert",
+    "sad",
+    "angry",
+    "surprised",
+    "excited",
+    "curious",
+    "proud",
+    "confused",
+    "love",
+    "laughing",
+    "scared",
+    "bored",
+    "shy",
+    "determined",
+    "namaste",
+    "diwali",
+    "woozy",
+    "shocked",
+    "mischievous",
+    "starstruck",
+    "dead",
+    "embarrassed",
+    "disgusted",
+    "nervous",
+    "grateful",
+    "calm",
+    "focused",
+    "skeptical",
+    "guilty",
+    "relieved",
+    "amazed",
+    "hopeful",
+    "worried",
+    "playful",
+    "offended",
+    "delighted",
+    "tranquil",
+    "suspicious",
+    "dreamy",
+    "impatient",
+    "proud_tears",
+    "empathetic",
+    "jealous",
+    "awkward",
+    "zen",
+    "glitch",
+    "loading",
+    "inspired",
+    "sleepy_happy",
+    "smug",
+    "pleading",
+    "touched",
+    "victory",
+    "meltdown",
+    "ecstatic",
+    "frustrated",
+    "satisfied",
+    "anxious",
+    "content",
+    "melancholy",
+    "wonder",
+    "blissful",
+    "contemplative",
+    "annoyed",
+    "exhausted",
+    "compassionate",
+    "smitten",
+    "heartbroken",
+    "thrilled",
+    "intrigued",
+    "yearning",
+    "relaxed",
+    "snappy",
+    "apologetic",
+    "proud_smile",
+    "grumpy",
+    "flirty",
+    "sympathetic",
+    "confident",
+    "flustered",
+    "divine",
+    "snarky",
+    "haunted",
+    "victorious"
+  ],
+  "default_mode": "natural",
+  "modes": {
+    "quiet": [
+      "alert",
+      "glitch"
+    ],
+    "natural": [
+      "alert",
+      "glitch",
+      "happy",
+      "laughing",
+      "excited",
+      "surprised",
+      "shocked",
+      "amazed",
+      "delighted",
+      "ecstatic",
+      "victory",
+      "victorious",
+      "proud",
+      "grateful",
+      "love",
+      "playful",
+      "mischievous",
+      "curious",
+      "confused",
+      "sad",
+      "scared",
+      "diwali",
+      "namaste",
+      "thrilled"
+    ],
+    "playful": [
+      "happy",
+      "alert",
+      "sad",
+      "angry",
+      "surprised",
+      "excited",
+      "curious",
+      "proud",
+      "confused",
+      "love",
+      "laughing",
+      "scared",
+      "shy",
+      "determined",
+      "namaste",
+      "diwali",
+      "woozy",
+      "shocked",
+      "mischievous",
+      "starstruck",
+      "embarrassed",
+      "disgusted",
+      "nervous",
+      "grateful",
+      "skeptical",
+      "guilty",
+      "relieved",
+      "amazed",
+      "hopeful",
+      "worried",
+      "playful",
+      "offended",
+      "delighted",
+      "suspicious",
+      "dreamy",
+      "impatient",
+      "proud_tears",
+      "empathetic",
+      "jealous",
+      "awkward",
+      "glitch",
+      "inspired",
+      "smug",
+      "pleading",
+      "touched",
+      "victory",
+      "meltdown",
+      "ecstatic",
+      "frustrated",
+      "satisfied",
+      "anxious",
+      "content",
+      "melancholy",
+      "wonder",
+      "blissful",
+      "annoyed",
+      "compassionate",
+      "smitten",
+      "heartbroken",
+      "thrilled",
+      "intrigued",
+      "yearning",
+      "snappy",
+      "apologetic",
+      "proud_smile",
+      "grumpy",
+      "flirty",
+      "sympathetic",
+      "confident",
+      "flustered",
+      "divine",
+      "snarky",
+      "haunted",
+      "victorious"
+    ]
+  },
+  "clips": {
+    "idle": {
+      "sha256": "7ee2c46e883c3dab246fe003303386a8555a667a37aafa8a3c151ccfaed0bdcc",
+      "bytes": 22358
+    },
+    "listening": {
+      "sha256": "0e05def8345d33fd44372c4145394c5a4bdde32475da78d676df8c087822b388",
+      "bytes": 20152
+    },
+    "thinking": {
+      "sha256": "2c0eedf3a7508d74873c9709590939d65656b82a17e30b9335a8f415924dbcf4",
+      "bytes": 30120
+    },
+    "speaking": {
+      "sha256": "56c34c2493e15bc916410682e1ef7f1ce47bff6f523e60b193cb22fe22a427fb",
+      "bytes": 19976
+    },
+    "happy": {
+      "sha256": "227760ff784d9b58c75c3696441d7cb38d533142328cbbda54cb0f244e14a9c3",
+      "bytes": 30120
+    },
+    "sleepy": {
+      "sha256": "0c7241f4b446deb3dccd2953116425345210dd8a0a12022753ecf2bec33ccd16",
+      "bytes": 46436
+    },
+    "alert": {
+      "sha256": "0db02c6f1168754f267aca283aa58190e67463974a16f1a74cbb0143adc882d7",
+      "bytes": 32942
+    },
+    "sad": {
+      "sha256": "5809cf3e50709e9dc15d83c3cb18835000e5fae7ec82ea4837c449b63137366e",
+      "bytes": 45554
+    },
+    "angry": {
+      "sha256": "51b1d805b01424da8672a600432f03b9661d3fcb5c4a416dad10bcecde5409e9",
+      "bytes": 27914
+    },
+    "surprised": {
+      "sha256": "650d54ae4d56cc92e932a55eef372e0b91a51fa7c069c3e3be6f6991cdcc73b5",
+      "bytes": 21122
+    },
+    "excited": {
+      "sha256": "7161e58539565744b391d27085d8bab98b9e3fea7e1835a58b8e733d5e4d20fc",
+      "bytes": 28708
+    },
+    "curious": {
+      "sha256": "70d8435bc573fe2356ca36d17cc06111b60e0befa570b453f5efb07b07c37c68",
+      "bytes": 20152
+    },
+    "proud": {
+      "sha256": "2dda4536cf3c1abb0105c590e2c2168fad04421534be262f4f17a9303c3e3425",
+      "bytes": 36470
+    },
+    "confused": {
+      "sha256": "697b078856cacf5d250d575a2f9ed9b6825b9d3cc1b8bdfd851e867d160bf2fe",
+      "bytes": 30120
+    },
+    "love": {
+      "sha256": "72bbbf261c1ca37285d339879b64c72956d858231ac27abcfab43fd91704f366",
+      "bytes": 39822
+    },
+    "laughing": {
+      "sha256": "c7d1acc298b5883c4a574aab05c5fe8c16c66ed5b092ef8b730ec206caa79b8d",
+      "bytes": 28708
+    },
+    "scared": {
+      "sha256": "7292fd853ed952e2ac4cfbd44943ac19fffde457766ddfa0ed761390ee5bfa31",
+      "bytes": 33648
+    },
+    "bored": {
+      "sha256": "0536d83f5db7ead49b09bf240dc49a648164d7becd6d4a9c7246e352d260779c",
+      "bytes": 45026
+    },
+    "shy": {
+      "sha256": "fc1f802f0f4ea1a70208f5457f13033e4c968ecd3c01379ca024760290c5fdf9",
+      "bytes": 38410
+    },
+    "determined": {
+      "sha256": "c1d0a6b92b4304e05f106b5c5cd4d8a139fd38ecfbf1468d0cf029608ac21874",
+      "bytes": 37176
+    },
+    "namaste": {
+      "sha256": "701db32231874909d66ce50c0e784a5b47e866bfdb42e816a38c75da6dacb2c7",
+      "bytes": 37176
+    },
+    "diwali": {
+      "sha256": "3db3c76a7a561303189f73dcd60086f4fc2c70b345424f66d68ac4c4125abebd",
+      "bytes": 37176
+    },
+    "woozy": {
+      "sha256": "782ac322b47d4de0f363a053777c6a338896d9bc8b1d30a7b41bc2d92255174d",
+      "bytes": 21476
+    },
+    "shocked": {
+      "sha256": "96b31b1fab739c972c607d8ec0fc3b887b77b64d8fa4e2d272830ef9850c1af2",
+      "bytes": 32942
+    },
+    "mischievous": {
+      "sha256": "ffe9c3ad6156ea85c819cf4af20641d83c910af99e37014345b7d2f85ac8797f",
+      "bytes": 33824
+    },
+    "starstruck": {
+      "sha256": "416484819f709bf2ffd197bd82466ccef811ad2d152e80091f261523bc7a0f97",
+      "bytes": 21476
+    },
+    "dead": {
+      "sha256": "6f3a08fdd5673afb8ceb9f8fbd1694b40a853ef319345a9f1ebe6587e1a4e532",
+      "bytes": 33118
+    },
+    "embarrassed": {
+      "sha256": "341b9c5b98306a0de62dfc27aa8f9ef9434f88e25dfe980eeaaddb978eabb5f9",
+      "bytes": 39116
+    },
+    "disgusted": {
+      "sha256": "d9444b502acf6aa8539fa643c296a9f935a42596ade1cd451cb08180f111ec98",
+      "bytes": 27914
+    },
+    "nervous": {
+      "sha256": "d51fe21d3ffbeefa3041b3c6d42cf8682310703e2bc7fc918a0581a8bf3a07ef",
+      "bytes": 33648
+    },
+    "grateful": {
+      "sha256": "8d06a6d67350adee84944efe773a5ef622ecaaf7c564379a958dc73b48e870f9",
+      "bytes": 35764
+    },
+    "calm": {
+      "sha256": "0182ccb867face6bd7a6daa01011817ee8644e97c80da06bcf0d08c8a13028bb",
+      "bytes": 22004
+    },
+    "focused": {
+      "sha256": "3e2a6a49efe3cdccf39b25660c62b575ad3052a81c1ef910e1c9edbf21d48125",
+      "bytes": 29414
+    },
+    "skeptical": {
+      "sha256": "de7c60af0e9eeed86c15c96e28c201c023d76cad065fe2f8f5c40633065a6d57",
+      "bytes": 29414
+    },
+    "guilty": {
+      "sha256": "a34417f296c66a2e0bd729fea0708ac285c55bfed081e6a22a2c65112efceb67",
+      "bytes": 44848
+    },
+    "relieved": {
+      "sha256": "ef4ab5cb8774f7c770195f8c03ffbe60cc46104e9c5b7808f53e6c5e64c588c0",
+      "bytes": 22004
+    },
+    "amazed": {
+      "sha256": "85ab09b91f337145258ddebc6a6b5f6452efc10173fe27dcf353757ac7cf164c",
+      "bytes": 21122
+    },
+    "hopeful": {
+      "sha256": "0ac67a98c655e2ebe6c9471768721b0f47641021e0d8f6d6e3bd9d51aab54a29",
+      "bytes": 37176
+    },
+    "worried": {
+      "sha256": "674f484e21f41374679a5f4159d72498ec85908051cb9c8317e62a336e5852e8",
+      "bytes": 44142
+    },
+    "playful": {
+      "sha256": "321efd1c57d5b388291192da199eaf5cc6922a2a35c967244298d93f564131b9",
+      "bytes": 30120
+    },
+    "offended": {
+      "sha256": "44bdc17ef24bc6e91ff99c2463e224146ce2153a595953f97cc7c1d125b5b7c8",
+      "bytes": 26504
+    },
+    "delighted": {
+      "sha256": "da3b42439984402f28d994aaf9e53a449ca3b46d89fe85b3a1d834ff48eda351",
+      "bytes": 28708
+    },
+    "tranquil": {
+      "sha256": "78baa4ac7442f782cb883dcf1f870fbb0a25996b379ad3ba444197f505ec3960",
+      "bytes": 21652
+    },
+    "suspicious": {
+      "sha256": "641ade673ac05094ba0f59d1b667a342ce316aadd8a70c4709a02227ccb84a86",
+      "bytes": 33824
+    },
+    "dreamy": {
+      "sha256": "ee6e6d20f1a25a0cd9ec07f339d048ce808dbbeab3cc64dc675410be450433de",
+      "bytes": 46436
+    },
+    "impatient": {
+      "sha256": "5e5a2b871e97c5df64e09382bade57f9da114acd4abaefb9b2c57914e8eceffc",
+      "bytes": 26504
+    },
+    "proud_tears": {
+      "sha256": "0eef1a7af614a1755ae5eb66cbff4c01be254d65a9f80a6ed40c759880d0ee92",
+      "bytes": 36470
+    },
+    "empathetic": {
+      "sha256": "0e8ca62be805ff18ca8b5d8e2352e3fe8dd3d60e9ef7705cc962d29474d35b41",
+      "bytes": 45554
+    },
+    "jealous": {
+      "sha256": "a210a07b09d23cd6e1e608f78249736199684188a0b8ca0add2a463446c8e436",
+      "bytes": 27914
+    },
+    "awkward": {
+      "sha256": "141b00682af37ce27dd8692d514b48b607f4f5c5ef5154b336574d403d607603",
+      "bytes": 33824
+    },
+    "zen": {
+      "sha256": "b9e8976e14bb3b26adfc35a8ef5ecb77b27b80cd98a4d367a0c81970916d1f5e",
+      "bytes": 22004
+    },
+    "glitch": {
+      "sha256": "95c89b402b8bbbaf57d9dcb004a5d3580423c704a54a7c83a031132f8e551188",
+      "bytes": 33118
+    },
+    "loading": {
+      "sha256": "9392d88cac4cb8caadcea5802b0dfc900f5d99cc4b8111c29dbe1deac914c2ac",
+      "bytes": 30120
+    },
+    "inspired": {
+      "sha256": "e66cb6974d8d6c1d07c1d9f749852b3398ae805c2e4f7fdb7251c09db8f851ae",
+      "bytes": 36470
+    },
+    "sleepy_happy": {
+      "sha256": "156de71226429b3444bcfbab32f0ead7fd3644af715331dd56ca74407534de00",
+      "bytes": 45730
+    },
+    "smug": {
+      "sha256": "8d92ac5c68fd527fcb76102fd391d7024b5af02d8f1d97366e2b3b810fec4314",
+      "bytes": 35764
+    },
+    "pleading": {
+      "sha256": "615285db9a4220a0c19f5c74a66de409a3b3c2c956d727ad137be8baae04fc61",
+      "bytes": 44848
+    },
+    "touched": {
+      "sha256": "5a9392d980c761f4b8e6056d3be35eff553b9a19faca611f0e094aa2d5a7f621",
+      "bytes": 44848
+    },
+    "victory": {
+      "sha256": "34a0e42e28e0d13bd126e0d021024558caacf0c40aee4bca27356315ad5a0b91",
+      "bytes": 37176
+    },
+    "meltdown": {
+      "sha256": "20dbca72875eead72790bbc6dac3548843ed00145c09804c960bab448c52d076",
+      "bytes": 33648
+    },
+    "ecstatic": {
+      "sha256": "ce57732ef9ec8fd1a37a728bf45aa27e69020275c3d02c6b14491bb1aacbfd2e",
+      "bytes": 30120
+    },
+    "frustrated": {
+      "sha256": "44bdc17ef24bc6e91ff99c2463e224146ce2153a595953f97cc7c1d125b5b7c8",
+      "bytes": 26504
+    },
+    "satisfied": {
+      "sha256": "43b3f176ed2aa98f3c9578d4d7b65192419b021319fb2cd402545bd446cdd78a",
+      "bytes": 37176
+    },
+    "anxious": {
+      "sha256": "7ff6ac86b7403c8c434c2e96ce578bbd7bea804c5eb880ffb44a6c166b3c4ecb",
+      "bytes": 33648
+    },
+    "content": {
+      "sha256": "4e4805373d5dc09544e3bfcaf7cdb6a830a4a233c9937d78812fb6522c19efd3",
+      "bytes": 21652
+    },
+    "melancholy": {
+      "sha256": "f8a8a61c4179829c5ef0b3680b38443fd95dc8f97ec3f4a6c9a337a655c4f035",
+      "bytes": 44848
+    },
+    "wonder": {
+      "sha256": "982ccb404b25b61ce39430fbe69cb0e1724f82937396b0c4eac225dd15f20089",
+      "bytes": 21122
+    },
+    "blissful": {
+      "sha256": "ae5fc059b167340362b8fb0d7a88cf28408292db9c6b377bcc30cff7d53952aa",
+      "bytes": 29414
+    },
+    "contemplative": {
+      "sha256": "a43736d1ce64e02f20ab819283db4eda5d7e7114b584ac46edab84050af8464f",
+      "bytes": 29414
+    },
+    "annoyed": {
+      "sha256": "4673ec10d1bb56662fc1ef3a5846f03012512ea071f15efbcddd6de41819038d",
+      "bytes": 27914
+    },
+    "exhausted": {
+      "sha256": "db917f616a6327b70f104fd30dd8d710810bf5f730e19dd0fad635f14f704be3",
+      "bytes": 45026
+    },
+    "compassionate": {
+      "sha256": "1cecc0cca93e4db21d603cdd35978efb3e7e61006bf66a53de0d4a4c6ca173ac",
+      "bytes": 44848
+    },
+    "smitten": {
+      "sha256": "78d416d3af9d4a7639a02c6aa33c72e8cab71d83d903a3fb4451866add3c1171",
+      "bytes": 39116
+    },
+    "heartbroken": {
+      "sha256": "9c9868fa23b95235015f39d9ad5b42adb0fc0ef44732695b3a00852b2b238a3e",
+      "bytes": 45554
+    },
+    "thrilled": {
+      "sha256": "ecc9172b40d5bbe212b2ad01b8e2273bea099c03889ac785faf5703d8c6bde54",
+      "bytes": 28708
+    },
+    "intrigued": {
+      "sha256": "1b8d2ab7e1d8e49f3101802756e0095dc100e52eb797bf836e5cbbb180a26d00",
+      "bytes": 20152
+    },
+    "yearning": {
+      "sha256": "5809cf3e50709e9dc15d83c3cb18835000e5fae7ec82ea4837c449b63137366e",
+      "bytes": 45554
+    },
+    "relaxed": {
+      "sha256": "3044859715b8c4b855d0f4fb7cbeb0e630a1889059a24f070936354d6b32f4d2",
+      "bytes": 22004
+    },
+    "snappy": {
+      "sha256": "cd912e7cda1aeb98dec8df8c86dc131e459354a7996d0c3bd33a07e1d21dc45d",
+      "bytes": 26504
+    },
+    "apologetic": {
+      "sha256": "105ed7c1abbcf91259ef8bab474d772d1e072c6f2058871748b66579a66ed7ef",
+      "bytes": 44848
+    },
+    "proud_smile": {
+      "sha256": "56552996cc6a20f55f27af891346744d0a0c9b980be6d4b5e8ce589019ce7285",
+      "bytes": 36470
+    },
+    "grumpy": {
+      "sha256": "edb2d44aa35d40ac32363351b57ddbf764361bf97e23da55854f7bdc6f3ed5db",
+      "bytes": 26504
+    },
+    "flirty": {
+      "sha256": "7f5989ac3281d74be3946fbb4fa49108d6a861a0e66a20f424b5c2f44d608e53",
+      "bytes": 39116
+    },
+    "sympathetic": {
+      "sha256": "d9b3a07e19e63189fc591095e100ab106b65ac25ac5ec9d61192a266e3cf2902",
+      "bytes": 44848
+    },
+    "confident": {
+      "sha256": "64d509960b93911e77bc739802f41416e670fcf4053511e425f81558a009dffc",
+      "bytes": 37176
+    },
+    "flustered": {
+      "sha256": "750288267f42e13860d692dabccae2650a6ee60d7e09f74d8ae82c8ca5394c30",
+      "bytes": 39822
+    },
+    "divine": {
+      "sha256": "dd4972db6e9fe091fac8581fbf3e194f9f38dc0f3750ae219511037e5927bce4",
+      "bytes": 36470
+    },
+    "snarky": {
+      "sha256": "80a18a87ba2de2722144998ea63ec8fb919d501f26fd7d949d1e606c05b3a679",
+      "bytes": 33824
+    },
+    "haunted": {
+      "sha256": "b542fc1f0ca516981bbea89228cc69ca519fd77e76fb16767e3e48e4ea2c97d4",
+      "bytes": 32236
+    },
+    "victorious": {
+      "sha256": "6ff081a14f3130f557df12371c07337f128d2a9117e0af754d2010dc1e9068e9",
+      "bytes": 36470
+    }
+  }
+}

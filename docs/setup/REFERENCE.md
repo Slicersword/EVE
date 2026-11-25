@@ -321,3 +321,32 @@ EVE_SIM=1 ./eve ctl chat "who are you"
 
 Do not set physical readiness flags to make simulation move. The automated tests already exercise
 commissioned fake configurations in temporary test state. Ctrl+C stops the simulation.
+
+
+## Try the restored expressions and home activities
+
+After M01 and the speaker check at M13, with wheel and head power off:
+
+1. On the face, tap the eyes to reveal **Expression sounds**, expand the panel and
+   choose **Enable sounds**. This starts muted on each new page load. **Natural**
+   is the default policy. **Quiet** allows rare attention cues, and **Playful**
+   allows additional reactions such as Proud Smile.
+2. Open the loopback control page using the usual token. Choose **Show expression**
+   to set the face for five seconds. For a direct sound-output check, open
+   **Expression studio and sound preview** and play Happy or Proud Smile. Preview
+   and live cues play on the device displaying the page. Keep live speech and the
+   microphone off during studio previews.
+3. In the control page, choose **EVE at home**. Start an activity and verify its
+   language and controls. Save only a test story or recipe you choose, reload,
+   and resume it. Try a short named timer. Select a local file for the music
+   visualizer, with microphone capture disabled. The file stays in that browser.
+4. Live cues yield to speech, microphone capture, quiet hours and a STOP latch.
+   Try them with mic capture disabled. If there is an active safety latch, use
+   the standalone preview for the speaker check while the robot is stationary.
+   Never clear an unresolved motion fault to hear a sound.
+
+For a hardware-free verification of a checkout, from the repository folder:
+
+```bash
+python3 tools/check_clone.py
+```

@@ -74,6 +74,10 @@ class Memory:
             self._db.executemany("UPDATE reminders SET done=1 WHERE id=?", [(r[0],) for r in rows])
         return [r[1] for r in rows]
 
+    def cancel_reminder(self, ident: int) -> bool:
+        with self._lock, self._db:
+            return self._db.execute("UPDATE reminders SET done=1 WHERE id=? AND done=0", (ident,)).rowcount > 0
+
     def cancel_reminders(self) -> int:
         with self._lock, self._db:
             return self._db.execute("UPDATE reminders SET done=1 WHERE done=0").rowcount

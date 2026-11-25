@@ -1,5 +1,12 @@
 ## Before M00: choose an installation route
 
+Use a separate checkout if an older robot installation already exists. Keep the
+motor supply off. The installer first runs the clone check with temporary state
+and simulated hardware. It verifies the packaged 90 original WAVs, the web
+routes and authenticated home commands before installing any system packages.
+A failure at this point means stop and check that you have the complete Git
+checkout or ZIP. A passing check still requires the physical M01–M17 tests.
+
 Target: Raspberry Pi 4, Raspberry Pi OS Desktop 64-bit Bookworm, Python 3.11, a
 working desktop login, SSH/PuTTY access and internet. Complete the Before you begin
 page first. PuTTY opens a terminal; the desktop must also be running on the Pi for the face.

@@ -29,6 +29,21 @@ it has been accepted on a physical robot. Start every build at zero.
 | Recovery tools | Doctor, stage checks, firmware fingerprint and safe diagnostic commands | Pi tools and the matching source/configuration | Use the relevant M-stage before confirming readiness |
 | Website notebook | Tracks task checkmarks, notes and completion dates with export/import | Any supported browser; optional local storage | Export and import a test backup on [My build progress](PROGRESS.md) |
 
+## Original expression pack and home activities
+
+The clone includes 90 expression definitions and their original WAV cues. The
+simple eyes-and-mouth face remains the normal display. The Expression Studio
+shows the original artwork and lets you audition every clip. Live expression
+sounds are opt-in and use Quiet, Natural, or Playful. Speech and microphone
+capture take precedence.
+
+Open **EVE at home** from the robot's token-protected control page. The bundled
+activities include riddles, a small twenty-questions game, antakshari, a branching
+story, recipe steps and named timers, household messages, reviewed memory
+capsules, and a local music visualizer. Saving requires explicit confirmation.
+Private records go to the Pi's data directory. User-selected songs stay in the
+browser. For test steps, see [Software setup](SETUP_GUIDE.md#try-the-restored-expressions-and-home-activities).
+
 ## What is enabled initially
 
 The shipped configuration leaves wheel/head firmware outputs disabled, all physical

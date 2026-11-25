@@ -1,5 +1,14 @@
 # Change log
 
+## Restore original expression and home features
+
+- Bundle all 90 recovered WAV cues with checksums, original artwork and a local
+  expression studio. The kiosk retains its simple default face and opt-in cues.
+- Restore the multilingual home activity catalog, home controls and local
+  persistence for games, stories, recipes, timers, messages, music and capsules.
+- Check the complete media pack and simulated HTTP build before setup installs
+  packages. Keep the existing firmware and commissioning defaults.
+
 ## Detailed hardware guide and optional progress — 24 November 2026
 
 - Matched the inventory and wiring to N20/TB6612 wheels, 28BYJ-48 head motors,

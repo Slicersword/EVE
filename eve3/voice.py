@@ -39,6 +39,10 @@ class Speaker:
         except queue.Full:
             return False                                # drop rather than fall behind
 
+    @property
+    def speech_pending(self):
+        return not self._queue.empty()
+
     def speak_now(self, text, voice):
         self.speaking = True
         try:

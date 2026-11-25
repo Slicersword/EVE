@@ -1,0 +1,399 @@
+{
+  "correct": {
+    "en": "Correct!",
+    "hi": "सही जवाब!",
+    "mr": "बरोबर उत्तर!",
+    "hi-en": "Sahi jawab!",
+    "mr-en": "Barobar uttar!",
+    "hi-mixed": "सही जवाब!",
+    "mr-mixed": "बरोबर उत्तर!"
+  },
+  "try_again": {
+    "en": "Answer:",
+    "hi": "जवाब:",
+    "mr": "उत्तर:",
+    "hi-en": "Jawab:",
+    "mr-en": "Uttar:",
+    "hi-mixed": "जवाब:",
+    "mr-mixed": "उत्तर:"
+  },
+  "yes": {
+    "en": "Yes",
+    "hi": "हाँ",
+    "mr": "हो",
+    "hi-en": "Haan",
+    "mr-en": "Ho",
+    "hi-mixed": "हाँ",
+    "mr-mixed": "हो"
+  },
+  "no": {
+    "en": "No",
+    "hi": "नहीं",
+    "mr": "नाही",
+    "hi-en": "Nahin",
+    "mr-en": "Nahi",
+    "hi-mixed": "नहीं",
+    "mr-mixed": "नाही"
+  },
+  "host_judges": {
+    "en": "Host: confirm the song and adjust the score.",
+    "hi": "संचालक गीत जाँचकर अंक दें।",
+    "mr": "संचालकाने गाणे तपासून गुण द्यावेत.",
+    "hi-en": "Host, gana check karke score dein.",
+    "mr-en": "Host, gaane tapasoon score dya.",
+    "hi-mixed": "संचालक गीत जाँचकर अंक दें।",
+    "mr-mixed": "संचालकाने गाणे तपासून गुण द्यावेत."
+  },
+  "riddles": [
+    {
+      "question": {
+        "en": "What has keys but cannot open a door?",
+        "hi": "किसमें कुंजियाँ हैं, पर वह दरवाज़ा नहीं खोल सकता?",
+        "mr": "कशाला कळा आहेत, पण दार उघडता येत नाही?",
+        "hi-en": "Kisme keys hain par darwaza nahi kholta?",
+        "mr-en": "Kashala keys aahet pan daar ughadat nahi?",
+        "hi-mixed": "किसमें कुंजियाँ हैं, पर वह दरवाज़ा नहीं खोल सकता?",
+        "mr-mixed": "कशाला कळा आहेत, पण दार उघडता येत नाही?"
+      },
+      "options": [
+        {
+          "en": "Piano",
+          "hi": "पियानो",
+          "mr": "पियानो",
+          "hi-en": "पियानो",
+          "mr-en": "पियानो",
+          "hi-mixed": "पियानो",
+          "mr-mixed": "पियानो"
+        },
+        {
+          "en": "Spoon",
+          "hi": "चम्मच",
+          "mr": "चमचा",
+          "hi-en": "चम्मच",
+          "mr-en": "चमचा",
+          "hi-mixed": "चम्मच",
+          "mr-mixed": "चमचा"
+        },
+        {
+          "en": "Cloud",
+          "hi": "बादल",
+          "mr": "ढग",
+          "hi-en": "बादल",
+          "mr-en": "ढग",
+          "hi-mixed": "बादल",
+          "mr-mixed": "ढग"
+        }
+      ],
+      "answer": 0
+    },
+    {
+      "question": {
+        "en": "What gets wetter while drying a plate?",
+        "hi": "थाली सुखाते समय खुद क्या गीला होता है?",
+        "mr": "ताट पुसताना स्वतः काय ओले होते?",
+        "hi-en": "Plate sukhate waqt kya geela hota hai?",
+        "mr-en": "Taat pustana kay ole hote?",
+        "hi-mixed": "थाली सुखाते समय खुद क्या गीला होता है?",
+        "mr-mixed": "ताट पुसताना स्वतः काय ओले होते?"
+      },
+      "options": [
+        {
+          "en": "Candle",
+          "hi": "मोमबत्ती",
+          "mr": "मेणबत्ती",
+          "hi-en": "मोमबत्ती",
+          "mr-en": "मेणबत्ती",
+          "hi-mixed": "मोमबत्ती",
+          "mr-mixed": "मेणबत्ती"
+        },
+        {
+          "en": "Towel",
+          "hi": "तौलिया",
+          "mr": "टॉवेल",
+          "hi-en": "तौलिया",
+          "mr-en": "टॉवेल",
+          "hi-mixed": "तौलिया",
+          "mr-mixed": "टॉवेल"
+        },
+        {
+          "en": "Stone",
+          "hi": "पत्थर",
+          "mr": "दगड",
+          "hi-en": "पत्थर",
+          "mr-en": "दगड",
+          "hi-mixed": "पत्थर",
+          "mr-mixed": "दगड"
+        }
+      ],
+      "answer": 1
+    },
+    {
+      "question": {
+        "en": "What has two hands but cannot clap?",
+        "hi": "किसके दो हाथ हैं, पर ताली नहीं बजती?",
+        "mr": "कशाला दोन हात आहेत पण टाळी वाजवता येत नाही?",
+        "hi-en": "Do hands hain par taali nahi bajata?",
+        "mr-en": "Don haat aahet pan taali vajavat nahi?",
+        "hi-mixed": "किसके दो हाथ हैं, पर ताली नहीं बजती?",
+        "mr-mixed": "कशाला दोन हात आहेत पण टाळी वाजवता येत नाही?"
+      },
+      "options": [
+        {
+          "en": "Chair",
+          "hi": "कुर्सी",
+          "mr": "खुर्ची",
+          "hi-en": "कुर्सी",
+          "mr-en": "खुर्ची",
+          "hi-mixed": "कुर्सी",
+          "mr-mixed": "खुर्ची"
+        },
+        {
+          "en": "Clock",
+          "hi": "घड़ी",
+          "mr": "घड्याळ",
+          "hi-en": "घड़ी",
+          "mr-en": "घड्याळ",
+          "hi-mixed": "घड़ी",
+          "mr-mixed": "घड्याळ"
+        },
+        {
+          "en": "Cup",
+          "hi": "कप",
+          "mr": "कप",
+          "hi-en": "कप",
+          "mr-en": "कप",
+          "hi-mixed": "कप",
+          "mr-mixed": "कप"
+        }
+      ],
+      "answer": 1
+    }
+  ],
+  "objects": [
+    {
+      "names": [
+        "pencil",
+        "पेंसिल",
+        "पेन्सिल",
+        "pensil"
+      ],
+      "label": {
+        "en": "Pencil",
+        "hi": "पेंसिल",
+        "mr": "पेन्सिल",
+        "hi-en": "पेंसिल",
+        "mr-en": "पेन्सिल",
+        "hi-mixed": "पेंसिल",
+        "mr-mixed": "पेन्सिल"
+      },
+      "traits": {
+        "living": false,
+        "home": true,
+        "writing": true,
+        "flying": false
+      }
+    },
+    {
+      "names": [
+        "parrot",
+        "तोता",
+        "पोपट",
+        "tota",
+        "popat"
+      ],
+      "label": {
+        "en": "Parrot",
+        "hi": "तोता",
+        "mr": "पोपट",
+        "hi-en": "तोता",
+        "mr-en": "पोपट",
+        "hi-mixed": "तोता",
+        "mr-mixed": "पोपट"
+      },
+      "traits": {
+        "living": true,
+        "home": false,
+        "writing": false,
+        "flying": true
+      }
+    },
+    {
+      "names": [
+        "cup",
+        "कप"
+      ],
+      "label": {
+        "en": "Cup",
+        "hi": "कप",
+        "mr": "कप",
+        "hi-en": "कप",
+        "mr-en": "कप",
+        "hi-mixed": "कप",
+        "mr-mixed": "कप"
+      },
+      "traits": {
+        "living": false,
+        "home": true,
+        "writing": false,
+        "flying": false
+      }
+    }
+  ],
+  "story": {
+    "start": {
+      "text": {
+        "en": "{hero} found a lantern in a quiet garden. One path led to a stream and another to a hill. Where next?",
+        "hi": "{hero} को बगीचे में लालटेन मिला। एक रास्ता झरने और दूसरा पहाड़ी की ओर था। कहाँ जाएँ?",
+        "mr": "{hero} ला बागेत कंदील सापडला. एक वाट झऱ्याकडे आणि दुसरी टेकडीकडे होती. कुठे जाऊया?",
+        "hi-en": "{hero} ko garden mein lantern mila. Stream ya hill, kahan chalein?",
+        "mr-en": "{hero} la garden madhye kandil sapadla. Stream ki hill, kuthe jauya?",
+        "hi-mixed": "{hero} को बगीचे में लालटेन मिला। एक रास्ता झरने और दूसरा पहाड़ी की ओर था। कहाँ जाएँ?",
+        "mr-mixed": "{hero} ला बागेत कंदील सापडला. एक वाट झऱ्याकडे आणि दुसरी टेकडीकडे होती. कुठे जाऊया?"
+      },
+      "choices": [
+        {
+          "label": {
+            "en": "Follow the stream",
+            "hi": "झरने की ओर",
+            "mr": "झऱ्याकडे",
+            "hi-en": "Stream ki taraf",
+            "mr-en": "Zaryakade",
+            "hi-mixed": "झरने की ओर",
+            "mr-mixed": "झऱ्याकडे"
+          },
+          "next": "stream"
+        },
+        {
+          "label": {
+            "en": "Climb the hill",
+            "hi": "पहाड़ी की ओर",
+            "mr": "टेकडीकडे",
+            "hi-en": "Hill ki taraf",
+            "mr-en": "Tekdikade",
+            "hi-mixed": "पहाड़ी की ओर",
+            "mr-mixed": "टेकडीकडे"
+          },
+          "next": "hill"
+        }
+      ]
+    },
+    "stream": {
+      "text": {
+        "en": "{hero} met a turtle searching for a way across the stream. Shall we use the bridge or light the stepping stones?",
+        "hi": "{hero} को रास्ता खोजता कछुआ मिला। पुल चुनें या पत्थरों को रोशन करें?",
+        "mr": "{hero} ला वाट शोधणारे कासव भेटले. पूल निवडू की दगड उजळवू?",
+        "hi-en": "{hero} ko turtle mila. Bridge chunein ya stones roshan karein?",
+        "mr-en": "{hero} la turtle bhetle. Bridge nivadu ki stones ujalavu?",
+        "hi-mixed": "{hero} को रास्ता खोजता कछुआ मिला। पुल चुनें या पत्थरों को रोशन करें?",
+        "mr-mixed": "{hero} ला वाट शोधणारे कासव भेटले. पूल निवडू की दगड उजळवू?"
+      },
+      "choices": [
+        {
+          "label": {
+            "en": "Use the bridge",
+            "hi": "पुल से जाएँ",
+            "mr": "पुलावरून जाऊ",
+            "hi-en": "Bridge se chalein",
+            "mr-en": "Bridge varun jau",
+            "hi-mixed": "पुल से जाएँ",
+            "mr-mixed": "पुलावरून जाऊ"
+          },
+          "next": "bridge_end"
+        },
+        {
+          "label": {
+            "en": "Light the stones",
+            "hi": "पत्थर रोशन करें",
+            "mr": "दगड उजळवू",
+            "hi-en": "Stones roshan karein",
+            "mr-en": "Stones ujalavu",
+            "hi-mixed": "पत्थर रोशन करें",
+            "mr-mixed": "दगड उजळवू"
+          },
+          "next": "stones_end"
+        }
+      ]
+    },
+    "hill": {
+      "text": {
+        "en": "{hero} discovered a sky map and a little bell. Follow the map or ring the bell?",
+        "hi": "{hero} को आकाश का नक्शा और घंटी मिली। नक्शे पर चलें या घंटी बजाएँ?",
+        "mr": "{hero} ला आकाशाचा नकाशा आणि घंटा सापडली. नकाशाप्रमाणे जाऊ की घंटा वाजवू?",
+        "hi-en": "{hero} ko sky map aur bell mili. Map follow karein ya bell bajayein?",
+        "mr-en": "{hero} la sky map ani bell sapadli. Map pramane jau ki bell vajavu?",
+        "hi-mixed": "{hero} को आकाश का नक्शा और घंटी मिली। नक्शे पर चलें या घंटी बजाएँ?",
+        "mr-mixed": "{hero} ला आकाशाचा नकाशा आणि घंटा सापडली. नकाशाप्रमाणे जाऊ की घंटा वाजवू?"
+      },
+      "choices": [
+        {
+          "label": {
+            "en": "Follow the map",
+            "hi": "नक्शे पर चलें",
+            "mr": "नकाशाप्रमाणे जाऊ",
+            "hi-en": "Map follow karein",
+            "mr-en": "Map pramane jau",
+            "hi-mixed": "नक्शे पर चलें",
+            "mr-mixed": "नकाशाप्रमाणे जाऊ"
+          },
+          "next": "map_end"
+        },
+        {
+          "label": {
+            "en": "Ring the bell",
+            "hi": "घंटी बजाएँ",
+            "mr": "घंटा वाजवू",
+            "hi-en": "Bell bajayein",
+            "mr-en": "Bell vajavu",
+            "hi-mixed": "घंटी बजाएँ",
+            "mr-mixed": "घंटा वाजवू"
+          },
+          "next": "bell_end"
+        }
+      ]
+    },
+    "bridge_end": {
+      "text": {
+        "en": "{hero} and the turtle crossed together. They left the lantern by the bridge for the next traveller. The end.",
+        "hi": "{hero} और कछुआ साथ पार गए। अगले यात्री के लिए लालटेन रखा। कहानी समाप्त।",
+        "mr": "{hero} आणि कासव एकत्र पार गेले. पुढच्या प्रवाशासाठी कंदील ठेवला. गोष्ट संपली.",
+        "hi-en": "{hero} aur turtle paar gaye. Lantern agle traveller ke liye chhoda. The end.",
+        "mr-en": "{hero} ani turtle paar gele. Kandil pudhchya traveller sathi thevla. Goshta sampli.",
+        "hi-mixed": "{hero} और कछुआ साथ पार गए। अगले यात्री के लिए लालटेन रखा। कहानी समाप्त।",
+        "mr-mixed": "{hero} आणि कासव एकत्र पार गेले. पुढच्या प्रवाशासाठी कंदील ठेवला. गोष्ट संपली."
+      }
+    },
+    "stones_end": {
+      "text": {
+        "en": "The stones glowed. {hero} waited patiently while the turtle crossed, then they shared a peaceful evening. The end.",
+        "hi": "पत्थर रोशन हुए। {hero} ने कछुए का इंतज़ार किया। दोनों ने शांत शाम बिताई। कहानी समाप्त।",
+        "mr": "दगड उजळले. {hero} कासवासाठी थांबले. दोघांनी शांत संध्याकाळ घालवली. गोष्ट संपली.",
+        "hi-en": "Stones roshan hue. {hero} ne turtle ka intezar kiya. The end.",
+        "mr-en": "Stones ujalle. {hero} turtle sathi thamble. Goshta sampli.",
+        "hi-mixed": "पत्थर रोशन हुए। {hero} ने कछुए का इंतज़ार किया। दोनों ने शांत शाम बिताई। कहानी समाप्त।",
+        "mr-mixed": "दगड उजळले. {hero} कासवासाठी थांबले. दोघांनी शांत संध्याकाळ घालवली. गोष्ट संपली."
+      }
+    },
+    "map_end": {
+      "text": {
+        "en": "The map brought {hero} to flowers shaped like stars. The lantern became their evening sun. The end.",
+        "hi": "{hero} तारों जैसे फूलों तक पहुँचे। लालटेन शाम का सूरज बना। कहानी समाप्त।",
+        "mr": "{hero} ताऱ्यासारख्या फुलांजवळ पोहोचले. कंदील संध्याकाळचा सूर्य झाला. गोष्ट संपली.",
+        "hi-en": "{hero} star flowers tak pahunche. Lantern evening sun bana. The end.",
+        "mr-en": "{hero} star flowers javal pohachle. Kandil evening sun zala. Goshta sampli.",
+        "hi-mixed": "{hero} तारों जैसे फूलों तक पहुँचे। लालटेन शाम का सूरज बना। कहानी समाप्त।",
+        "mr-mixed": "{hero} ताऱ्यासारख्या फुलांजवळ पोहोचले. कंदील संध्याकाळचा सूर्य झाला. गोष्ट संपली."
+      }
+    },
+    "bell_end": {
+      "text": {
+        "en": "Paper birds answered the bell and showed {hero} the way home, carrying lantern light on their wings. The end.",
+        "hi": "कागज़ के पंछी आए और {hero} को घर का रास्ता दिखाया। कहानी समाप्त।",
+        "mr": "कागदी पक्षी आले आणि त्यांनी {hero} ला घरची वाट दाखवली. गोष्ट संपली.",
+        "hi-en": "Paper birds aaye aur {hero} ko ghar ka rasta dikhaya. The end.",
+        "mr-en": "Paper birds aale ani {hero} la gharchi vat dakhavli. Goshta sampli.",
+        "hi-mixed": "कागज़ के पंछी आए और {hero} को घर का रास्ता दिखाया। कहानी समाप्त।",
+        "mr-mixed": "कागदी पक्षी आले आणि त्यांनी {hero} ला घरची वाट दाखवली. गोष्ट संपली."
+      }
+    }
+  }
+}

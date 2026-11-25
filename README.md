@@ -34,7 +34,9 @@ Windows PowerShell. The `eve` launcher selects the Python virtual environment.
 
 The repository contains the Python runtime (`eve3/`), Mega sketch (`firmware/`),
 setup and diagnostic tools, configuration examples, host tests, and the source for
-the companion website. The website is generated directly from these documents and
+the companion website. The clone includes the original 90 expression WAVs, the
+expression studio, and the local home activity catalog and UI. System packages and
+optional model downloads are installed in the documented setup stages. The website is generated directly from these documents and
 source files; it includes offline search, copy buttons and full source listings.
 
 The hardware path uses two regulated 5 V USB banks, two TB6612FNG wheel drivers,
@@ -72,3 +74,5 @@ runs locally; external AI and network integrations are disabled by default.
 
 Project licensing remains an explicit maintainer choice. Public access alone does
 not grant an open-source license; included third-party files retain their own licenses.
+
+See [coverage of older EVE builds](docs/KNOWN_LIMITATIONS.md#coverage-of-older-eve-builds) for historical features and files outside this setup.

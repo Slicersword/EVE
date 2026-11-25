@@ -6,12 +6,20 @@ then every request except the face page itself needs the token. Commands ALWAYS 
 from __future__ import annotations
 import hmac, ipaddress, json, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
+from zipfile import ZipFile
+from .expressions import CLIPS, WEB
 from urllib.parse import parse_qs, urlparse
 
-WEB = Path(__file__).resolve().parent / "web"
 MAX_BODY = 4096
-PAGES = {"/": "face.html", "/control": "control.html"}
+MAX_HOME_BODY = 32768
+PAGES = {"/": "face.html", "/control": "control.html", "/expressions": "expressions.html", "/home": "home.html"}
+EXPRESSION_ASSETS = {
+    "/home.css": ("home.css", "text/css"),
+    "/home.js": ("home.js", "text/javascript"),
+    "/eva-face-art.js": ("eva-face-art.js", "text/javascript"),
+    "/expression-audio.js": ("expression-audio.js", "text/javascript"),
+    "/expression-assets.json": ("expressions.json", "application/json"),
+}
 
 
 def host_allowed(host_header: str) -> bool:
@@ -37,12 +45,12 @@ def make_handler(runtime):
 
         def _send(self, code, body: bytes, ctype="application/json"):
             self.send_response(code)
-            self.send_header("Content-Type", ctype + "; charset=utf-8")
+            self.send_header("Content-Type", ctype if ctype.startswith("audio/") else ctype + "; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
             self.send_header("X-Frame-Options", "DENY")
-            self.send_header("Content-Security-Policy", "default-src 'self' 'unsafe-inline'; connect-src 'self'")
+            self.send_header("Content-Security-Policy", "default-src 'self' 'unsafe-inline'; connect-src 'self'; media-src 'self' blob:")
             self.end_headers()
             self.wfile.write(body)
 
@@ -62,6 +70,18 @@ def make_handler(runtime):
             url = urlparse(self.path)
             if url.path in PAGES:
                 return self._send(200, (WEB / PAGES[url.path]).read_bytes(), "text/html")
+            if url.path in EXPRESSION_ASSETS:
+                file, mime = EXPRESSION_ASSETS[url.path]
+                return self._send(200, (WEB / file).read_bytes(), mime)
+            if url.path.startswith("/sfx/"):
+                name = url.path.removeprefix("/sfx/")
+                if name.endswith(".wav") and name[:-4] in CLIPS:
+                    with ZipFile(WEB / "expression-sounds.zip") as pack:
+                        return self._send(200, pack.read(name), "audio/wav")
+            if url.path == "/api/audio-priority":
+                if not self._token_ok():
+                    return self._json(401, {"ok": False, "message": "token required"})
+                return self._json(200, runtime.audio_priority())
             if url.path == "/api/status":
                 if not (self._local() or self._token_ok(parse_qs(url.query))):
                     return self._json(401, {"ok": False, "message": "token required"})
@@ -71,7 +91,8 @@ def make_handler(runtime):
         def do_POST(self):
             if not host_allowed(self.headers.get("Host", "")):
                 return self._json(403, {"ok": False, "message": "bad host"})
-            if urlparse(self.path).path != "/api/command":
+            path = urlparse(self.path).path
+            if path not in ("/api/command", "/api/home-command"):
                 return self._json(404, {"ok": False, "message": "not found"})
             if not self._token_ok():
                 return self._json(401, {"ok": False, "message": "token required"})
@@ -79,13 +100,16 @@ def make_handler(runtime):
                 length = int(self.headers.get("Content-Length", ""))
             except ValueError:
                 return self._json(411, {"ok": False, "message": "length required"})
-            if not 0 < length <= MAX_BODY:
+            limit = MAX_HOME_BODY if path == "/api/home-command" else MAX_BODY
+            if not 0 < length <= limit:
                 return self._json(413, {"ok": False, "message": "request too large"})
             try:
                 body = json.loads(self.rfile.read(length).decode("utf-8"))
                 name, args = body["name"], body.get("args", {})
             except (ValueError, KeyError, TypeError, UnicodeError):
                 return self._json(400, {"ok": False, "message": "bad JSON"})
+            if path == "/api/home-command" and (not isinstance(name, str) or not name.startswith("home.")):
+                return self._json(400, {"ok": False, "message": "home command required"})
             ok, message = runtime.execute(name, args, source="owner")
             self._json(200, {"ok": bool(ok), "message": message})
 

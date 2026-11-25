@@ -35,3 +35,11 @@ sharing a URL that includes a token. Tokens change with runtime restart.
 
 The runtime avoids HTTP access logs, but terminal history, manually copied output and service logs can
 still disclose information. Inspect logs before sharing. Git ignores all runtime data and local overlays.
+
+
+Home activity records are held locally in `home_companion.sqlite3`. The robot's
+control token is required to read or change them. Household messages are a shared
+board for holders of that token. Music is selected and played in the browser
+without uploading a file. The expression WAVs are original generated cues, and
+the bundled activity catalog contains prepared examples. Git does not contain
+the Pi's saved household records.

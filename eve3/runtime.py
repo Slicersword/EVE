@@ -7,6 +7,8 @@ Every command - web, CLI, touch, voice - enters through execute(); voice/chat ma
 from __future__ import annotations
 import os, secrets, threading, time
 from . import __version__, firmware, intents
+from .expressions import EXPRESSIONS
+from .home.activities import HomeModule
 from .ai import ACTIONS, Brain, line
 from .behavior import Behavior, Context
 from .camera import Camera, tracking_step
@@ -22,7 +24,6 @@ from .touch import TouchPads
 from .voice import Listener, Speaker
 
 VOICE_COMMANDS = frozenset(name for name, _ in ACTIONS.values())      # stop, drive, head_look, sleep, wake
-EXPRESSIONS = ("idle", "happy", "sleepy", "alert", "listening", "speaking", "surprised", "sad", "love")
 LOOK = {"left": (-200, 0), "right": (200, 0), "up": (0, 80), "down": (0, -80), "center": (0, 0)}
 
 
@@ -59,6 +60,7 @@ class Runtime:
         self.token = secrets.token_urlsafe(18)
         self.expression = "idle"
         self.caption = ""
+        self._cue_block_until = 0.0
         self.lang = cfg["robot"]["language"]
         self.last_interaction = time.time()
         self._override = ("", 0.0)             # (expression, until) set by touch / owner
@@ -79,6 +81,22 @@ class Runtime:
             "sleep": self._c_sleep, "wake": self._c_wake,
             "note_add": self._c_note_add, "notes": self._c_notes, "note_forget": self._c_note_forget,
             "erase_memory": self._c_erase_memory, "remind": self._c_remind, "reminders": self._c_reminders,
+        }
+
+        self._audio_session = secrets.token_hex(8)
+        self.home = HomeModule(self, data_path(cfg, f"{cfg['storage']['data_dir']}/home_companion.sqlite3")) if self.memory else None
+        if self.home:
+            self.commands.update(self.home.commands())
+
+    def audio_priority(self):
+        return {
+            "session": self._audio_session,
+            "home_available": bool(self.home and self.home._allowed()),
+            "stop_latched": bool(self.gate.latched),
+            "capture_active": self.cfg["voice"]["capture_enabled"],
+            "speaking": self.speaker.speaking or getattr(self.speaker, "speech_pending", False)
+                        or time.monotonic() < self._cue_block_until,
+            "music_stop_generation": self.home.music_stop_generation if self.home else 0,
         }
 
     # ------------------------------------------------------------------ lifecycle
@@ -107,6 +125,8 @@ class Runtime:
                 part.stop()
         self.touch.close()
         self.reader.close()
+        if self.home:
+            self.home.stop()
         if self.memory:
             self.memory.close()
         log("EVE stopped safely.")
@@ -203,6 +223,7 @@ class Runtime:
         self.behavior.sleeping = False
 
     def _speak(self, text, lang):
+        self._cue_block_until = time.monotonic() + 1
         self.caption = text
         self.speaker.say(text, lang)
 
@@ -367,6 +388,8 @@ class Runtime:
         if a.get("confirm") is not True:
             return False, "confirm=true required; this erases all notes and reminders"
         self._need_memory().erase_all()
+        if self.home:
+            self.home.clear_private_data()
         return True, "memory erased"
 
     def _c_remind(self, a):
@@ -387,6 +410,13 @@ class Runtime:
         return {
             "name": cfg["robot"]["name"], "version": __version__, "expression": self.expression,
             "caption": self.caption if self.speaker.speaking else "", "sleeping": self.behavior.sleeping,
+            "expression_cues_allowed": not (
+                cfg["voice"]["capture_enabled"] or self.gate.latched or self.speaker.speaking
+                or getattr(self.speaker, "speech_pending", False)
+                or self._thinking or self.expression in ("listening", "speaking")
+                or time.monotonic() < self._cue_block_until
+                or self.behavior.is_night()
+            ),
             "face_offset": self.camera.offset if self.camera.face_present() else None,
             "mega": {"connected": self.link.synced, "online": self.link.online(), "firmware_id": self.link.firmware_id,
                      "expected_id": self.link.expected_id, "firmware_ok": self.link.firmware_ok,

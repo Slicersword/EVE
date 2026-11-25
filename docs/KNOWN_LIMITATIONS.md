@@ -28,3 +28,25 @@ performing each hands-on acceptance test.
 Some stage checks confirm availability only. Dialogue, reminders, sleep/wake,
 sound and physical behavior still require their interactive tests. A successful
 automated check never records a physical test as passed without builder confirmation.
+
+## Coverage of older EVE builds
+
+The current checkout preserves the original 90-expression catalog, artwork and
+sound files and the prepared home activities from the 6 November handover. This
+build uses the current Pi/Mega interface and setup guide.
+
+| Older work | Current Git build |
+|---|---|
+| Expression artwork and audio | All 90 originals are in Git, with separate preview and live opt-in playback. |
+| Family games, story branches, recipe sessions, timers, messages, music and memory capsules | Bundled and accessible from the token-protected Home page. Household data and chosen music are supplied locally. |
+| Earlier expression studio controls and old spoken home command phrases | Use the current Expression Studio and Home screen. The old command API and its full voice shortcuts have not been ported. |
+| Earlier family voice profiles, special privacy modes and audio echo-cancellation path | Not migrated. The current microphone and speaker use turn-taking. |
+| Older joystick controller, local model experiments and automated maintenance workflows | Not part of the supported clone setup. |
+| Chassis CAD, build photos and historical reports | The Git build includes assembly and connection guides. Older CAD and image originals remain in historical archives. |
+| Earlier firmware, field calibration, measurements and device state | Use the firmware and guide from this checkout. Physical commissioning must be performed on the assembled robot. |
+
+Fresh installation still needs an internet connection for Pi OS packages,
+Arduino tooling and the optional speech model. The automated checkout test covers
+bundled assets, simulated runtime and access controls. Only an on-Pi test can
+verify the actual GPIO wiring, USB serial port, audio output, sensors and motion
+interlocks.

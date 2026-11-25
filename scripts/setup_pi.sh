@@ -10,6 +10,7 @@ cd "$(dirname "$0")/.."
   || { echo "Target: Raspberry Pi 4, Raspberry Pi OS Desktop 64-bit Bookworm. See docs/GETTING_STARTED.md."; exit 1; }
 [ "$(id -u)" -ne 0 ] || { echo "Run as your normal Pi user; the installer invokes sudo where needed."; exit 1; }
 chmod +x eve scripts/*.sh tools/*.py 2>/dev/null || true
+python3 tools/check_clone.py
 sudo apt-get update
 sudo apt-get install -y python3-venv python3-dev python3-smbus2 python3-serial python3-gpiozero python3-lgpio python3-libgpiod \
   python3-picamera2 python3-opencv opencv-data i2c-tools raspi-utils espeak-ng alsa-utils device-tree-compiler g++ git cmake curl

@@ -8,6 +8,13 @@ Rules: stages in order, never skip. The Bank B actuator branch stays OFF until M
 
 ## Before M00: choose an installation route
 
+Use a separate checkout if an older robot installation already exists. Keep the
+motor supply off. The installer first runs the clone check with temporary state
+and simulated hardware. It verifies the packaged 90 original WAVs, the web
+routes and authenticated home commands before installing any system packages.
+A failure at this point means stop and check that you have the complete Git
+checkout or ZIP. A passing check still requires the physical M01–M17 tests.
+
 Target: Raspberry Pi 4, Raspberry Pi OS Desktop 64-bit Bookworm, Python 3.11, a
 working desktop login, SSH/PuTTY access and internet. Complete the Before you begin
 page first. PuTTY opens a terminal; the desktop must also be running on the Pi for the face.
@@ -1012,3 +1019,32 @@ EVE_SIM=1 ./eve ctl chat "who are you"
 
 Do not set physical readiness flags to make simulation move. The automated tests already exercise
 commissioned fake configurations in temporary test state. Ctrl+C stops the simulation.
+
+
+## Try the restored expressions and home activities
+
+After M01 and the speaker check at M13, with wheel and head power off:
+
+1. On the face, tap the eyes to reveal **Expression sounds**, expand the panel and
+   choose **Enable sounds**. This starts muted on each new page load. **Natural**
+   is the default policy. **Quiet** allows rare attention cues, and **Playful**
+   allows additional reactions such as Proud Smile.
+2. Open the loopback control page using the usual token. Choose **Show expression**
+   to set the face for five seconds. For a direct sound-output check, open
+   **Expression studio and sound preview** and play Happy or Proud Smile. Preview
+   and live cues play on the device displaying the page. Keep live speech and the
+   microphone off during studio previews.
+3. In the control page, choose **EVE at home**. Start an activity and verify its
+   language and controls. Save only a test story or recipe you choose, reload,
+   and resume it. Try a short named timer. Select a local file for the music
+   visualizer, with microphone capture disabled. The file stays in that browser.
+4. Live cues yield to speech, microphone capture, quiet hours and a STOP latch.
+   Try them with mic capture disabled. If there is an active safety latch, use
+   the standalone preview for the speaker check while the robot is stationary.
+   Never clear an unresolved motion fault to hear a sound.
+
+For a hardware-free verification of a checkout, from the repository folder:
+
+```bash
+python3 tools/check_clone.py
+```
