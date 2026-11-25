@@ -133,7 +133,9 @@ class SensorTests(unittest.TestCase):
         first = hub.snapshot()
         self.assertEqual((first.tof_mm, first.tilt_deg), ((100.0, 200.0, 300.0), 1.0))
         reader.poll()                                                        # tof bus error, imu implausible
-        self.assertEqual(hub.snapshot(), first)                              # nothing new published
+        failed = hub.snapshot()
+        self.assertEqual((failed.tof_mm, failed.tilt_deg), ((None, None, None), None))
+        self.assertEqual((failed.tof_at, failed.imu_at), (0, 0))
         self.assertFalse(reader.status()["tof"]["ok"])
         reader.poll()
         self.assertEqual(tof.starts, 1)                                      # waits retry_s before restarting
@@ -162,7 +164,8 @@ class SafetyTests(unittest.TestCase):
             "tof stale": dict(tof_at=now - 0.6), "tof never": dict(tof_at=0.0), "tof future": dict(tof_at=now + 5),
             "imu stale": dict(imu_at=now - 0.6), "tilt none": dict(tilt_deg=None), "tilt nan": dict(tilt_deg=float("nan")),
             "tilt big": dict(tilt_deg=29.0), "cliff stale": dict(cliff_at=now - 0.6), "cliff one": dict(cliff=(False, True, False)),
-            "cliff none": dict(cliff=(False, None, False)), "obstacle left": dict(tof_mm=(149.0, 500.0, 500.0)),
+            "cliff none": dict(cliff=(False, None, False)), "cliff short": dict(cliff=()),
+            "obstacle left": dict(tof_mm=(149.0, 500.0, 500.0)),
             "obstacle right": dict(tof_mm=(500.0, 100.0, 500.0)),
         }
         for name, over in cases.items():
@@ -291,6 +294,16 @@ class MotionTests(unittest.TestCase):
         self.link.stop_motion = lambda: (_ for _ in ()).throw(IOError("gone"))
         self.drive.move(0, 0, 0)
         self.assertIsNone(self.drive.active)
+
+    def test_failed_motion_send_is_reported(self):
+        def drop(*args):
+            raise OSError("unplugged")
+        self.link.drive = self.link.head = drop
+        self.assertFalse(self.drive.move(60, 60, 1)[0])
+        self.assertIsNone(self.drive.active)
+        self.head.home(True)
+        self.assertFalse(self.head.jog(4, 0, True)[0])
+        self.assertFalse(self.head.homed)
 
     def test_head_home_needs_owner_confirmation(self):
         self.assertFalse(self.head.home(False)[0])

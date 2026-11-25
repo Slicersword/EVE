@@ -46,8 +46,10 @@ sensor fault or emergency stop can prevent further movement and require investig
   independently of the runtime.
 - A back-pad hold requests emergency stop while the touch/runtime path is working.
   The CLI emergency stop also needs a live server/link to reach the controller.
-- A voice stop needs a recognized utterance and cannot interrupt speech/transcription
-  in this half-duplex implementation. It is an additional convenience.
+- Voice stop depends on recognition and is unavailable during standard turn-taking
+  playback. Operate with the physical cutoff within reach.
+- Normal Stop disables face tracking. Start a fresh session to resume tracking,
+  and manually home the head again if it was moving when stopped.
 - After a normal session, end the session, turn off the actuator branch and stop EVE.
   Shut the Pi down cleanly before removing Bank A or storage.
 
@@ -134,7 +136,7 @@ starting the robot; source backups do not install new dependencies or flash firm
 | ToF/IMU board, wiring or mounting | M04 freshness/readings and M05 refusal tests |
 | Motor, wheel, driver or firmware timing | M03 current, M05 stops and M07 lifted/contained tests |
 | Head bracket, load, steps or cable | M08 centre/travel/retention; M10 tracking if enabled |
-| Microphone, room noise or gain | M13 each channel, threshold, recognition and half-duplex test |
+| Microphone, room noise or gain | M13 each channel, threshold and recognition tests; repeat acoustic acceptance if using echo cancellation |
 | Amplifier/speaker/supply | Electrical supply/output-limit acceptance and M13 audibility |
 | Desktop, OS, service or network | M01/M16/M17 startup, authorized access and no motion after restart |
 

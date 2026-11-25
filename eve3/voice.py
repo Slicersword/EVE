@@ -1,11 +1,40 @@
-"""M13 - voice. Speaking: espeak-ng (English, Hindi, Marathi). Hearing: arecord -> simple loudness-based
-speech detection -> whisper.cpp on the Pi. Audio stays in RAM: the short clip handed to whisper lives in
-/dev/shm and is deleted straight after. While EVE speaks the microphone input is thrown away, so she does
-not hear herself."""
+"""M13 - local voice. The normal ALSA path takes turns. The optional paired echo-cancel path
+uses the Pi's local desktop audio server. Temporary recognition clips live in RAM under /dev/shm."""
 from __future__ import annotations
-import array, os, queue, subprocess, tempfile, threading, wave
+import array, os, queue, shlex, subprocess, tempfile, threading, time, wave
 
 VOICES = {"en": "en", "hi": "hi", "mr": "mr"}
+ECHO_SOURCE = "eve_echo_capture"
+ECHO_SINK = "eve_echo_playback"
+
+
+def audio_server() -> str:
+    # Explicit Unix socket keeps the microphone on this host even if PULSE_SERVER is set.
+    return f"--server=unix:/run/user/{os.getuid()}/pulse/native"
+
+
+def check_echo_route(run=subprocess.run):
+    def rows(kind):
+        result = run(["pactl", audio_server(), "list", "short", kind], timeout=2,
+                     text=True, capture_output=True, check=True)
+        return [line.split("\t") for line in result.stdout.splitlines()]
+
+    try:
+        sources = {row[1] for row in rows("sources") if len(row) > 1}
+        sinks = {row[1] for row in rows("sinks") if len(row) > 1}
+        for row in rows("modules"):
+            if len(row) < 3 or row[1] != "module-echo-cancel":
+                continue
+            options = dict(option.split("=", 1) for option in shlex.split(row[2]) if "=" in option)
+            capture, playback = options.get("source_master", ""), options.get("sink_master", "")
+            if (options.get("aec_method") == "webrtc" and options.get("source_name") == ECHO_SOURCE
+                    and options.get("sink_name") == ECHO_SINK and {ECHO_SOURCE, capture} <= sources
+                    and {ECHO_SINK, playback} <= sinks and capture != ECHO_SOURCE
+                    and not capture.endswith(".monitor") and playback != ECHO_SINK):
+                return
+    except (OSError, subprocess.SubprocessError, ValueError):
+        pass
+    raise RuntimeError("local WebRTC echo route unavailable; see optional voice setup (M13)")
 
 
 def clean_speech(text, limit=300) -> str:
@@ -17,10 +46,12 @@ class Speaker:
     def __init__(self, cfg, run=subprocess.run):
         v = cfg["voice"]
         self.enabled, self.command, self.speed = v["tts_enabled"] is True, v["tts_command"], int(v["tts_speed"])
+        self.echo_cancel = v["echo_cancel_enabled"]
         self._run = run
         self._queue: queue.Queue = queue.Queue(maxsize=5)
         self.speaking = False
         self.last_error = ""
+        self.quiet_until = 0.0
         self._stop = threading.Event()
         self._thread = None
 
@@ -29,46 +60,64 @@ class Speaker:
         self._thread = threading.Thread(target=self._loop, name="eve3-speaker", daemon=True)
         self._thread.start()
 
-    def say(self, text, lang="en") -> bool:
+    def say(self, text, lang="en", on_done=None) -> bool:
         text = clean_speech(text)
-        if not self.enabled or not text:
+        if not self.enabled or not text or self._stop.is_set():
             return False
         try:
-            self._queue.put_nowait((text, VOICES.get(lang, "en")))
+            self._queue.put_nowait((text, VOICES.get(lang, "en"), on_done))
             return True
         except queue.Full:
             return False                                # drop rather than fall behind
 
     @property
     def speech_pending(self):
-        return not self._queue.empty()
+        return bool(self._queue.unfinished_tasks)
 
     def speak_now(self, text, voice):
         self.speaking = True
         try:
             # list arguments + "--": the text can never be read as an option or a shell command
-            result = self._run([self.command, "-v", voice, "-s", str(self.speed), "--", text],
-                               timeout=30, check=False, capture_output=True)
+            args = [self.command, "-v", voice, "-s", str(self.speed)]
+            if self.echo_cancel:
+                check_echo_route(self._run)
+                args.append("--stdout")
+            result = self._run([*args, "--", text], timeout=30, check=False, capture_output=True)
             code = getattr(result, "returncode", 0)
             self.last_error = f"speech command exited {code}" if code else ""
+            if self.echo_cancel and not code:
+                result = self._run(["paplay", audio_server(), f"--device={ECHO_SINK}"], input=result.stdout,
+                                   timeout=30, check=False, capture_output=True)
+                if result.returncode:
+                    self.last_error = "echo-cancel playback failed"
+        except RuntimeError as exc:
+            self.last_error = str(exc)
         except Exception as exc:
             self.last_error = type(exc).__name__
         finally:
+            self.quiet_until = time.monotonic() + 0.5
             self.speaking = False
+        return not self.last_error
 
     def _loop(self):
         while not self._stop.is_set():
             try:
-                text, voice = self._queue.get(timeout=0.2)
+                text, voice, complete = self._queue.get(timeout=0.2)
             except queue.Empty:
                 continue
-            self.speak_now(text, voice)
+            try:
+                success = not self._stop.is_set() and self.speak_now(text, voice)
+                if complete:
+                    complete(success)
+            finally:
+                self._queue.task_done()
 
     def stop(self):
         self._stop.set()
         while not self._queue.empty():
             try:
                 self._queue.get_nowait()
+                self._queue.task_done()
             except queue.Empty:
                 break
 
@@ -124,6 +173,8 @@ def transcribe(cfg, pcm: bytes, run=subprocess.run, shm="/dev/shm") -> str:
         result = run([os.path.join(root, v["stt_command"]), "-m", os.path.join(root, v["stt_model"]), "-f", path,
                       "-l", str(v["stt_language"]), "-nt", "-np", "-t", "3"],
                      capture_output=True, text=True, timeout=v["stt_timeout_s"], check=False)
+        if getattr(result, "returncode", 0) != 0:
+            raise RuntimeError("speech recognition command failed")
         text = " ".join(result.stdout.split())
         return "" if text.startswith(("[", "(")) else text[:400]         # "[BLANK_AUDIO]", "(music)" etc.
     finally:
@@ -141,6 +192,7 @@ class Listener:
         self._popen, self._transcribe = popen, transcriber
         v = cfg["voice"]
         self.rate = int(v["sample_rate"])
+        self.echo_cancel = v["echo_cancel_enabled"]
         self.chunk_bytes = self.rate // 10 * 2
         self.segmenter = Segmenter(v["vad_rms"], 0.1, v["silence_s"], v["max_utterance_s"])
         self.listening = False
@@ -158,32 +210,44 @@ class Listener:
     def _loop(self):
         v = self.cfg["voice"]
         while not self._stop.is_set():
+            failed = False
             try:
-                self._proc = self._popen(["arecord", "-q", "-D", str(v["capture_device"]), "-f", "S16_LE", "-r", str(self.rate),
-                                          "-c", "1", "-t", "raw"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                if self.echo_cancel:
+                    check_echo_route()
+                    args = ["parec", audio_server(), f"--device={ECHO_SOURCE}", "--raw", "--format=s16le",
+                            f"--rate={self.rate}", "--channels=1"]
+                else:
+                    args = ["arecord", "-q", "-D", str(v["capture_device"]), "-f", "S16_LE", "-r", str(self.rate),
+                            "-c", "1", "-t", "raw"]
+                self._proc = self._popen(args, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
                 self.listening, self.last_error = True, ""
                 while not self._stop.is_set():
                     chunk = self._proc.stdout.read(self.chunk_bytes)
                     if not chunk:
                         raise IOError("microphone stream ended")
-                    self.handle_chunk(chunk)
+                    if self.handle_chunk(chunk):
+                        break                    # reopen the device after inference; discard queued audio
             except Exception as exc:
                 self.last_error = f"{type(exc).__name__}: {exc}"[:120]
+                failed = True
             finally:
                 self.listening = False
                 self._kill()
-            self._stop.wait(5)                           # retry later; never spin
+            if failed:
+                self._stop.wait(5)               # retry later; never spin
 
     def handle_chunk(self, chunk: bytes):
-        if self.is_speaking():
+        if not self.echo_cancel and self.is_speaking():
             self.segmenter.reset()                       # half-duplex: ignore the robot's own voice
             return
         self.level = rms(chunk)
         utterance = self.segmenter.feed(chunk)
         if utterance:
+            self._kill()                         # the capture buffer cannot accumulate while recognition runs
             text = self._transcribe(self.cfg, utterance)
-            if text:
+            if text and not self._stop.is_set() and (self.echo_cancel or not self.is_speaking()):
                 self.on_text(text)
+            return True
 
     def _kill(self):
         proc, self._proc = self._proc, None

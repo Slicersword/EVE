@@ -29,7 +29,7 @@
                    "endpoint": "", "model": "", "key_file": "data/cloud.key",
                    "max_requests_per_day": 50, "timeout_s": 30, "max_tokens": 200}},
   "voice": {"languages": ["en", "hi", "mr"], "tts_enabled": true, "tts_command": "espeak-ng",
-            "tts_speed": 150, "capture_enabled": false, "capture_device": "default",
+            "tts_speed": 150, "capture_enabled": false, "capture_device": "default", "echo_cancel_enabled": false,
             "sample_rate": 16000, "vad_rms": 500, "max_utterance_s": 8, "require_wake_word": true,
             "stt_command": "third_party/whisper.cpp/build/bin/whisper-cli",
             "stt_model": "models/ggml-tiny.bin", "stt_language": "auto", "stt_timeout_s": 30,

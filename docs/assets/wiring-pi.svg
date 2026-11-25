@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 906" role="img" aria-labelledby="title desc">
+<title id="title">Pi signal and data wiring</title><desc id="desc">BCM = software number · pin = position on the Pi 40-pin header</desc>
+<defs><marker id="arrow" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto-start-reverse" viewBox="0 0 7 6"><path d="M0 0 L7 3 L0 6z" fill="#b6d0e7"/></marker></defs>
+<style>.canvas{fill:#0c1827;stroke:none} rect{fill:#15273a;stroke:#365470} text{fill:#e9f3fb;font:16px system-ui, sans-serif} .title{font-size:30px;font-weight:700}.heading{fill:#7fe6d7;font-weight:700;font-size:19px}.terminal{font-weight:600}.note{font-size:14px;fill:#c0d5e9}path[class]{stroke-width:2;fill:none}.power{stroke:#ffd07e}.signal{stroke:#85d8f9}.ground{stroke:#c6d0dd;stroke-dasharray:5 4}</style>
+<rect class="canvas" width="100%" height="100%"/>
+<text x="26" y="40" class="title">Pi signal and data wiring</text>
+<text x="26" y="66" class="note">BCM = software number · pin = position on the Pi 40-pin header</text>
+<rect x="20" y="88" width="820" height="245" rx="10"/>
+<text x="38" y="118" class="heading">Shared I²C bus · 3.3 V-compatible logic</text>
+<text x="38" y="150" class="terminal">Pi BCM2 · pin 3</text>
+<path d="M303 145 H382" class="signal" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<text x="402" y="150" class="">SDA on all three VL53L0X and the MPU6050</text>
+<text x="38" y="183" class="terminal">Pi BCM3 · pin 5</text>
+<path d="M303 178 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="183" class="">SCL on all three VL53L0X and the MPU6050</text>
+<text x="38" y="216" class="terminal">Pi BCM5 · pin 29</text>
+<path d="M303 211 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="216" class="">Front-left VL53L0X XSHUT → 0x30</text>
+<text x="38" y="249" class="terminal">Pi BCM6 · pin 31</text>
+<path d="M303 244 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="249" class="">Front-right VL53L0X XSHUT → 0x31</text>
+<text x="38" y="282" class="terminal">Pi BCM13 · pin 33</text>
+<path d="M303 277 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="282" class="">Rear VL53L0X XSHUT → 0x32</text>
+<text x="38" y="309" class="note">Verify breakout VIN, pull-ups and GND. MPU6050 defaults to 0x68.</text>
+<rect x="20" y="348" width="820" height="245" rx="10"/>
+<text x="38" y="378" class="heading">Shared I²S bus · two INMP441 microphones</text>
+<text x="38" y="410" class="terminal">Pi BCM18 · pin 12</text>
+<path d="M303 405 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="410" class="">SCK / BCLK on both mics</text>
+<text x="38" y="443" class="terminal">Pi BCM19 · pin 35</text>
+<path d="M303 438 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="443" class="">WS / LRCLK on both mics</text>
+<text x="38" y="476" class="terminal">Pi BCM20 · pin 38</text>
+<path d="M303 471 H382" class="signal" marker-start="url(#arrow)"/>
+<text x="402" y="476" class="">SD / DOUT on both mics</text>
+<text x="38" y="509" class="terminal">Pi 3.3 V · pin 1 or 17</text>
+<path d="M303 504 H382" class="power" marker-end="url(#arrow)"/>
+<text x="402" y="509" class="">Both VDD pins, right microphone L/R</text>
+<text x="38" y="542" class="terminal">Pi GND · e.g. pin 6</text>
+<path d="M303 537 H382" class="ground" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<text x="402" y="542" class="">Both GND pins, left microphone L/R</text>
+<text x="38" y="569" class="note">Same SD line with opposite slots. Check decoupling and the SD pull-down in the wiring guide.</text>
+<rect x="20" y="608" width="820" height="278" rx="10"/>
+<text x="38" y="638" class="heading">Touch, camera and display</text>
+<text x="38" y="670" class="terminal">Pi BCM27 · pin 13</text>
+<path d="M303 665 H382" class="signal" marker-start="url(#arrow)"/>
+<text x="402" y="670" class="">Head TTP233 OUT</text>
+<text x="38" y="703" class="terminal">Pi BCM22 · pin 15</text>
+<path d="M303 698 H382" class="signal" marker-start="url(#arrow)"/>
+<text x="402" y="703" class="">Back TTP233 OUT</text>
+<text x="38" y="736" class="terminal">Pi BCM25 · pin 22</text>
+<path d="M303 731 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="736" class="">Camera indicator via resistor / driver to GND</text>
+<text x="38" y="769" class="terminal">Pi CSI connector</text>
+<path d="M303 764 H382" class="signal" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<text x="402" y="769" class="">Camera Module 3 via correct Pi 4 ribbon</text>
+<text x="38" y="802" class="terminal">Pi micro-HDMI 0</text>
+<path d="M303 797 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="802" class="">7-inch display HDMI input · picture</text>
+<text x="38" y="835" class="terminal">Pi USB-A</text>
+<path d="M303 830 H382" class="signal" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<text x="402" y="835" class="">Display touch USB · data; Mega USB-B · serial</text>
+<text x="38" y="862" class="note">TTP233 modules use 3.3 V and Pi GND. Set direct active-high mode. Keep the physical camera shutter.</text>
+</svg>

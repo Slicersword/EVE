@@ -1,5 +1,6 @@
-import array, json, os, tempfile, threading, time, unittest, urllib.error, urllib.request
+import array, json, os, sqlite3, tempfile, threading, time, unittest, urllib.error, urllib.request
 from pathlib import Path
+from types import SimpleNamespace
 from eve3 import ai, camera, intents, integrations, voice
 from eve3.behavior import Behavior, Context
 from eve3.memory import Memory
@@ -33,11 +34,32 @@ class MemoryTests(unittest.TestCase):
 
     def test_reminders_and_erase(self):
         self.m.add_reminder(100, "milk"); self.m.add_reminder(200, "call")
-        self.assertEqual(self.m.pop_due(150), ["milk"])
-        self.assertEqual(self.m.pop_due(150), [])                            # fires once
+        reminder = self.m.next_due(150)
+        self.assertEqual(reminder["text"], "milk")
+        self.m.mark_announced(reminder)
+        self.assertIsNone(self.m.next_due(150))
+        self.assertTrue(self.m.pending_reminders()[0]["announced"])
+        self.assertTrue(self.m.cancel_reminder(reminder["id"]))
+        self.assertEqual([r["text"] for r in self.m.pending_reminders()], ["call"])
         self.m.add_note("n", True); self.m.put("k", "v")
         self.m.erase_all()
         self.assertEqual((self.m.notes(), self.m.pending_reminders(), self.m.get("k")), ([], [], None))
+
+    def test_reminder_upgrade_preserves_data_and_delivery_status(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "eve.db"
+            with sqlite3.connect(path) as old:
+                old.executescript("CREATE TABLE reminders(id INTEGER PRIMARY KEY, due REAL, text TEXT, done INTEGER);"
+                                  "INSERT INTO reminders VALUES(1, 5, 'tea', 0), (2, 5, 'old', 1);")
+            first = Memory(path)
+            first.mark_announced(first.next_due(10))
+            first.close()
+            reopened = Memory(path)
+            try:
+                self.assertIsNone(reopened.next_due(10))
+                self.assertEqual(reopened.pending_reminders(), [{"id": 1, "due": 5.0, "text": "tea", "announced": True}])
+            finally:
+                reopened.close()
 
     def test_file_is_private(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -58,10 +80,11 @@ class SchedulerTests(unittest.TestCase):
         for bad in (0, 4, -5, 8 * 86400, "60", None):
             self.assertFalse(s.add_in(bad, "x")[0], bad)
         self.assertTrue(s.add_in(60, "medicine")[0])
-        self.assertEqual(s.tick(), [])
+        self.assertIsNone(s.next_due())
         clock.advance(61)
-        self.assertEqual(s.tick(), ["medicine"])
-        self.assertEqual(s.tick(), [])
+        self.assertEqual(s.next_due()["text"], "medicine")
+        s.memory.mark_announced(s.next_due())
+        self.assertIsNone(s.next_due())
 
     def test_add_at_uses_local_time_and_rolls_to_tomorrow(self):
         clock = Clock(1_700_000_000.0)                                      # 2023-11-14 22:13:20 UTC = 03:43 IST next day
@@ -109,6 +132,13 @@ class IntentTests(unittest.TestCase):
         self.assertEqual(intents.strip_wake("अरे ईवा थांब", wake), (True, "थांब"))
         self.assertEqual(intents.strip_wake("everyone is here", wake), (False, "everyone is here"))
         self.assertEqual(intents.strip_wake("Eve", wake), (True, ""))
+        self.assertEqual(intents.strip_wake("Don't Eve go forward", wake), (False, "don t eve go forward"))
+
+    def test_motion_phrases_are_complete_commands(self):
+        for phrase in ("Don't go forward", "how do you turn left", "आगे मत चल", "पुढे जाऊ नको", "don't look up",
+                       "I said go forward yesterday", "won't you look right?"):
+            self.assertIsNone(intents.parse(phrase), phrase)
+        self.assertEqual(intents.parse("please look up").name, "look_up")
 
 
 class BrainTests(unittest.TestCase):
@@ -187,7 +217,7 @@ class BrainTests(unittest.TestCase):
         self.assertIn("Sorry", b.respond("explain rainbows")["reply"])
         self.assertEqual(b.last_error, "URLError")
 
-    def test_cloud_is_off_unless_double_opt_in_and_redacts(self):
+    def test_cloud_requires_double_opt_in_and_never_sends_dialogue(self):
         with tempfile.TemporaryDirectory() as tmp:
             cfg = cfg_with(); cfg["_root"] = tmp
             os.mkdir(os.path.join(tmp, "data"))
@@ -196,28 +226,37 @@ class BrainTests(unittest.TestCase):
             cloud = cfg["ai"]["cloud"]
             cloud.update(enabled=True, privacy_consent=False, endpoint="https://example.invalid/v1/chat", model="m")
             b = self.brain(cfg)
-            b.respond("explain rainbows")
+            b.respond("public fact about the moon")
             self.assertEqual(self.posts, [])                                   # consent missing -> nothing sent
             cloud["privacy_consent"] = True
             self.memory.add_note("secret family note", True)
-            b.respond("call me on 98765 43210 or a.b@mail.com about rainbows")
+            for phrase in ("call me on 98765 43210 or a.b@mail.com about rainbows",
+                           "public fact about the moon from my friend Mae", "Mae lives on Main Road"):
+                b.respond(phrase)
+            self.assertEqual(self.posts, [])
+            b.respond("public fact about the moon")
             url, payload, headers = self.posts[0]
-            sent = json.dumps(payload)
-            self.assertNotIn("98765", sent); self.assertNotIn("mail.com", sent); self.assertNotIn("secret family note", sent)
+            self.assertEqual(payload["messages"], [{"role": "user", "content": "Give one public science fact about the Moon."}])
             self.assertEqual(headers["Authorization"], "Bearer sk-test")
             cloud["max_requests_per_day"] = 1
-            b.respond("explain clouds")
+            b.respond("public fact about photosynthesis")
             self.assertEqual(len(self.posts), 1)                               # daily limit
             if os.name == "posix":
                 os.chmod(key, 0o644); cloud["max_requests_per_day"] = 50
-                b.respond("explain rain")
+                b.respond("public fact about photosynthesis")
                 self.assertEqual(len(self.posts), 1)                           # world-readable key refused
             cloud["send_private_data"] = True; os.chmod(key, 0o600)
-            b.respond("explain snow")
+            b.respond("public fact about the moon")
             self.assertEqual(len(self.posts), 1)
 
-    def test_redact(self):
-        self.assertEqual(ai.redact("mail a@b.co or 020-2555-1234 see http://x.y/z"), "mail [email] or [number] see [link]")
+    def test_local_model_url_cannot_select_remote_host_as_userinfo(self):
+        cfg = cfg_with()
+        cfg["ai"]["local_llm"].update(enabled=True, endpoint="http://localhost:8081@example.invalid/v1/chat")
+        self.brain(cfg).respond("Explain X")
+        self.assertEqual(self.posts, [])
+        cfg["ai"]["local_llm"].update(endpoint="http://localhost:8081/v1/chat")
+        self.brain(cfg).respond("Explain X")
+        self.assertEqual(self.posts[0][0], "http://127.0.0.1:8081/v1/chat")
 
 
 class VoiceTests(unittest.TestCase):
@@ -291,6 +330,41 @@ class VoiceTests(unittest.TestCase):
             lis.handle_chunk(self.pcm(amp))
         self.assertEqual(heard, ["hello"])
 
+    def test_listener_discards_capture_before_inference_and_late_transcripts(self):
+        heard, killed, speaking = [], [], [False]
+        def transcriber(cfg, pcm):
+            self.assertEqual(killed, [True])
+            speaking[0] = True
+            return "go forward"
+        listen = voice.Listener(cfg_with(), heard.append, lambda: speaking[0], transcriber=transcriber)
+        listen._proc = SimpleNamespace(kill=lambda: killed.append(True), wait=lambda timeout: None)
+        for amp in [3000] * 6 + [0] * 8:
+            listen.handle_chunk(self.pcm(amp))
+        self.assertEqual(heard, [])
+
+    def test_echo_cancel_routes_playback_only_to_the_local_verified_sink(self):
+        cfg = cfg_with()
+        cfg["voice"]["echo_cancel_enabled"] = True
+        rows = {
+            "sources": "10\tmic\talsa\n11\teve_echo_capture\tpipewire\n",
+            "sinks": "12\theadphones\talsa\n13\teve_echo_playback\tpipewire\n",
+            "modules": "14\tmodule-echo-cancel\taec_method=webrtc source_name=eve_echo_capture "
+                       "sink_name=eve_echo_playback source_master=mic sink_master=headphones\n",
+        }
+        calls = []
+        def run(args, **kwargs):
+            calls.append((args, kwargs))
+            return SimpleNamespace(stdout=rows[args[-1]] if args[0] == "pactl" else b"RIFF audio", returncode=0)
+        speaker = voice.Speaker(cfg, run=run)
+        self.assertTrue(speaker.speak_now("tea", "en"))
+        self.assertIn("--stdout", calls[-2][0])
+        self.assertEqual(calls[-1][0], ["paplay", voice.audio_server(), "--device=eve_echo_playback"])
+        self.assertEqual(calls[-1][1]["input"], b"RIFF audio")
+        rows["sinks"] = "12\theadphones\talsa\n"
+        calls.clear()
+        self.assertFalse(speaker.speak_now("tea", "en"))
+        self.assertTrue(all(args[0] == "pactl" for args, _ in calls))
+
 
 class CameraBehaviorTouchTests(unittest.TestCase):
     def test_face_offset_and_tracking_step(self):
@@ -302,6 +376,30 @@ class CameraBehaviorTouchTests(unittest.TestCase):
         self.assertEqual(camera.tracking_step((0.05, -0.05)), (0, 0))
         self.assertEqual(camera.tracking_step((0.5, -0.5)), (8, -8))
         self.assertEqual(camera.tracking_step((0.5, -0.5), pan_sign=-1), (-8, -8))
+
+    def test_paused_camera_releases_capture_and_resumes_after_wake(self):
+        cfg = cfg_with()
+        cfg["camera"]["enabled"] = True
+        cam = camera.Camera(cfg)
+        opened, closed = threading.Event(), threading.Event()
+        def capture():
+            cam.running, cam.error = True, ""
+            opened.set()
+            while not cam._stop.wait(.01) and not cam._paused.is_set():
+                pass
+            cam.running = False
+            closed.set()
+        cam._capture = capture
+        cam.start()
+        self.addCleanup(cam.stop)
+        self.assertTrue(opened.wait(1))
+        cam.set_paused(True)
+        self.assertTrue(closed.wait(1))
+        self.assertEqual(cam.state, "paused for sleep")
+        opened.clear()
+        cam.set_paused(False)
+        self.assertTrue(opened.wait(1))
+        self.assertEqual(cam.state, "on")
 
     def test_behavior(self):
         clock = Clock(1_700_000_000.0 + 8 * 3600)                              # 11:43 IST
@@ -384,7 +482,11 @@ class RuntimeServerTests(unittest.TestCase):
         def __init__(self): self.said = []
         def start(self): pass
         def stop(self): pass
-        def say(self, text, lang="en"): self.said.append((text, lang)); return True
+        def say(self, text, lang="en", on_done=None):
+            self.said.append((text, lang))
+            if on_done:
+                on_done(True)
+            return True
 
     def boot(self, cfg=None, tof=(600.0, 600.0, 600.0), fw_match=True):
         cfg = cfg or cfg_with(all=True)
@@ -467,9 +569,25 @@ class RuntimeServerTests(unittest.TestCase):
 
     def test_firmware_mismatch_blocks_motion(self):
         rt = self.boot(fw_match=False)
-        rt.execute("session_start", {"minutes": 5}); rt.execute("clear")
+        rt.execute("session_start", {"minutes": 5})
+        self.assertIn("firmware", rt.execute("clear")[1])
         ok, why = rt.execute("drive", {"left": 100, "right": 100})
         self.assertFalse(ok); self.assertIn("firmware", why)
+
+    def test_silent_connected_mega_resyncs_without_resuming_motion(self):
+        rt = self.boot(); self.arm(rt)
+        self.assertTrue(rt.execute("drive", {"left": 60, "right": 60})[0])
+        old_mega = self.mega
+        replacement = FakeMega(firmware_id=firmware.firmware_id(self.cfg))
+        rt.link._opener = lambda: replacement
+        old_mega.silent = True
+        self.wait(lambda: rt.link.ser is replacement and rt.link.online(), timeout=5)
+        self.assertEqual(replacement.log[0], "SYNC")
+        self.assertTrue(replacement.latched)
+        self.assertFalse(rt.session.active())
+        self.assertFalse(rt.execute("drive", {"left": 60, "right": 60})[0])
+        self.arm(rt)
+        self.assertTrue(rt.execute("drive", {"left": 60, "right": 60})[0])
 
     def test_estop_from_touch_and_soft_stop(self):
         rt = self.boot(); self.arm(rt)
@@ -495,6 +613,28 @@ class RuntimeServerTests(unittest.TestCase):
         rt.head.limits_verified = True
         self.assertTrue(rt.execute("head_look", {"direction": "left"})[0])
         self.wait(lambda: self.mega.pan == -200)
+
+    def test_stop_releases_moving_head_and_disables_face_tracking(self):
+        rt = self.boot()
+        rt.cfg["camera"]["allow_tracking"] = True
+        rt.head.limits_verified = True
+        self.arm(rt)
+        self.assertTrue(rt.execute("head_home", {"confirm": True})[0])
+        self.wait(lambda: rt.head.homed)
+        rt.camera.face_present = lambda: True
+        rt.camera.offset = (0.9, 0)
+        self.wait(lambda: any(p.startswith("HEAD,") for p in self.mega.log))
+        with rt._motion_lock:
+            rt.head.target = (100, 0, time.monotonic() + 1, False)
+            self.assertTrue(rt.execute("stop")[0])
+        self.assertIn("HEADSTOP", self.mega.log)
+        self.assertFalse(rt.head.homed)
+        self.assertFalse(rt._tracking_active)
+        self.assertTrue(rt.execute("head_home", {"confirm": True})[0])
+        self.wait(lambda: rt.head.homed)
+        count = sum(p.startswith("HEAD,") for p in self.mega.log)
+        rt._slow_tick()
+        self.assertEqual(sum(p.startswith("HEAD,") for p in self.mega.log), count)
 
     def test_voice_can_only_use_the_allowed_commands(self):
         rt = self.boot(); self.arm(rt)
@@ -522,6 +662,29 @@ class RuntimeServerTests(unittest.TestCase):
         rt._awake_until = 0
         rt._heard("stop")                                                          # STOP never needs the wake word
         self.assertEqual(self.voice.said[-1][0], "Stopped.")
+
+    def test_spoken_home_shortcuts_use_local_catalog_and_hide_messages(self):
+        rt = self.boot(cfg_with())
+        self.assertEqual(rt.converse("खेळ खेळूया")["lang"], "mr")
+        self.assertEqual(rt.home.game["kind"], "riddles")
+        rt.converse("उत्तर पर्याय १")
+        self.assertEqual(rt.home.game["round"], 1)
+        self.assertIn("1.", rt.converse("start a story")["reply"])
+        rt.converse("story choice 1")
+        self.assertEqual(len(rt.home.story["path"]), 2)
+        self.assertTrue(rt.execute("home.kitchen", {"action": "start", "title": "Tea", "steps": ["Water", "Add tea"]})[0])
+        self.assertEqual(rt.converse("next step")["reply"], "Add tea")
+        self.assertIn("Home page", rt.converse("show household messages")["reply"])
+        rt.converse("stop music")
+        self.assertEqual(rt.home.music_stop_generation, 1)
+
+    def test_microphone_cannot_request_motion_while_echo_cancel_is_enabled(self):
+        rt = self.boot(); self.arm(rt)
+        rt.cfg["voice"]["echo_cancel_enabled"] = True
+        out = rt.converse("go forward", microphone=True)
+        self.assertFalse(out["action"]["ok"])
+        self.assertIn("echo-cancel", out["reply"])
+        self.assertTrue(rt.converse("stop", microphone=True)["action"]["ok"])
 
     def test_control_thread_survives_an_unexpected_error(self):
         rt = self.boot(); self.arm(rt)
@@ -553,9 +716,23 @@ class RuntimeServerTests(unittest.TestCase):
         self.assertTrue(rt.execute("note_add", {"text": "keys in drawer", "consent": True})[0])
         self.assertEqual(rt.execute("notes")[1][0]["text"], "keys in drawer")
         rt.memory.add_reminder(time.time() - 1, "medicine")
-        self.wait(lambda: any("medicine" in t for t, _ in self.voice.said))
+        self.wait(lambda: rt.memory.pending_reminders()[0]["announced"])
+        self.assertTrue(any("medicine" in t for t, _ in self.voice.said))
         self.assertTrue(rt.execute("erase_memory", {"confirm": True})[0])
         self.assertEqual(rt.execute("notes")[1], [])
+
+    def test_reminder_survives_playback_failure_and_retries(self):
+        rt = self.boot(cfg_with())
+        def fail(_, __, on_done):
+            on_done(False)
+            return True
+        self.voice.say = fail
+        rt.memory.add_reminder(time.time() - 1, "tea")
+        self.wait(lambda: rt._reminder_retry_at > 0)
+        self.assertFalse(rt.memory.pending_reminders()[0]["announced"])
+        self.voice.say = self.Quiet().say
+        rt._reminder_retry_at = 0
+        self.wait(lambda: rt.memory.pending_reminders()[0]["announced"])
 
     def test_web_api_auth_limits_and_pages(self):
         rt = self.boot(cfg_with())

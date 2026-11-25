@@ -1,33 +1,22 @@
-# Verification record
+# Software coverage and verification
 
-This record describes software evidence for the standalone reference build.
-It does not record anyone's robot as assembled or commissioned.
+Use the feature table to check what ships in a fresh checkout and what to accept
+on the assembled robot. The host suite uses temporary state and runs with
+commissioning unset. The [current GitHub workflow runs](https://github.com/Slicersword/EVE/actions/workflows/verify.yml)
+show which revision passed host, AVR and site checks.
 
-| Check | Observed result |
-|---|---|
-| Linux host suite (Python 3.12) | 122 tests passed, including real-sketch fake-core harness |
-| Configuration/upload regressions | Explicit port precedence, rejected unsafe settings, private local file mode, configured lock path, fake upload success/failure passed |
-| Public defaults | All readiness flags false; drive/head disabled; cliff calibration unset; external AI off |
-| Generated files | Firmware header and M00–M17 software guide match generators |
-| Source / syntax | Python compilation, Bash syntax, JavaScript syntax and diff whitespace checks passed |
-| Documentation site | Markdown pages and complete offline source listings; local links/fragments/assets/raw source consistency checked |
-| Browser QA | Desktop page layout and offline search checked in the local preview |
-| Live simulation | Mega handshake, authenticated CLI chat, shipped motion refusal and safe shutdown passed |
-| GitHub CI | Python 3.11/3.12 host jobs, Mega target compilation and site validation passed in the linked run |
-| AVR target | Locked and enabled Mega 2560 variants compiled in CI using CLI 1.3.1 and AVR core 1.8.6 |
-| Raspberry Pi installation | Requires a real Pi 4 / Bookworm / arm64 system; not run on the development host |
-| Mega upload and bootloader | Requires the physical Mega; not performed |
-| Wiring, load, sensors and stop distance | Builder must measure and run the corresponding physical stages |
+| Subsystem | Verified in the checkout or host tests | Test on your Pi and Mega |
+|---|---|---|
+| Fresh install and firmware source | Required files, default configuration, generated firmware header, explicit port selection and simulated upload handling | M00–M02: Pi installation, full-screen desktop, successful upload and the matching live firmware fingerprint |
+| Power and motion | Both actuator outputs locked in the shipped configuration. Real sketch logic tested for leases, cliffs, stop, and head/drive exclusion. Host tests cover stale link reconnect and complete voice motion phrases | M03/M05/M07/M08: measure both banks and drivers, find safe stop distance and head travel, exercise the cutoff and all stop paths |
+| ToF, tilt and cliff | Incorrect, missing and stale input blocks movement. Failed I2C reads immediately invalidate the previous reading | M04: measure every channel at the actual mounting position, including dark floors and safe simulated edges |
+| Face and sound cues | All 90 WAVs and artwork load from the checkout. Tested the Happy cue after the quiet interval and cancellation when blocked | M01/M12/M13: examine the face, play a selected cue, and verify safe speaker output |
+| Touch, camera and sleep | Touch gestures and the sleep capture lifecycle are exercised in the host suite. Sleep ends the motion session | M09/M10/M16: tap/hold, confirm the visible LED and local face offsets, and observe that sleep releases the camera before wake reopens it |
+| Local conversation | English/Hindi/Marathi text intents, wake words, offline responses and local privacy rules tested | M12/M13: verify language selection, both mic slots, recognition latency, and no responses to EVE's own voice |
+| Overlapping audio | The optional backend selects the matched desktop echo source and sink and reports a missing route | M13 optional: verify the device names on the Pi and test real room feedback and recognition while the speaker plays |
+| Home activities and reminders | Authenticated Home operations and restored spoken shortcuts, durable timers, older database upgrade and playback retry tested. Sample games, stories and text catalog ship in Git | M12/M15: use a game and a branching story, test a timer through restart, mark it Done, and confirm the Pi's own speaker produces audio |
+| Website and progress | Offline and Pages rendering checks cover links, assets, source listings and progress persistence/export. Wiring diagrams are regenerated from the shipped pins | Open the guide on the device you will use and keep one private progress export |
 
-Host tests use fakes/temp state and do not set public commissioning flags.
-The upload regression uses a fake CLI and pseudoterminal, not a connected board.
-The real sketch harness exercises logic; target compilation checks the AVR build;
-a successful upload still does not provide physical acceptance.
-
-For reproducible commands see [Testing](TESTING.md). Read the repository Actions
-results for the commit you intend to build. GitHub Pages publishes directly from
-main as described in [Website](WEBSITE.md); it requires no ChatGPT hosting service.
-
-CI evidence: [Verify EVE, commit 21b6c3b](https://github.com/Slicersword/EVE/actions/runs/45338206886).
-All four jobs completed successfully. This report's later text/link-only updates
-do not change the tested runtime or firmware.
+For repeatable checks see [Testing](TESTING.md). For boundaries and earlier features
+outside this build see [Known limitations](KNOWN_LIMITATIONS.md#coverage-of-older-eve-builds).
+Current operating choices and labels to record are in [Build choices](DECISIONS.md).

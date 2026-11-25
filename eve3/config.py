@@ -6,6 +6,7 @@ Validation fails closed: a bad value stops start-up instead of being guessed.
 from __future__ import annotations
 import copy, json, math, os
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 COMMISSIONING_FLAGS = ("power_a_verified", "power_b_verified", "motor_current_verified",
@@ -37,6 +38,18 @@ def _need(cond, message):
 
 def _int(v, lo, hi):
     return type(v) is int and lo <= v <= hi
+
+
+def local_model_endpoint(url: str) -> str:
+    try:
+        parsed = urlsplit(url)
+        port = parsed.port
+        if (parsed.scheme == "http" and parsed.hostname in ("127.0.0.1", "localhost")
+                and parsed.username is None and port and not parsed.fragment):
+            return urlunsplit(parsed._replace(netloc=f"127.0.0.1:{port}"))
+    except ValueError:
+        pass
+    raise ConfigError("ai.local_llm.endpoint must be a loopback HTTP URL with a port")
 
 
 def _no_secrets(node, path=""):
@@ -127,6 +140,9 @@ def _check_values(cfg):
 
 def _validate(cfg: dict) -> dict:
     _no_secrets(cfg)
+    voice = cfg["voice"]
+    _need(not voice["echo_cancel_enabled"] or (voice["capture_enabled"] and voice["tts_enabled"]),
+          "voice.echo_cancel_enabled needs both microphone capture and TTS enabled")
     _need(cfg["hardware"].get("ina219_enabled") is False, "hardware.ina219_enabled must be false (INA219 removed)")
     com = cfg["commissioning"]
     _need(set(com) == set(COMMISSIONING_FLAGS), "commissioning: unknown or missing flag")
@@ -163,8 +179,7 @@ def _validate(cfg: dict) -> dict:
         _need(str(cloud["endpoint"]).startswith("https://"), "ai.cloud.endpoint must be https://")
         _need(str(cloud["key_file"]).startswith("data/") and ".." not in cloud["key_file"],
               "ai.cloud.key_file must be inside data/")
-    llm = cfg["ai"]["local_llm"]["endpoint"]
-    _need(llm.startswith(("http://127.0.0.1:", "http://localhost:")), "ai.local_llm.endpoint must be on this Pi")
+    local_model_endpoint(cfg["ai"]["local_llm"]["endpoint"])
     net = cfg["network"]
     _need(net["host"] in ("127.0.0.1", "0.0.0.0") and _int(net["port"], 1024, 65535),
           "network.host must be 127.0.0.1 (this Pi only) or 0.0.0.0 (home LAN, token needed)")

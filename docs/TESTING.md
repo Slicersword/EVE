@@ -26,7 +26,7 @@ For the website, Node 22 is the CI target; no npm dependencies are downloaded:
 node tools/build_docs.mjs
 python3 tools/check_site.py
 node --check site/assets/site.js
-node --test tests/progress.test.mjs
+node --test tests/*.test.mjs
 ```
 
 The site check validates local files, links, fragments, source listings and offline
@@ -82,9 +82,9 @@ checks and an explicit builder confirmation; it does not repair or simulate hard
 | M09–M16 | Each fitted feature behaves as described | Incorrect indicator, memory consent, repeated reminder or self-triggered speech |
 | M17 | 30-minute attended run and safe restart | Any unexpected motion, stale input, power fault or unreliable stop |
 
-Voice is half-duplex and may be slow. A spoken stop is unavailable while speech is
-playing or STT is busy. The physical actuator cutoff and direct CLI stop must remain
-accessible; never rely on voice as the sole stop.
+Voice takes turns by default and can be slow. Optional echo cancellation requires
+the real Pi and the M13 overlap/feedback test. The physical actuator cutoff and
+direct CLI stop must remain accessible.
 
 ## Acceptance record
 

@@ -128,6 +128,28 @@ For reversed look/tracking orientation, adjust the relevant sign after observing
 
 This does not change manual head_jog signs. Disable tracking again if it moves away from the face.
 
+### Optional Mega upload from a separate computer (M02)
+
+The Pi flasher is the standard route. If you upload using another computer, keep
+the actuator cutoff off and stop the EVE process on the Pi first. Generate the
+header on the Pi so the sketch matches its current configuration.
+
+```bash
+.venv/bin/python tools/gen_header.py
+```
+
+Use WinSCP or SFTP to copy the entire `firmware/eve_controller` folder to the
+other computer. Copy only the sketch folder, with `eve_controller.ino` and
+`eve_config.h` together. Disconnect the Mega from the Pi, then plug it into the
+other computer with the USB data cable. In Arduino IDE, install Arduino AVR
+Boards 1.8.6, select Arduino Mega or Mega 2560 with the ATmega2560 processor,
+select the Mega's actual port, and verify and upload the sketch.
+
+Disconnect the USB cable from the other computer and reconnect it to the Pi.
+Run `./eve run` and confirm `./eve status` shows online and a matching firmware
+fingerprint. Repeat this process after any later stage changes a firmware
+setting. See [Arduino Mega 2560 documentation](https://docs.arduino.cc/hardware/mega-2560/).
+
 ### Optional IMU orientation / address (M04)
 
 Only use these after identifying an inverted board or an AD0-high address. They are alternatives to
@@ -175,6 +197,68 @@ an example only; substitute your identified card/device, then recalibrate the th
 ./eve cfg set voice.capture_device plughw:1,0
 ```
 
+### Optional echo cancellation (M13)
+
+Accept the standard M13 tests first. This optional path listens while EVE speaks
+through a paired local WebRTC echo-cancel source and sink. It needs a running Pi
+desktop audio session and a physical acoustic test at the intended speaker
+volume. Keep the actuator cutoff off during this setup.
+
+**PuTTY 1, with EVE stopped**
+
+```bash
+sudo apt-get install -y pulseaudio-utils
+EVE_PULSE="unix:/run/user/$(id -u)/pulse/native"
+pactl --server="$EVE_PULSE" info
+pactl --server="$EVE_PULSE" list short sources
+pactl --server="$EVE_PULSE" list short sinks
+```
+
+Use the source and sink names in the second column. Select the actual INMP441
+capture source and the analogue headphone output feeding the PAM8610. A source
+ending in `.monitor` records playback. If the INMP441 is visible only to ALSA
+or the echo module is unavailable, continue with the standard M13 route.
+
+```bash
+read -r -p "INMP441 desktop source name: " EVE_MIC_SOURCE
+read -r -p "Analogue headphone sink name: " EVE_HEADPHONE_SINK
+pactl --server="$EVE_PULSE" load-module module-echo-cancel aec_method=webrtc \
+  source_master="$EVE_MIC_SOURCE" sink_master="$EVE_HEADPHONE_SINK" \
+  source_name=eve_echo_capture sink_name=eve_echo_playback
+pactl --server="$EVE_PULSE" list short sources
+pactl --server="$EVE_PULSE" list short sinks
+```
+
+Record the module number printed on success. Continue only when both named routes
+appear. The temporary module must be loaded again after a reboot or restart of the
+audio server. Test in a foreground run before considering it for daily use.
+
+```bash
+./eve cfg set voice.echo_cancel_enabled true
+./eve run
+```
+
+In PuTTY 2 check `./eve status full` for the microphone and voice mode. Use
+`./eve ctl say "I am checking my speaker and microphone. The local test is now running."`
+and speak “EVE, what time is it?” during playback. Repeat with multiple phrases,
+distances and volumes. Then play the same speech again with nobody talking.
+Acceptance requires the person's speech to be recognized without self-triggered
+replies, oscillation or feedback. Software checks exercise routing, and the
+physical test establishes acoustic performance.
+
+Wheel and head requests from the microphone are refused in this mode. Use the
+authenticated controls for motion. Live face cues and Home music still pause
+with capture enabled because they are browser audio. A missing paired route
+reports a voice error. If the route or acoustic test fails, stop EVE, turn off
+echo mode, and restart:
+
+```bash
+./eve cfg set voice.echo_cancel_enabled false
+./eve run
+```
+
+See the [PipeWire echo-cancel module options](https://docs.pipewire.org/page_pulse_module_echo_cancel.html).
+
 ### Optional local LLM (M12)
 
 A separately installed on-Pi model server must provide the loopback chat endpoint in config.
@@ -185,7 +269,8 @@ After the model server is running and tested locally:
 ./eve cfg set ai.local_llm.enabled true
 ```
 
-Restart EVE. Disable it if memory/latency harms robot operation. Keep cloud disabled for the strict privacy rule.
+Restart EVE. Disable the model if its resource use harms robot operation. Cloud
+starts off and its optional adapter accepts fixed public questions only.
 
 ### Optional phone control (M16)
 

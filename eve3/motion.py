@@ -41,18 +41,19 @@ class Drive:
             self.stop(verdict.reason)
             return False, verdict.reason
         self.active = (left, right, self._clock() + seconds, test)
-        self._send()
-        return True, "moving"
+        return (True, "moving") if self._send() else (False, self.last_stop_reason)
 
     def _send(self):
         active = self.active
         if active is None:
-            return
+            return False
         try:
             self.link.drive(active[0], active[1])
             self._sent_at = self._clock()
+            return True
         except Exception as exc:
             self.stop(f"Mega write failed: {type(exc).__name__}")
+            return False
 
     def stop(self, reason=""):
         self.active, self.last_stop_reason = None, reason
@@ -86,10 +87,11 @@ class Head:
         self.jog_max = int(h["jog_max_steps"])
         self.target = None            # (pan, tilt, deadline, test)
         self._sent_at = 0.0
+        self._released = False
 
     @property
     def homed(self) -> bool:
-        return self.link.telemetry.get("homed") is True
+        return not self._released and self.link.telemetry.get("homed") is True
 
     def position(self):
         t = self.link.telemetry
@@ -105,26 +107,30 @@ class Head:
             self.link.set_manual_home()
         except Exception as exc:
             return False, f"Mega refused home: {exc}"
+        self._released = False
         return True, "this position is now the head centre"
 
     def _start(self, pan, tilt, test):
         if not (self.pan_lim[0] <= pan <= self.pan_lim[1] and self.tilt_lim[0] <= tilt <= self.tilt_lim[1]):
             return False, "outside head limits"
         cur = self.position()
+        if not all(type(value) is int for value in cur):
+            return False, "head position missing; home the head again"
         steps = abs(pan - cur[0]) + abs(tilt - cur[1])
         self.target = (pan, tilt, self._clock() + steps * 0.002 + 0.5, test)
-        self._send()
-        return True, "moving"
+        return (True, "moving") if self._send() else (False, "Mega head write failed")
 
     def _send(self):
         target = self.target
         if target is None:
-            return
+            return False
         try:
             self.link.head(target[0], target[1])
             self._sent_at = self._clock()
+            return True
         except Exception:
-            self.target = None
+            self.release()
+            return False
 
     def goto(self, pan, tilt) -> tuple[bool, str]:
         if type(pan) is not int or type(tilt) is not int:
@@ -157,10 +163,16 @@ class Head:
 
     def release(self):
         self.target = None
+        self._released = True
         try:
             self.link.release_head()
         except Exception:
-            pass
+            return False                  # the Mega's lease still cuts movement if the link has failed
+        return True
+
+    def stop(self):
+        if self.target is not None or self.link.telemetry.get("head_busy") is True:
+            self.release()
 
     def tick(self):
         """Renew the Mega's head lease while a move is in progress and still safe."""
@@ -168,9 +180,9 @@ class Head:
         if target is None:
             return
         pan, tilt, deadline, test = target
-        if self.position() == (pan, tilt) or self._clock() >= deadline:
+        if self.position() == (pan, tilt):
             self.target = None
-        elif not self.gate.head_verdict(self.hub.snapshot(), self.link, test).ok or not self.homed:
-            self.target = None            # stop renewing; the Mega holds position when its lease expires
+        elif self._clock() >= deadline or not self.gate.head_verdict(self.hub.snapshot(), self.link, test).ok or not self.homed:
+            self.release()
         elif self._clock() - self._sent_at >= 0.1:
             self._send()

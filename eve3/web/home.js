@@ -100,7 +100,7 @@
   $('#timerStart').onclick = async () => { const r = await act('home.timer', {name: $('#timerName').value, seconds: Number($('#timerSeconds').value)}); if (r) timers(); };
   async function timers() {
     try { const r = await command('home.timers'); $('#timers').replaceChildren();
-      r.items.forEach(t => { const d = document.createElement('div'); d.className = 'saved'; line(d, `${t.text} · ${new Date(t.due * 1000).toLocaleString()}${t.due * 1000 < Date.now() ? ' · DUE' : ''}`);
+      r.items.forEach(t => { const d = document.createElement('div'); d.className = 'saved'; line(d, `${t.text} · ${new Date(t.due * 1000).toLocaleString()}${t.announced ? ' · Announced' : t.due * 1000 <= Date.now() ? ' · Due' : ''}`);
         button('Done', async () => { await act('home.timer_cancel', {id: t.id}); timers(); }, d);
         button('Cancel', async () => { await act('home.timer_cancel', {id: t.id}); timers(); }, d); $('#timers').appendChild(d); });
     } catch(e) { note(e.message); }

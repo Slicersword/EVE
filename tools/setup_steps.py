@@ -68,8 +68,9 @@ SETUP_STEPS = {'M00': [('you',
          ('PuTTY 2',
           './eve ctl session_start minutes=10\n'
           './eve ctl clear\n'
-          './eve ctl drive_test left=60 right=60 wheels_lifted=true\n'
-          './eve ctl drive_test left=40 right=70 wheels_lifted=true'),
+          './eve ctl drive_test left=60 right=60 wheels_lifted=true'),
+         ('you', 'Observe the first test and wait for all wheels to stop. Then try the gentle arc.'),
+         ('PuTTY 2', './eve ctl drive_test left=40 right=70 wheels_lifted=true'),
          ('you',
           'Do all stopping/direction tests below BEFORE confirming drive. Default max duration is one '
           'second in drive_test.'),
@@ -91,8 +92,9 @@ SETUP_STEPS = {'M00': [('you',
          ('PuTTY 2',
           './eve ctl session_start minutes=10\n'
           './eve ctl clear\n'
-          './eve ctl head_home confirm=true\n'
-          './eve ctl head_jog pan=8 confirm=true'),
+          './eve ctl head_home confirm=true'),
+         ('you', 'Check that the head reports homed in status before jogging.'),
+         ('PuTTY 2', './eve ctl head_jog pan=8 confirm=true'),
          ('you',
           'Wait for each jog to finish, inspect cable clearance, then repeat as required. Use pan=-8, '
           'tilt=8 or tilt=-8 for the other directions. Note safe position values. If limits need '
@@ -107,9 +109,11 @@ SETUP_STEPS = {'M00': [('you',
          ('PuTTY 2',
           './eve ctl session_start minutes=10\n'
           './eve ctl clear\n'
-          './eve ctl head_home confirm=true\n'
-          './eve ctl head_look direction=left\n'
-          './eve ctl head_look direction=center')],
+          './eve ctl head_home confirm=true'),
+         ('you', 'Check that the head reports homed in status before trying a look.'),
+         ('PuTTY 2', './eve ctl head_look direction=left'),
+         ('you', 'Observe the left look and wait for it to finish before returning to centre.'),
+         ('PuTTY 2', './eve ctl head_look direction=center')],
  'M09': [('PuTTY 2', 'watch -n 0.5 ./eve status')],
  'M10': [('PuTTY 2', './eve cfg set camera.enabled true'),
          ('you', 'Stop EVE with Ctrl+C and restart.'),
@@ -118,14 +122,15 @@ SETUP_STEPS = {'M00': [('you',
          ('you',
           'Head tracking is optional; see the optional settings section after completing the camera '
           'test.')],
- 'M11': [('PuTTY 2', './eve ctl chat "remember that the keys are in the drawer"'),
+ 'M11': [('PuTTY 2', './eve ctl chat "remember that the EVE test note is for setup"'),
          ('you',
-          'Restart EVE once, then check persistence before the erase test. This erases ALL notes and '
-          'reminders; use only disposable test data.'),
+          'Restart EVE once, then check that the test note persists.'),
          ('PuTTY 2',
           './eve ctl chat "what do you remember"\n'
-          './eve ctl notes\n'
-          './eve ctl erase_memory confirm=true\n'
+          './eve ctl notes'),
+         ('you', 'Replace NOTE_ID below with the numeric ID of the test note in the list.'),
+         ('PuTTY 2',
+          './eve ctl note_forget id=NOTE_ID\n'
           './eve ctl notes')],
  'M12': [('PuTTY 2',
           './eve ctl chat "who are you"\n'

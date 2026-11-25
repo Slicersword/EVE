@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   let pack, mode, enabled = false, active, blockedUntil = Infinity;
-  let lastExpression, permitted = false;
+  let lastExpression, pending, permitted = false;
   const quietTail = 550;
 
   function stop() {
@@ -35,6 +35,7 @@
     configure(on, selected) {
       enabled = on;
       if (pack && Object.hasOwn(pack.modes, selected)) mode = selected;
+      pending = undefined;
       stop();
     },
     update(status) {
@@ -45,13 +46,17 @@
       if (!nextAllowed) {
         permitted = false;
         blockedUntil = Infinity;
+        pending = undefined;
         stop();
         return;
       }
       if (!permitted) blockedUntil = performance.now() + quietTail;
       permitted = true;
-      if (enabled && changed && performance.now() >= blockedUntil &&
-          pack?.modes[mode]?.includes(name)) play(name, 0.175);
+      if (changed) pending = name;
+      if (pending && performance.now() >= blockedUntil) {
+        if (enabled && pack?.modes[mode]?.includes(pending)) play(pending, 0.175);
+        pending = undefined;
+      }
     },
     preview(name) { play(name, 0.175); },
     stop,

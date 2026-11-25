@@ -58,7 +58,7 @@ jobs:
       - run: python tools/check_site.py
       - run: node --check site/assets/site.js
       - run: node --check site/assets/progress.js && node --check site/assets/progress-state.js && node --check site/assets/source-browser.js
-      - run: node --test tests/progress.test.mjs
+      - run: node --test tests/*.test.mjs
       - name: Compile Pi microphone Device Tree overlay
         run: |
           sudo apt-get update

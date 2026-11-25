@@ -83,9 +83,10 @@ Do not change readiness flags to hide a fault.
 | Microphone quiet / wrong input | Select actual ALSA device, calibrate threshold and confirm capture enable |
 | STT not installed / no transcript | Build whisper.cpp and download the multilingual model; verify paths and microphone rate/device |
 | Recognition slow / poor Hindi or Marathi | Test the multilingual model with short phrases and low background noise; measure Pi load and latency |
-| Does not hear while speaking | Expected half-duplex behavior; simultaneous listening and echo cancellation are not implemented |
+| Does not hear while speaking | The default voice route takes turns; M13 documents the optional verified local echo-cancel route |
+| Local WebRTC echo route unavailable | Check the Pi desktop session and both named routes. Reload the module after reboot or disable echo mode and restart for turn-taking |
 | No general answer | Basic offline replies cover fixed intents; optional local LLM needs its own loopback server and model |
-| Reminder silent / late | Runtime and speaker must be running; check pending reminder, UTC offset and output device |
+| Reminder silent / late | Check the runtime, system clock and actual output device. The due reminder stays available to retry if software playback fails |
 | Autostart fails | First prove foreground operation, then inspect user-service logs, source path and desktop login |
 | Website search or styles absent offline | Keep all of dist together and open index.html; rebuild/validate after source changes |
 | Pages website not updated | Check Verify EVE and its Publish GitHub Pages job; fix any failed render/link check; follow Website |

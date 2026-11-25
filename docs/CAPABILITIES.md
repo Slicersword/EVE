@@ -23,8 +23,8 @@ it has been accepted on a physical robot. Start every build at zero.
 | Local speech recognition | Records short utterances, runs multilingual whisper.cpp, then handles supported commands | Two INMP441 microphones, I2S/ALSA profile and local model | M13: quiet/speech threshold, each mic and wake-word/command test |
 | Offline conversation | Fixed local replies for greetings, identity, time/date, jokes, short stories and status | Text chat works before microphone setup | M12: examples in each language produce the intended reply |
 | Local notes | Saves explicit “remember” notes, lists and deletes them | SQLite on Pi storage; memory enabled | M11: note persists after restart and can be erased |
-| Timers/reminders | Stores a relative reminder and speaks it when due | Runtime running, memory/database, accurate clock and working audio | M15: short reminder, restart persistence and one delivery |
-| Sleep/wake face | Sleepy expression after quiet idle time; interaction wakes it | Behavior enabled, chosen idle/night settings | M14/M16: timeout or explicit sleep/wake test |
+| Timers/reminders | Speaks a due reminder and keeps it visible until acknowledged | Runtime, SQLite, accurate clock and working audio | M15: one announcement across a restart, then mark Done |
+| Sleep/wake | Changes to a sleepy face, ends the motion session and pauses the camera; interaction wakes it | Behavior enabled, chosen idle/night settings | M14/M16: verify idle and explicit sleep; then wake and check camera/indicator |
 | Control page | Local status and authorized controls using a runtime token | Loopback default; optional SSH tunnel or explicit trusted LAN | M16: live status, wrong-token refusal, stop command |
 | Recovery tools | Doctor, stage checks, firmware fingerprint and safe diagnostic commands | Pi tools and the matching source/configuration | Use the relevant M-stage before confirming readiness |
 | Website notebook | Tracks task checkmarks, notes and completion dates with export/import | Any supported browser; optional local storage | Export and import a test backup on [My build progress](PROGRESS.md) |
@@ -77,12 +77,19 @@ included in the parser, but recognition accuracy depends on your model and room.
 | Explicit note | Remember that the spare cable is in the drawer | याद रख केबल दराज में है | लक्षात ठेव केबल कपाटात आहे |
 | Recall notes | What do you remember | क्या याद है | काय लक्षात आहे |
 | Reminder | Remind me in 1 minute to drink water | याद दिला 1 मिनट पानी | आठवण 1 मिनिट पाणी |
+| Start riddles | Play a game | खेल खेलते हैं | खेळ खेळूया |
+| Choose a riddle answer | Riddle answer 1 | जवाब विकल्प १ | उत्तर पर्याय १ |
+| Start a branching story | Start a story | कहानी सुनाओ | गोष्ट सांग |
+| Choose a story branch | Story choice 1 | कहानी विकल्प १ | गोष्ट पर्याय १ |
+| Advance an open recipe | Next step | अगला कदम | पुढची पायरी |
+| Stop Home music | Stop music | संगीत बंद करो | गाणे बंद कर |
 
 By default, microphone commands need “EVE” or a configured wake-word form. A back tap
 or recent recognized interaction opens a short follow-up window. Recognized stop
-phrases do not require a wake word, but **recognition is unavailable while speaking
-or busy transcribing**. Use the physical cutoff, back hold or command-line emergency
-stop in the circumstances each supports; speech is not the independent stop.
+phrases do not require a wake word. In standard turn-taking, recognition pauses
+while speech plays or transcription runs. Keep the physical cutoff accessible.
+Motion phrases must match a full supported command. Home messages and memory
+capsules are shown on the token-protected screen.
 
 “Come here” currently requests a bounded forward action; it does not locate a person
 or plan a route. Left/right drive phrases request forward arcs. Look commands use
@@ -97,21 +104,22 @@ after transcription. Explicit notes/reminders remain in the local database. Webs
 progress is separate browser data and never enters the robot. Review [Privacy](PRIVACY.md)
 for practical limits and handling of private backups.
 
-Two microphones supply two slots which are mixed to mono. They do not create a
-beamforming array. Audio is **half-duplex**: the runtime discards mic input while
-speaking. On a Pi 4, speech/model work can be slow; measure real latency and keep
-phrases short. More swap does not make the processor faster.
+Two microphone slots are mixed to mono. The default audio path takes turns.
+[Optional echo cancellation](SETUP_GUIDE.md#optional-echo-cancellation-m13) allows
+listening during speech after you verify the local audio route and pass the acoustic
+test. In that mode the microphone is limited to conversation, Home and Stop
+commands. Use the control page for motion. Measure recognition latency on your Pi.
 
 An optional on-Pi language model can answer additional text questions through a
 loopback server. It is separate software and is not required for basic commands.
-Generated model answers are not parsed as movement instructions. Cloud stays disabled
-for the private build; do not enable it expecting automatic privacy guarantees.
+Generated model answers are spoken as text. The optional cloud adapter uses fixed
+public prompts and starts disabled.
 
 ## Boundaries and build blockers
 
 There is no SLAM/map, room navigation, docking, battery percentage, automatic charging,
-wheel encoder control, object/person identity recognition, source-code self-editing,
-full-duplex audio or unattended roaming. There is no verified protection for arbitrary
+wheel encoder control, object/person identity recognition, source-code self-editing
+or unattended roaming. There is no verified protection for arbitrary
 stairs, sunlight, reflective surfaces or all directions of travel. Reverse and pivot
 remain disabled. Read [Known limitations](KNOWN_LIMITATIONS.md).
 

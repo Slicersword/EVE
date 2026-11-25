@@ -8,6 +8,6 @@ Conversation text is not logged. Notes need explicit consent and are stored loca
 Optional local-model requests carry current text to a loopback endpoint. Model
 output is text-only and cannot directly issue actuator commands.
 
-Cloud and web integrations are off by default. Cloud opt-in sends current text
-through limited regex redaction, which cannot guarantee removal of private names
-or addresses. Keep it disabled for private use. See [Privacy](../PRIVACY.md).
+Cloud and web integrations are off by default. Cloud opt-in sends only fixed
+public catalog prompts. Local model HTTP rejects redirects and ignores proxies.
+See [Privacy](../PRIVACY.md).

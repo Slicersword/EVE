@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 1364" role="img" aria-labelledby="title desc">
+<title id="title">Mega signal wiring</title><desc id="desc">Numbers are Arduino digital sockets. See the power diagram for the positive feeds and returns.</desc>
+<defs><marker id="arrow" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto-start-reverse" viewBox="0 0 7 6"><path d="M0 0 L7 3 L0 6z" fill="#b6d0e7"/></marker></defs>
+<style>.canvas{fill:#0c1827;stroke:none} rect{fill:#15273a;stroke:#365470} text{fill:#e9f3fb;font:16px system-ui, sans-serif} .title{font-size:30px;font-weight:700}.heading{fill:#7fe6d7;font-weight:700;font-size:19px}.terminal{font-weight:600}.note{font-size:14px;fill:#c0d5e9}path[class]{stroke-width:2;fill:none}.power{stroke:#ffd07e}.signal{stroke:#85d8f9}.ground{stroke:#c6d0dd;stroke-dasharray:5 4}</style>
+<rect class="canvas" width="100%" height="100%"/>
+<text x="26" y="40" class="title">Mega signal wiring</text>
+<text x="26" y="66" class="note">Numbers are Arduino digital sockets. See the power diagram for the positive feeds and returns.</text>
+<rect x="20" y="88" width="820" height="377" rx="10"/>
+<text x="38" y="118" class="heading">Left-side TB6612FNG</text>
+<text x="38" y="150" class="terminal">Mega D8</text>
+<path d="M303 145 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="150" class="">STBY</text>
+<text x="38" y="183" class="terminal">Mega D22</text>
+<path d="M303 178 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="183" class="">AIN1</text>
+<text x="38" y="216" class="terminal">Mega D23</text>
+<path d="M303 211 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="216" class="">AIN2</text>
+<text x="38" y="249" class="terminal">Mega D2</text>
+<path d="M303 244 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="249" class="">PWMA</text>
+<text x="38" y="282" class="terminal">Mega D24</text>
+<path d="M303 277 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="282" class="">BIN1</text>
+<text x="38" y="315" class="terminal">Mega D25</text>
+<path d="M303 310 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="315" class="">BIN2</text>
+<text x="38" y="348" class="terminal">Mega D3</text>
+<path d="M303 343 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="348" class="">PWMB</text>
+<text x="38" y="381" class="terminal">Driver AO1 / AO2</text>
+<path d="M303 376 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="381" class="">Left-front N20 wheel motor pair</text>
+<text x="38" y="414" class="terminal">Driver BO1 / BO2</text>
+<path d="M303 409 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="414" class="">Left-rear N20 wheel motor pair</text>
+<text x="38" y="441" class="note">VCC at Mega logic 5 V · VM at switched Bank B 5 V · common GND</text>
+<rect x="20" y="480" width="820" height="377" rx="10"/>
+<text x="38" y="510" class="heading">Right-side TB6612FNG</text>
+<text x="38" y="542" class="terminal">Mega D9</text>
+<path d="M303 537 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="542" class="">STBY</text>
+<text x="38" y="575" class="terminal">Mega D26</text>
+<path d="M303 570 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="575" class="">AIN1</text>
+<text x="38" y="608" class="terminal">Mega D27</text>
+<path d="M303 603 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="608" class="">AIN2</text>
+<text x="38" y="641" class="terminal">Mega D4</text>
+<path d="M303 636 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="641" class="">PWMA</text>
+<text x="38" y="674" class="terminal">Mega D28</text>
+<path d="M303 669 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="674" class="">BIN1</text>
+<text x="38" y="707" class="terminal">Mega D29</text>
+<path d="M303 702 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="707" class="">BIN2</text>
+<text x="38" y="740" class="terminal">Mega D5</text>
+<path d="M303 735 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="740" class="">PWMB</text>
+<text x="38" y="773" class="terminal">Driver AO1 / AO2</text>
+<path d="M303 768 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="773" class="">Right-front N20 wheel motor pair</text>
+<text x="38" y="806" class="terminal">Driver BO1 / BO2</text>
+<path d="M303 801 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="806" class="">Right-rear N20 wheel motor pair</text>
+<text x="38" y="833" class="note">VCC at Mega logic 5 V · VM at switched Bank B 5 V · common GND</text>
+<rect x="20" y="872" width="820" height="245" rx="10"/>
+<text x="38" y="902" class="heading">Pan and tilt · one ULN2003 per motor</text>
+<text x="38" y="934" class="terminal">Mega D30 (pan) / D34 (tilt)</text>
+<path d="M303 929 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="934" class="">IN1 on the matching ULN2003</text>
+<text x="38" y="967" class="terminal">Mega D31 (pan) / D35 (tilt)</text>
+<path d="M303 962 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="967" class="">IN2 on the matching ULN2003</text>
+<text x="38" y="1000" class="terminal">Mega D32 (pan) / D36 (tilt)</text>
+<path d="M303 995 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="1000" class="">IN3 on the matching ULN2003</text>
+<text x="38" y="1033" class="terminal">Mega D33 (pan) / D37 (tilt)</text>
+<path d="M303 1028 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="1033" class="">IN4 on the matching ULN2003</text>
+<text x="38" y="1066" class="terminal">Each ULN2003 five-pin socket</text>
+<path d="M303 1061 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="1066" class="">Matching keyed 28BYJ-48 5 V motor plug</text>
+<text x="38" y="1093" class="note">Each ULN2003 motor supply uses switched Bank B 5 V and common GND.</text>
+<rect x="20" y="1132" width="820" height="212" rx="10"/>
+<text x="38" y="1162" class="heading">Cliff and presence inputs</text>
+<text x="38" y="1194" class="terminal">Mega D39</text>
+<path d="M303 1189 H382" class="signal" marker-start="url(#arrow)"/>
+<text x="402" y="1194" class="">Front-left TCRT5000 digital OUT</text>
+<text x="38" y="1227" class="terminal">Mega D40</text>
+<path d="M303 1222 H382" class="signal" marker-start="url(#arrow)"/>
+<text x="402" y="1227" class="">Rear-centre TCRT5000 digital OUT</text>
+<text x="38" y="1260" class="terminal">Mega D41</text>
+<path d="M303 1255 H382" class="signal" marker-start="url(#arrow)"/>
+<text x="402" y="1260" class="">Front-right TCRT5000 digital OUT</text>
+<text x="38" y="1293" class="terminal">Mega D38</text>
+<path d="M303 1288 H382" class="signal" marker-start="url(#arrow)"/>
+<text x="402" y="1293" class="">HC-SR501 PIR OUT</text>
+<text x="38" y="1320" class="note">Mega-side supply only if the module accepts it. All module GNDs go to Mega GND.</text>
+</svg>

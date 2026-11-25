@@ -1,5 +1,22 @@
 # Change log
 
+## Software audit and wiring diagrams — 25 November 2026
+
+- Require whole motion phrases and keep Stop ahead of movement. Cancel head
+  movement and tracking on Stop, and make stale Mega links reconnect without
+  carrying over the attended session.
+- Invalidate failed I2C data immediately and refuse clear on a firmware mismatch.
+- End the motion session and pause local camera capture during sleep.
+- Restore multilingual spoken Home shortcuts and keep due timers until Done.
+  Retry failed playback and preserve timer state on databases from earlier builds.
+- Keep captured audio local, discard capture backlog before recognition and add
+  an optional paired WebRTC echo-cancel route for on-Pi acceptance.
+- Restrict optional cloud requests to fixed public questions and pin local-model
+  requests to numeric loopback with no redirect or proxy.
+- Preserve expression cues through the brief quiet interval. Add three wiring
+  diagrams generated from the current pin assignments and correct the setup's
+  motor, head and note tests.
+
 ## Restore original expression and home features
 
 - Bundle all 90 recovered WAV cues with checksums, original artwork and a local

@@ -25,6 +25,8 @@ def strip_wake(text: str, wake_words) -> tuple[bool, str]:
     for i, w in enumerate(words[:4]):
         if w in wake:
             return True, " ".join(words[i + 1:])
+        if w not in {"hey", "hi", "ok", "okay", "अरे", "ए"}:
+            break
     return False, " ".join(words)
 
 
@@ -63,6 +65,8 @@ _UNITS = [(3600, r"hours?|hrs?|ghante|ghanta|taas|tasa|घंटे|घंटा
           (60, r"minutes?|mins?|minat|minit|मिनट|मिनिट|मिनिटे|मिनिटांनी|मिनिटं"),
           (1, r"seconds?|secs?|sekand|सेकंड|सेकंद")]
 _FILLER = re.compile(r"^(?:me |mujhe |mala |मुझे |मला )?(?:in |after |to |that |ki |ke |baad |bad |nantar |kar |kara |de |dena |बाद |नंतर |की |कि |के |कर |करा |दे |देना )*")
+_EXACT_RULES = {"forward", "turn_left", "turn_right", "look_left", "look_right", "look_up", "look_down",
+                "look_center", "sleep", "wake", "cancel_reminders", "recall"}
 
 
 def _has(text: str, phrase: str) -> bool:
@@ -92,7 +96,14 @@ def parse(text: str) -> Intent | None:
     t = normalize(text)
     if not t:
         return None
+    command = t.removeprefix("please ").removesuffix(" please")
     for name, phrases in _RULES:
+        if name in _EXACT_RULES:
+            if command in phrases:
+                return Intent(name)
+            continue
+        if name == "remember" and not any(command == p or command.startswith(p + " ") for p in phrases):
+            continue
         if not any(_has(t, p) for p in phrases):
             continue
         if name in ("remind", "timer"):

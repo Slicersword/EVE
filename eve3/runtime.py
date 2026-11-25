@@ -5,11 +5,12 @@ reminders, face tracking), plus the Mega reader, speaker, listener and camera th
 Every command - web, CLI, touch, voice - enters through execute(); voice/chat may use only VOICE_COMMANDS.
 """
 from __future__ import annotations
-import os, secrets, threading, time
+import os, secrets, sqlite3, threading, time
+from contextlib import nullcontext
 from . import __version__, firmware, intents
 from .expressions import EXPRESSIONS
 from .home.activities import HomeModule
-from .ai import ACTIONS, Brain, line
+from .ai import ACTIONS, Brain, detect_lang, line
 from .behavior import Behavior, Context
 from .camera import Camera, tracking_step
 from .config import data_path, missing_flags, COMMISSIONING_FLAGS
@@ -25,6 +26,8 @@ from .voice import Listener, Speaker
 
 VOICE_COMMANDS = frozenset(name for name, _ in ACTIONS.values())      # stop, drive, head_look, sleep, wake
 LOOK = {"left": (-200, 0), "right": (200, 0), "up": (0, 80), "down": (0, -80), "center": (0, 0)}
+MOTION_COMMANDS = {"stop", "estop", "session_start", "session_end", "drive", "drive_test", "head_goto",
+                   "head_jog", "head_look", "head_release", "sleep"}
 
 
 def log(message: str):
@@ -56,7 +59,7 @@ class Runtime:
         self.behavior = Behavior(cfg)
         self.camera = Camera(cfg)
         self.touch = TouchPads(cfg, self._touch_head, self._touch_back_tap, self._touch_back_hold)
-        self.listener = listener_factory(cfg, self._heard, lambda: self.speaker.speaking) if cfg["voice"]["capture_enabled"] else None
+        self.listener = listener_factory(cfg, self._heard, self._speech_output_active) if cfg["voice"]["capture_enabled"] else None
         self.token = secrets.token_urlsafe(18)
         self.expression = "idle"
         self.caption = ""
@@ -66,9 +69,14 @@ class Runtime:
         self._override = ("", 0.0)             # (expression, until) set by touch / owner
         self._awake_until = 0.0
         self._thinking = 0
+        self._reminder_lock = threading.RLock()
+        self._reminder_pending = False
+        self._reminder_retry_at = 0.0
         self._stop = threading.Event()
+        self._motion_lock = threading.RLock()
+        self._tracking_active = False
         self._threads: list[threading.Thread] = []
-        self._connecting = False
+        self._connection_thread = None
         self._last_connect = self._power_checked = -1e9
         self.settle_s = cfg["serial"]["settle_s"]
         self.commands = {
@@ -115,11 +123,13 @@ class Runtime:
 
     def stop(self):
         self._stop.set()
-        self.drive.stop("shutting down")
+        self._stop_movement("shutting down")
         for thread in self._threads:
             thread.join(timeout=2)
         self._threads = []
         self.link.close()                       # sends STOP to the Mega first
+        if self._connection_thread:
+            self._connection_thread.join(timeout=1)
         for part in (self.listener, self.camera, self.speaker):
             if part:
                 part.stop()
@@ -128,7 +138,8 @@ class Runtime:
         if self.home:
             self.home.stop()
         if self.memory:
-            self.memory.close()
+            with self._reminder_lock:
+                self.memory.close()
         log("EVE stopped safely.")
 
     def write_token(self):
@@ -143,15 +154,15 @@ class Runtime:
     def _connect(self):
         try:
             self.link.open(self.settle_s)
+            if self._stop.is_set():
+                self.link.close()
+                return
             ok = "matches" if self.link.firmware_ok else "DOES NOT MATCH config - run gen_header, compile, upload"
             log(f"Mega connected. Firmware id {self.link.firmware_id} {ok}.")
         except Exception as exc:
             if self.link.last_error != getattr(self, "_logged_link_error", None):
                 log(f"Mega not connected: {type(exc).__name__}: {exc}")
                 self._logged_link_error = self.link.last_error
-        finally:
-            self._connecting = False
-
     def _control_loop(self):
         period = self.cfg["safety"]["heartbeat_ms"] / 1000
         while not self._stop.wait(period):
@@ -159,27 +170,55 @@ class Runtime:
                 self._control_tick()
             except Exception as exc:                 # never let this thread die: it feeds the Mega heartbeat
                 log(f"control error: {type(exc).__name__}: {exc}")
-                self.drive.stop("control error")
+                self._stop_movement("control error")
 
     def _control_tick(self):
         now = time.monotonic()
+        connecting = self._connection_thread is not None and self._connection_thread.is_alive()
         if self.link.synced:
+            # After SYNC, give the first heartbeat and telemetry time to arrive.
+            grace = max(self.link.hb_max_age_s, self.link.telemetry_max_age_s)
             try:
-                self.link.heartbeat()
+                if self.link.online(now) or now - self.link.synced_at < grace:
+                    self.link.heartbeat()
+                else:
+                    self._link_lost("Mega heartbeat or telemetry timed out")
             except Exception:
-                self.link.close()
-        elif not self._connecting and now - self._last_connect > 3:
-            self._connecting, self._last_connect = True, now
-            threading.Thread(target=self._connect, name="eve3-connect", daemon=True).start()
-        self.drive.tick()
-        self.head.tick()
+                self._link_lost("Mega heartbeat write failed")
+        elif not connecting:
+            if self.link.ser is not None:
+                self._link_lost(self.link.last_error or "Mega link offline")
+            if now - self._last_connect > 3 and not self._stop.is_set():
+                self._last_connect = now
+                self._connection_thread = threading.Thread(target=self._connect, name="eve3-connect", daemon=True)
+                self._connection_thread.start()
+        with self._motion_lock:
+            self.drive.tick()
+            self.head.tick()
+            if self.gate.latched:
+                self._tracking_active = False
         if now - self._power_checked > 5:
             self._power_checked = now
             reason = self.session.check()
             if reason:
                 self.gate.latch(reason)
-                self.drive.stop(reason)
+                self._stop_movement(reason)
                 log(f"Session ended: {reason}")
+
+    def _link_lost(self, reason):
+        with self._motion_lock:
+            self.session.end()
+            self.gate.latch(reason)
+            self._stop_movement(reason)
+            self.link.close()
+            self.link.last_error = reason
+        log(f"Mega link lost: {reason}")
+
+    def _stop_movement(self, reason):
+        with self._motion_lock:
+            self._tracking_active = False
+            self.drive.stop(reason)
+            self.head.stop()
 
     def _sensor_loop(self):
         while not self._stop.wait(0.03):
@@ -196,36 +235,74 @@ class Runtime:
         frame = self.hub.snapshot()
         front = [v for v in frame.tof_mm[:2] if type(v) in (int, float)]
         fresh = time.monotonic() - frame.tof_at < 1
+        was_sleeping = self.behavior.sleeping
         out = self.behavior.tick(Context(
             presence=bool(frame.pir and time.monotonic() - frame.cliff_at < 1) or self.camera.face_present(),
             obstacle_mm=min(front) if front and fresh else None, latched=bool(self.gate.latched),
             speaking=self.speaker.speaking, listening_now=self._thinking > 0, last_interaction=self.last_interaction))
+        if self.behavior.sleeping and not was_sleeping:
+            self._sleep_motion()
         override, until = self._override
         self.expression = override if override and time.time() < until and out["expression"] in ("idle", "happy", "sleepy") else out["expression"]
         if out["greet"]:
             self._speak(self.brain.greeting(self.lang), self.lang)
         if self.scheduler:
-            for text in self.scheduler.tick():
-                self.behavior.sleeping = False
-                self._speak(line("remind_due", self.lang, text=text), self.lang)
-        if self.cfg["camera"]["allow_tracking"] is True and self.camera.face_present() and self.head.target is None and self.head.homed:
+            self._announce_reminder()
+        self.camera.set_paused(self.behavior.sleeping)
+        with self._motion_lock:
+            self._track_face()
+
+    def _track_face(self):
+        if (self._tracking_active and not self.behavior.sleeping and self.session.active()
+                and self.cfg["camera"]["allow_tracking"] is True and self.camera.face_present()
+                and self.head.target is None and self.head.homed):
             c = self.cfg["camera"]
             dpan, dtilt = tracking_step(self.camera.offset, c["tracking_deadband"], c["tracking_step"],
                                         c["tracking_pan_sign"], c["tracking_tilt_sign"])
             if dpan or dtilt:
                 pan, tilt = self.head.position()
+                if not all(type(value) is int for value in (pan, tilt)):
+                    return
                 self.head.goto(max(self.head.pan_lim[0], min(self.head.pan_lim[1], pan + dpan)),
                                max(self.head.tilt_lim[0], min(self.head.tilt_lim[1], tilt + dtilt)))
+
+    def _announce_reminder(self):
+        with self._reminder_lock:
+            if self._stop.is_set() or self._reminder_pending or self._speech_output_active() or time.monotonic() < self._reminder_retry_at:
+                return
+            reminder = self.scheduler.next_due()
+            if not reminder:
+                return
+
+            def complete(success):
+                with self._reminder_lock:
+                    self._reminder_pending = False
+                    if success and not self._stop.is_set():
+                        try:
+                            self.memory.mark_announced(reminder)
+                            return
+                        except sqlite3.Error:
+                            log("Could not record the reminder announcement.")
+                    self._reminder_retry_at = time.monotonic() + 5
+
+            self._reminder_pending = True
+            self.behavior.sleeping = False
+            if not self._speak(line("remind_due", self.lang, text=reminder["text"]), self.lang, on_done=complete):
+                complete(False)
 
     # ------------------------------------------------------------------ people
     def _interaction(self):
         self.last_interaction = time.time()
         self.behavior.sleeping = False
+        self.camera.set_paused(False)
 
-    def _speak(self, text, lang):
+    def _speech_output_active(self):
+        return self.speaker.speaking or getattr(self.speaker, "speech_pending", False) or time.monotonic() < getattr(self.speaker, "quiet_until", 0.0)
+
+    def _speak(self, text, lang, on_done=None):
         self._cue_block_until = time.monotonic() + 1
         self.caption = text
-        self.speaker.say(text, lang)
+        return self.speaker.say(text, lang, on_done=on_done) if on_done else self.speaker.say(text, lang)
 
     def _touch_head(self):
         self._interaction()
@@ -249,20 +326,25 @@ class Runtime:
         if not rest:
             self._touch_back_tap()                           # just the name: "yes?"
             return
-        self.converse(rest)
+        self.converse(rest, microphone=True)
 
-    def converse(self, text: str) -> dict:
+    def converse(self, text: str, microphone=False) -> dict:
         """Understand one sentence, act if it is an allowed action, answer. Used by voice and by chat."""
         self._interaction()
         self._thinking += 1
         try:
             verdict = self.gate.latched or ""
-            result = self.brain.respond(text, status_reason=verdict)
+            lang = detect_lang(text, self.cfg["robot"]["language"])
+            reply = self.home.spoken(text, lang) if self.home else None
+            result = {"reply": reply, "lang": lang, "action": None} if reply is not None else self.brain.respond(text, status_reason=verdict)
             lang = self.lang = result["lang"]
             reply, done = result["reply"], None
             if result["action"]:
                 name, args = result["action"]
-                ok, message = self.execute(name, dict(args), source="voice")
+                if microphone and self.cfg["voice"]["echo_cancel_enabled"] and name in ("drive", "head_look"):
+                    ok, message = False, "use the control page for movement in echo-cancel mode"
+                else:
+                    ok, message = self.execute(name, dict(args), source="voice")
                 done = {"command": name, "ok": ok, "message": message}
                 reply = line("stopped" if name == "stop" else "sleep" if name == "sleep" else "wake" if name == "wake" else "ok", lang) \
                     if ok else line("cannot", lang, why=message)
@@ -281,23 +363,22 @@ class Runtime:
         if source != "owner" and name not in VOICE_COMMANDS:
             return False, "this needs the owner (control page or evectl)"
         try:
-            return self.commands[name](args)
+            with self._motion_lock if name in MOTION_COMMANDS else nullcontext():
+                return self.commands[name](args)
         except (KeyError, TypeError, ValueError, PermissionError) as exc:
             return False, f"not accepted: {exc}"
 
     def _c_stop(self, a):
-        self.drive.stop("stop requested")
-        self.head.target = None                              # Mega holds the head when its lease runs out
+        self._stop_movement("stop requested")
         return True, "stopped"
 
     def _c_estop(self, a):
         self.gate.latch("emergency stop")
-        self.drive.stop("emergency stop")
-        self.head.target = None
         try:
             self.link.emergency_stop()
         except Exception:
             pass                                             # link down = Mega already stopped itself
+        self._stop_movement("emergency stop")
         log("EMERGENCY STOP")
         return True, "emergency stop - latched until the owner clears it"
 
@@ -308,12 +389,13 @@ class Runtime:
     def _c_session_start(self, a):
         ok, message = self.session.start(a.get("minutes", 10))
         if ok:
+            self._tracking_active = True
             log("Attended session started.")
         return ok, message
 
     def _c_session_end(self, a):
         self.session.end()
-        self.drive.stop("session ended")
+        self._stop_movement("session ended")
         return True, "session ended"
 
     def _c_drive(self, a):
@@ -339,15 +421,17 @@ class Runtime:
         return self.head.goto(pan * c["tracking_pan_sign"], tilt * c["tracking_tilt_sign"])
 
     def _c_head_release(self, a):
-        self.head.release()
-        return True, "head released (home again before the next move)"
+        if self.head.release():
+            return True, "head release sent (home again before the next move)"
+        return False, "Mega head release write failed"
 
     def _c_say(self, a):
         lang = a.get("lang", self.lang)
         if lang not in ("en", "hi", "mr") or not isinstance(a.get("text"), str):
             return False, "text and lang (en/hi/mr) required"
-        self._speak(a["text"][:300], lang)
-        return True, "speaking"
+        if self._speak(a["text"][:300], lang):
+            return True, "speech queued"
+        return False, "speaker disabled, queue full or no text to speak"
 
     def _c_chat(self, a):
         if not isinstance(a.get("text"), str) or not a["text"].strip():
@@ -361,10 +445,16 @@ class Runtime:
         return True, a["name"]
 
     def _c_sleep(self, a):
-        self.drive.stop("sleep")
         self.behavior.sleeping = True
         self.last_interaction = 0.0
+        self.camera.set_paused(True)
+        self._sleep_motion()
         return True, "sleeping"
+
+    def _sleep_motion(self):
+        with self._motion_lock:
+            self.session.end()
+            self._stop_movement("sleep")
 
     def _c_wake(self, a):
         self._interaction()
@@ -433,8 +523,9 @@ class Runtime:
                      "limits_verified": self.head.limits_verified},
             "commissioning": {**cfg["commissioning"], "missing": missing_flags(cfg, COMMISSIONING_FLAGS)},
             "firmware_flags": cfg["firmware"],
-            "features": {"touch": self.touch.error or "ok", "camera": "on" if self.camera.running else self.camera.error,
+            "features": {"touch": self.touch.error or "ok", "camera": self.camera.state,
                          "microphone": ("listening" if self.listener.listening else self.listener.last_error or "starting") if self.listener else "off",
+                         "voice_mode": "echo cancellation" if cfg["voice"]["echo_cancel_enabled"] else "turn-taking",
                          "mic_level": round(self.listener.level) if self.listener else None,
                          "speaker": self.speaker.last_error or ("on" if self.speaker.enabled else "off"),
                          "memory": "on" if self.memory else "off",

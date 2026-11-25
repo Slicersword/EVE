@@ -6,23 +6,23 @@ tracking and web tools are disabled. Speaking, consent-based memory and basic of
 | Data | Handling |
 |---|---|
 | Camera frames | Local picamera2/OpenCV processing; no frame saving or upload path in the runtime |
-| Microphone audio | ALSA stream; short transcription clip in /dev/shm, deleted in finally; no disk fallback |
+| Microphone audio | ALSA or the local echo-cancel source; short transcription clip in /dev/shm, deleted after transcription |
 | Conversation text | Used for the current answer; not written to a conversation log |
 | Explicit notes/reminders | Local SQLite under ignored data/; not sent to model adapters |
 | Owner token / API key | Ignored runtime files, never source configuration or commits |
-| Optional local-model request | Current text to configured loopback model endpoint |
-| Optional cloud-model request | Current text after limited regex redaction, only with both opt-in switches |
+| Optional local-model request | Current text to the numeric loopback endpoint, with proxies and redirects disabled |
+| Optional cloud-model request | One fixed prompt from the built-in public catalog, only with both opt-in switches |
 
 RAM-backed files/memory are not a forensic zero-retention guarantee: system swap, OS crash tooling,
 backups and external audio/model programs are outside this runtime's control. Inspect the actual Pi
 configuration when strict volatile-only processing is required.
 
-## Cloud limitation
+## Cloud
 
-Cloud is OFF. The existing optional redactor handles email addresses, URLs and long numbers; it does
-not reliably recognize names, addresses or every identifying detail. Enabling its switches does not make
-arbitrary private speech safe for cloud transmission. To preserve the owner's strict no-private-data
-rule, leave cloud disabled. No private notes, audio or images are intentionally attached by the adapter.
+Cloud is off by default. If enabled explicitly, the supported phrases “public fact
+about the Moon”, “public fact about photosynthesis” and “public fact about the Taj
+Mahal” select fixed text. Arbitrary dialogue, local notes, audio, images and
+household records stay on the Pi. The default build works offline after installation.
 
 Model responses are text-only; they are never parsed as actuator commands. Fixed intent actions from the
 person's own words still pass the runtime motion gates.

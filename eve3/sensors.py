@@ -1,5 +1,5 @@
 """M04 - sensors. 3x GY-530 VL53L0X (XSHUT BCM5/6/13 -> 0x30/0x31/0x32), MPU-6050 (0x68), and the three
-KY-033 cliff sensors + PIR that arrive through Mega telemetry.
+digital TCRT5000 cliff modules + PIR that arrive through Mega telemetry.
 
 Order of the ToF tuple: (front-left, front-right, rear). Order of cliff: (front-left, rear-centre, front-right).
 A reading that is missing, stale or out of range is None / unsafe - nothing is ever invented.
@@ -30,7 +30,7 @@ def valid_tof_mm(v, lo=30, hi=1000) -> bool:
 
 
 def decode_cliff(raw, edge_level, calibrated: bool) -> tuple:
-    """Digital KY-033. A channel is unsafe when it reads its calibrated edge level, or anything unexpected."""
+    """A digital cliff channel is unsafe when it reads its edge level or an unexpected value."""
     if not calibrated or len(raw) != 3:
         return (True, True, True)
     return tuple(r not in (0, 1) or r == e for r, e in zip(raw, edge_level))
@@ -46,7 +46,7 @@ def calibrate_cliff(floor_rows, edge_rows) -> dict:
         floor, edge = {r[i] for r in floor_rows}, {r[i] for r in edge_rows}
         if len(floor) != 1 or len(edge) != 1 or floor == edge:
             raise ValueError(f"{name} cliff sensor: reading flickers or does not change between floor and edge "
-                             "(turn the blue trimmer on that KY-033 and repeat)")
+                             "(adjust the threshold on that digital cliff module and repeat)")
         levels.append(next(iter(edge)))
     return {"calibrated": True, "edge_level": levels}
 
@@ -174,7 +174,7 @@ class SensorReader:
         self.hub, self.clock, self.retry_s = hub, clock, retry_s
         self.devices = {"tof": [tof, False, -1e9, "not started"], "imu": [imu, False, -1e9, "not started"]}
 
-    def _poll_one(self, name, publish):
+    def _poll_one(self, name, publish, missing):
         dev = self.devices[name]
         device, started, last_try, _ = dev
         if not started:
@@ -190,9 +190,11 @@ class SensorReader:
         try:
             publish(device.sample())
             dev[3] = ""
-        except ValueError as exc:                       # implausible value: skip this sample, keep the device
+        except ValueError as exc:                       # keep the device, invalidate the sample
+            publish(missing, at=0)
             dev[3] = str(exc)[:160]
         except Exception as exc:                        # bus error: restart the device later
+            publish(missing, at=0)
             dev[1], dev[2], dev[3] = False, self.clock(), f"{type(exc).__name__}: {exc}"[:160]
             try:
                 device.close()
@@ -200,8 +202,8 @@ class SensorReader:
                 pass
 
     def poll(self):
-        self._poll_one("tof", self.hub.update_tof)
-        self._poll_one("imu", self.hub.update_imu)
+        self._poll_one("tof", self.hub.update_tof, (None, None, None))
+        self._poll_one("imu", self.hub.update_imu, None)
 
     def status(self) -> dict:
         return {name: {"ok": d[1] and not d[3], "error": d[3]} for name, d in self.devices.items()}

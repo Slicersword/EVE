@@ -1,25 +1,27 @@
 """M12 - EVE's brain. Three layers, tried in this order:
  1. intents      - the person's own words mapped to a fixed list of actions (offline, always on)
  2. small talk   - built-in answers in English / Hindi / Marathi (offline)
- 3. language model - optional. Local llama-server on this Pi, or (owner opt-in only) a cloud endpoint.
+ 3. language model - optional. Local llama-server on this Pi. The optional cloud endpoint accepts a built-in public question catalog.
 
 Model output is TEXT ONLY. It is cleaned, shortened and spoken; it is never parsed for commands.
-The cloud path receives one redacted sentence - no memory, names list, audio or images.
+The cloud path sends fixed catalog text only. Dialogue, memory and camera/mic data stay local.
 """
 from __future__ import annotations
-import json, os, random, re, time, urllib.request
+import json, os, random, re, threading, time, urllib.request
 from datetime import datetime, timedelta, timezone
 from . import intents
-from .config import data_path
+from .config import data_path, local_model_endpoint
 
 _MR_WORDS = {"आहे", "आहेस", "आहात", "काय", "नाही", "मला", "माझं", "माझे", "तू", "तुझं", "तुझे", "तुम्ही", "कसा", "कशी",
              "किती", "झाला", "बघ", "थांब", "थांबा", "सांग", "ये", "पुढे", "आठवण", "लक्षात", "वाजले", "गोष्ट", "विनोद",
              "आज", "उद्या", "नंतर", "मिनिटांनी", "डावीकडे", "उजवीकडे", "समोर", "वर", "खाली", "झोप", "उठा", "नमस्कार",
+             "खेळ", "खेळूया", "पायरी", "पुढची", "पर्याय", "आठवणी", "घरचे", "गाणे", "khelu", "payari", "gane",
              "ahe", "ahes", "kay", "nahi", "mala", "maza", "tu", "kasa", "kashi", "kiti", "bagh", "thamb", "zop",
              "pudhe", "sang", "goshta", "athavan", "vajle", "nantar", "davikade", "ujvikade", "samor"}
 _HI_WORDS = {"है", "हूँ", "हूं", "हो", "क्या", "नहीं", "मुझे", "मेरा", "मेरी", "तुम", "आप", "कैसे", "कैसी", "कितने", "देख",
              "रुक", "रुको", "बजे", "सुना", "सुनाओ", "कहानी", "चुटकुला", "याद", "बाद", "मिनट", "घंटे", "आगे", "बाएं", "दाएं",
              "ऊपर", "नीचे", "सामने", "नमस्ते", "बता", "बताओ", "कौन", "तारीख",
+             "खेलते", "कदम", "अगला", "जवाब", "विकल्प", "दिखाओ", "यादें", "करो",
              "hai", "ho", "kya", "nahi", "mujhe", "tum", "kaise", "kaisi", "kitne", "dekh", "ruk", "baje", "aage",
              "sunao", "kahani", "chutkula", "yaad", "baad", "ghante", "baye", "daye", "kaun"}
 
@@ -71,6 +73,11 @@ ACTIONS = {
     "sleep": ("sleep", {}), "wake": ("wake", {}),
 }
 _SIMPLE = {"who", "how", "thanks", "bye", "forget_hint", "remind_unclear", "remember_unclear"}
+PUBLIC_QUESTIONS = {
+    "public fact about the moon": "Give one public science fact about the Moon.",
+    "public fact about photosynthesis": "Give one public science fact about photosynthesis.",
+    "public fact about the taj mahal": "Give one public historical fact about the Taj Mahal.",
+}
 
 
 def detect_lang(text: str, default="en") -> str:
@@ -97,17 +104,16 @@ def clean_reply(text, limit=300) -> str:
     return text[:limit]
 
 
-def redact(text: str) -> str:
-    """Remove things that identify people before any text may leave the house."""
-    text = re.sub(r"[\w.+-]+@[\w-]+\.[\w.-]+", "[email]", text)
-    text = re.sub(r"https?://\S+", "[link]", text)
-    return re.sub(r"\d[\d\s-]{5,}\d", "[number]", text)
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 def _post_chat(url, payload, timeout, headers=None) -> str:
     request = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"),
                                      headers={"Content-Type": "application/json", **(headers or {})}, method="POST")
-    with urllib.request.urlopen(request, timeout=timeout) as response:
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect())
+    with opener.open(request, timeout=timeout) as response:
         raw = response.read(65537)
     if len(raw) > 65536:
         raise ValueError("model response too large")
@@ -122,6 +128,7 @@ class Brain:
         self.default_lang = cfg["robot"]["language"]
         self.tz = timezone(timedelta(minutes=cfg["behavior"]["utc_offset_minutes"]))
         self.last_error = ""
+        self._cloud_lock = threading.Lock()
 
     def _now(self) -> datetime:
         return datetime.fromtimestamp(self._clock(), self.tz)
@@ -181,31 +188,32 @@ class Brain:
         try:
             if ai["local_llm"]["enabled"]:
                 llm = ai["local_llm"]
-                return clean_reply(self._post(llm["endpoint"], {
+                return clean_reply(self._post(local_model_endpoint(llm["endpoint"]), {
                     "messages": [{"role": "system", "content": system},
                                  {"role": "user", "content": text[:llm["max_input_chars"]]}],
                     "max_tokens": llm["max_tokens"], "temperature": 0.6}, llm["timeout_s"]))
-            if ai["cloud"]["enabled"] and ai["cloud"]["privacy_consent"] is True and ai["cloud"]["send_private_data"] is False:
-                return self._cloud(system, text)
+            question = PUBLIC_QUESTIONS.get(intents.normalize(text))
+            if (question and self.memory and ai["cloud"]["enabled"] and ai["cloud"]["privacy_consent"] is True
+                    and ai["cloud"]["send_private_data"] is False):
+                return self._cloud(question)
         except Exception as exc:
             self.last_error = f"{type(exc).__name__}"                        # never log the text itself
         return ""
 
-    def _cloud(self, system, text) -> str:
+    def _cloud(self, question) -> str:
         cloud = self.cfg["ai"]["cloud"]
         key_path = data_path(self.cfg, cloud["key_file"])
         if os.stat(key_path).st_mode & 0o077:
             raise PermissionError("cloud key file must be chmod 600")
         day = self._now().strftime("%Y-%m-%d")
-        used = 0
-        if self.memory:
+        key = key_path.read_text(encoding="utf-8").strip()
+        with self._cloud_lock:
             stamp, _, count = (self.memory.get("cloud_day", "") or "").partition("=")
             used = int(count) if stamp == day and count.isdigit() else 0
             if used >= cloud["max_requests_per_day"]:
                 raise RuntimeError("cloud daily limit reached")
             self.memory.put("cloud_day", f"{day}={used + 1}")
-        key = key_path.read_text(encoding="utf-8").strip()
         return clean_reply(self._post(cloud["endpoint"], {
             "model": cloud["model"], "max_tokens": cloud["max_tokens"],
-            "messages": [{"role": "system", "content": system}, {"role": "user", "content": redact(text)[:400]}]},
+            "messages": [{"role": "user", "content": question}]},
             cloud["timeout_s"], {"Authorization": f"Bearer {key}"}))

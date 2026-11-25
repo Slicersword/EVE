@@ -58,9 +58,9 @@ distance. The full build requires hands-on measurements and commissioning.
 Chassis dimensions and exact motor/power-bank models are builder choices, recorded
 in the [build worksheet](docs/DECISIONS.md).
 
-Voice is half-duplex: microphone input is ignored during speech. There is no mapping,
-automatic docking, battery monitoring or autonomous source editing. Basic conversation
-runs locally; external AI and network integrations are disabled by default.
+Voice takes turns by default. M13 also documents the optional verified local
+echo-cancel route. Basic conversation runs locally, and external AI starts off.
+See the [software coverage and physical checks](docs/VERIFICATION.md).
 
 ## Find help or change a setting
 

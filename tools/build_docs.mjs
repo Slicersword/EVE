@@ -78,6 +78,7 @@ for (const source of docs) {
       const [filename, fragment] = href.split('#');
       const resolved = path.posix.normalize(path.posix.join(path.posix.dirname(source), filename));
       if (docs.includes(resolved)) target = relative(url, route(resolved));
+      else if (resolved.startsWith('docs/assets/') && fs.existsSync(path.join(root, resolved))) target = relative(url, resolved);
       else if (sources.includes(resolved)) target = relative(url, sourceRoute(resolved));
       else throw new Error(`Unmapped documentation link ${source}: ${href}`);
       if (fragment) target += '#' + fragment;

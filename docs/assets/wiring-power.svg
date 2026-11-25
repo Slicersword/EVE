@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 807" role="img" aria-labelledby="title desc">
+<title id="title">Power and speaker wiring</title><desc id="desc">Gold = supply · dashed = return · blue = audio or a speaker pair</desc>
+<defs><marker id="arrow" markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto-start-reverse" viewBox="0 0 7 6"><path d="M0 0 L7 3 L0 6z" fill="#b6d0e7"/></marker></defs>
+<style>.canvas{fill:#0c1827;stroke:none} rect{fill:#15273a;stroke:#365470} text{fill:#e9f3fb;font:16px system-ui, sans-serif} .title{font-size:30px;font-weight:700}.heading{fill:#7fe6d7;font-weight:700;font-size:19px}.terminal{font-weight:600}.note{font-size:14px;fill:#c0d5e9}path[class]{stroke-width:2;fill:none}.power{stroke:#ffd07e}.signal{stroke:#85d8f9}.ground{stroke:#c6d0dd;stroke-dasharray:5 4}</style>
+<rect class="canvas" width="100%" height="100%"/>
+<text x="26" y="40" class="title">Power and speaker wiring</text>
+<text x="26" y="66" class="note">Gold = supply · dashed = return · blue = audio or a speaker pair</text>
+<rect x="20" y="88" width="820" height="212" rx="10"/>
+<text x="38" y="118" class="heading">Bank A · Pi and logic</text>
+<text x="38" y="150" class="terminal">Bank A 5 V USB</text>
+<path d="M303 145 H382" class="power" marker-end="url(#arrow)"/>
+<text x="402" y="150" class="">Pi 4 USB-C power input</text>
+<text x="38" y="183" class="terminal">Pi USB-A</text>
+<path d="M303 178 H382" class="power" marker-end="url(#arrow)"/>
+<text x="402" y="183" class="">Mega USB-B and display touch USB</text>
+<text x="38" y="216" class="terminal">Pi 5 V · measured budget</text>
+<path d="M303 211 H382" class="power" marker-end="url(#arrow)"/>
+<text x="402" y="216" class="">Always-on Pi fan (+), fan (−) to Pi GND</text>
+<text x="38" y="249" class="terminal">Mega 5 V logic</text>
+<path d="M303 244 H382" class="power" marker-end="url(#arrow)"/>
+<text x="402" y="249" class="">Both TB6612 VCC and compatible digital sensors</text>
+<text x="38" y="276" class="note">Check how your panel receives 5 V. Use one documented supply path.</text>
+<rect x="20" y="315" width="820" height="179" rx="10"/>
+<text x="38" y="345" class="heading">Bank B · switched motor branch</text>
+<text x="38" y="377" class="terminal">Bank B 5 V (+)</text>
+<path d="M303 372 H382" class="power" marker-end="url(#arrow)"/>
+<text x="402" y="377" class="">Branch protection, then actuator cutoff</text>
+<text x="38" y="410" class="terminal">Actuator cutoff output · 5 V</text>
+<path d="M303 405 H382" class="power" marker-end="url(#arrow)"/>
+<text x="402" y="410" class="">Both TB6612 VM and both ULN2003 motor (+)</text>
+<text x="38" y="443" class="terminal">Bank B common return (−)</text>
+<path d="M303 438 H382" class="ground" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<text x="402" y="443" class="">Each motor driver GND and the Mega GND reference</text>
+<text x="38" y="470" class="note">Keep Bank A and Bank B positive rails separate. The cutoff opens every motor (+) feed.</text>
+<rect x="20" y="509" width="820" height="278" rx="10"/>
+<text x="38" y="539" class="heading">Bank B · switched audio branch</text>
+<text x="38" y="571" class="terminal">Bank B 5 V (+)</text>
+<path d="M303 566 H382" class="power" marker-end="url(#arrow)"/>
+<text x="402" y="571" class="">Branch protection, audio switch, boost IN+</text>
+<text x="38" y="604" class="terminal">Bank B return (−)</text>
+<path d="M303 599 H382" class="ground" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<text x="402" y="604" class="">Boost IN−, audio ground per module instructions</text>
+<text x="38" y="637" class="terminal">Boost OUT+ / OUT−</text>
+<path d="M303 632 H382" class="power" marker-end="url(#arrow)"/>
+<text x="402" y="637" class="">Regulated 9 V to PAM8610 DC+ / DC−</text>
+<text x="38" y="670" class="terminal">Pi 3.5 mm stereo line</text>
+<path d="M303 665 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="670" class="">Amplifier L / R / GND input</text>
+<text x="38" y="703" class="terminal">PAM8610 left + / −</text>
+<path d="M303 698 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="703" class="">Left 4 Ω / 3 W speaker, its own pair</text>
+<text x="38" y="736" class="terminal">PAM8610 right + / −</text>
+<path d="M303 731 H382" class="signal" marker-end="url(#arrow)"/>
+<text x="402" y="736" class="">Right 4 Ω / 3 W speaker, its own pair</text>
+<text x="38" y="763" class="note">Set and load-test 9 V before attaching the amplifier. Keep both speaker pairs isolated from ground.</text>
+</svg>

@@ -29,6 +29,10 @@ def main():
                                cwd=ROOT, text=True, capture_output=True, check=True).stdout
     if generated != (ROOT / 'docs/SETUP_GUIDE.md').read_text():
         failures.append('SETUP_GUIDE.md is stale; regenerate it from tools/stage.py')
+    diagrams = subprocess.run([sys.executable, str(ROOT / 'tools/draw_wiring.py'), '--check'],
+                              cwd=ROOT, text=True, capture_output=True)
+    if diagrams.returncode:
+        failures.append(diagrams.stderr.strip() or 'Wiring diagrams are stale')
     snapshot = subprocess.run([sys.executable, str(ROOT / 'tools/build_source_index.py'), '--check'],
                               cwd=ROOT, text=True, capture_output=True)
     if snapshot.returncode:

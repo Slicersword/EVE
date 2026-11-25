@@ -10,10 +10,10 @@ performing each hands-on acceptance test.
 | Electrical specification | Motor, driver-board, supply and wiring ratings must be recorded and measured per build |
 | Sensors | All three ToF, all three cliff channels and MPU6050 must pass live response/freshness tests |
 | Firmware | Host harness runs the real sketch; AVR CI compiles target binaries; USB upload/bootloader behavior needs the Mega |
-| Voice | Half-duplex only; no echo cancellation/barge-in; latency and recognition quality need measurement |
-| Voice stop | Ordinary stop, not a latched estop; unavailable during speech/transcription; never the sole stop |
+| Voice | Turn-taking by default. Optional local echo-cancel route needs the M13 acoustic test. Listening can overlap speech, but inference can still delay the next utterance |
+| Voice stop | Requests ordinary motion Stop. Microphone recognition can be delayed or unavailable. The physical cutoff remains independent |
 | Optional LLM | Adapter only; model weights/server not included; Pi RAM/latency must be tested |
-| Cloud privacy | Regex redaction is incomplete; keep cloud disabled for private operation |
+| Cloud privacy | Disabled by default. Opt-in requests use a small fixed public catalog |
 | Web integrations | Helpers exist but are not connected to conversation; no general web-browsing feature |
 | Autonomy | Bounded commands and optional face tracking; no SLAM, docking or route navigation |
 | Self-modification | No autonomous source editing or execution of model output |
@@ -39,9 +39,10 @@ build uses the current Pi/Mega interface and setup guide.
 |---|---|
 | Expression artwork and audio | All 90 originals are in Git, with separate preview and live opt-in playback. |
 | Family games, story branches, recipe sessions, timers, messages, music and memory capsules | Bundled and accessible from the token-protected Home page. Household data and chosen music are supplied locally. |
-| Earlier expression studio controls and old spoken home command phrases | Use the current Expression Studio and Home screen. The old command API and its full voice shortcuts have not been ported. |
-| Earlier family voice profiles, special privacy modes and audio echo-cancellation path | Not migrated. The current microphone and speaker use turn-taking. |
-| Older joystick controller, local model experiments and automated maintenance workflows | Not part of the supported clone setup. |
+| Expression Studio and spoken Home shortcuts | The current studio auditions all 90 sounds. Fixed spoken shortcuts run riddles, story branches, recipe navigation and music stop. Private household records open through authenticated Home. |
+| Earlier audio and privacy modes | Optional local echo-cancel routing is present. Instant interruption of in-progress speech, family voice profiles and separate guest/focus modes are outside this build. Sleep ends motion and pauses the camera. Enabled microphones remain available for voice wake. |
+| Earlier reminder scheduling | Relative reminders and named kitchen timers survive restarts and remain until acknowledged. Recurrence, snooze and spoken clock-time scheduling are outside the current workflow. |
+| Older joystick controller, alternative local model experiments and maintenance tools | Current controls use bounded motion commands. Models use a separate loopback adapter. Doctor, verification and protected source updates are available. |
 | Chassis CAD, build photos and historical reports | The Git build includes assembly and connection guides. Older CAD and image originals remain in historical archives. |
 | Earlier firmware, field calibration, measurements and device state | Use the firmware and guide from this checkout. Physical commissioning must be performed on the assembled robot. |
 

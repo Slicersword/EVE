@@ -65,9 +65,10 @@ public repository. Website notes/export files are your private build record.
 | Local timezone | UTC (offset 0) | `behavior.utc_offset_minutes`; e.g. 330 for India |
 | Camera/tracking | Off | Enable after M08/M10 acceptance |
 | Microphone capture | Off | Install local STT and calibrate at M13 |
+| Overlapping speech and listening | Turn-taking | Optional local echo route in M13, after a successful acoustic test |
 | Network | Loopback only | SSH tunnel, or explicit trusted-LAN mode |
 | Local language model | Off; basic offline replies work alone | Separate on-Pi loopback server/model, with measured RAM/latency |
-| Cloud | Off | Keep off for private operation; regex redaction is incomplete |
+| Cloud | Off | Optional fixed public questions only |
 | Reverse/pivot | Off | Requires additional coverage and a separate physical review |
 | Website | GitHub Pages from main, independent of ChatGPT; separate offline build | Keep the public repository and Pages enabled |
 | Project license | Not selected | Maintainer must choose before representing this as open-source licensed |

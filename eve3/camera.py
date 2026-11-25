@@ -35,16 +35,26 @@ class Camera:
         self.running = False
         self.error = "off"
         self._stop = threading.Event()
+        self._paused = threading.Event()
         self._thread = None
 
     def start(self):
-        if self.running or self.c["enabled"] is not True:
+        if self.c["enabled"] is not True or (self._thread and self._thread.is_alive()):
             return
         self._stop.clear()
         self._thread = threading.Thread(target=self._loop, name="eve3-camera", daemon=True)
         self._thread.start()
 
     def _loop(self):
+        while not self._stop.is_set():
+            if self._paused.is_set():
+                self._stop.wait(0.1)
+                continue
+            self._capture()
+            if self.error:
+                return
+
+    def _capture(self):
         cam = led = None
         try:
             import cv2
@@ -61,7 +71,7 @@ class Camera:
             cam.start()
             self.running, self.error = True, ""
             period = 1.0 / max(1, int(self.c["process_fps"]))
-            while not self._stop.wait(period):
+            while not self._stop.wait(period) and not self._paused.is_set():
                 gray = cv2.cvtColor(cam.capture_array(), cv2.COLOR_RGB2GRAY)
                 faces = cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5, minSize=(48, 48))
                 self.offset, self.offset_at = face_offset([tuple(int(v) for v in f) for f in faces], width, height), time.monotonic()
@@ -70,16 +80,30 @@ class Camera:
         except Exception as exc:
             self.error = f"{type(exc).__name__}: {exc}"[:120]
         finally:
-            self.running, self.offset = False, None
+            self.offset = None
             for closer in (lambda: cam and cam.stop(), lambda: cam and cam.close(), lambda: led and led.off(),
                            lambda: led and led.close()):
                 try:
                     closer()
                 except Exception:
                     pass
+            self.running = False
 
     def face_present(self, max_age_s=1.5) -> bool:
-        return self.running and self.offset is not None and time.monotonic() - self.offset_at < max_age_s
+        return (not self._paused.is_set() and self.running and self.offset is not None
+                and time.monotonic() - self.offset_at < max_age_s)
+
+    def set_paused(self, paused):
+        if paused:
+            self._paused.set()
+        else:
+            self._paused.clear()
+
+    @property
+    def state(self):
+        if self.c["enabled"] and self._paused.is_set() and not self.running:
+            return "paused for sleep"
+        return "on" if self.running else self.error
 
     def stop(self):
         self._stop.set()

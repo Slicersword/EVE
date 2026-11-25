@@ -32,6 +32,7 @@ class MegaLink:
         self.ser = None
         self.seq = 1
         self.synced = False
+        self.synced_at = 0.0
         self.firmware_id = ""
         self.telemetry: dict = {}
         self.telemetry_at = 0.0
@@ -62,6 +63,7 @@ class MegaLink:
         try:
             ack = self.request("SYNC", timeout_s=0.6)
             self.firmware_id = ack.split(",", 1)[1] if "," in ack else ""
+            self.synced_at = time.monotonic()
             self.synced = True
         except Exception as exc:
             self.close()
@@ -167,7 +169,7 @@ class MegaLink:
         return self.request("HOMESET")
 
     def release_head(self):
-        return self.request("HEADSTOP")
+        self._send("HEADSTOP")
 
     # -- rx ----------------------------------------------------------------
     def _consume(self, line: bytes):

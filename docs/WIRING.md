@@ -10,6 +10,30 @@ lithium packs, charger and buck converters are outside this build's charging cir
 INA219 is disabled and is not wired. The INMP441 microphones are I2S devices;
 the distance and tilt sensors use a different bus, I2C.
 
+## Wiring diagrams
+
+Read the wire labels in the diagrams, then use the tables below to identify each
+terminal on your particular board. The diagrams use the shipped pin assignments
+and show connections by signal name. Open an image at full size to read small labels.
+
+### Power and speakers
+
+![Bank A powers the Pi. Bank B has separate switched branches for 5 V motors and the 9 V amplifier. Grounds share a reference.](assets/wiring-power.svg)
+
+[Open power wiring at full size](assets/wiring-power.svg).
+
+### Mega signals
+
+![Mega digital pins for each TB6612FNG, both ULN2003 boards, three cliff sensors and the PIR.](assets/wiring-mega.svg)
+
+[Open Mega wiring at full size](assets/wiring-mega.svg).
+
+### Pi signals
+
+![Pi header pins for shared I2C, three XSHUT signals, both INMP441 slots, touch pads and the camera indicator.](assets/wiring-pi.svg)
+
+[Open Pi wiring at full size](assets/wiring-pi.svg).
+
 ## Read the connection labels
 
 | Label | Meaning | Example |
@@ -314,8 +338,9 @@ provide 64 bit clocks per stereo frame. The supplied Pi profile captures 48 kHz,
 
 Install the I2S profile at M13 using the software guide. Test the two microphones
 individually by gently speaking near each; do not short SD during operation. The
-runtime combines channels for speech recognition. It does not implement beamforming,
-sound direction finding, echo cancellation or simultaneous listening while speaking.
+runtime combines channels for speech recognition. The default voice path takes turns.
+[M13 optional echo cancellation](SETUP_GUIDE.md#optional-echo-cancellation-m13) needs
+a verified local desktop audio route. The two slots provide no direction estimate.
 
 ### PAM8610 amplifier and 4 Ω / 3 W speakers
 

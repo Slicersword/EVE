@@ -28,9 +28,10 @@ class Scheduler:
             due += 86400
         return self.add_in(due - now, text) if due - now >= 5 else self.add_in(5, text)
 
-    def tick(self) -> list[str]:
-        return self.memory.pop_due(self._clock())
+    def next_due(self) -> dict | None:
+        return self.memory.next_due(self._clock())
 
     def pending(self) -> list[dict]:
         now = self._clock()
-        return [{"in_s": max(0, int(r["due"] - now)), "text": r["text"]} for r in self.memory.pending_reminders()]
+        return [{"id": r["id"], "in_s": max(0, int(r["due"] - now)), "text": r["text"],
+                 "announced": r["announced"]} for r in self.memory.pending_reminders()]

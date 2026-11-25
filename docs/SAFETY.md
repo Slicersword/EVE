@@ -22,21 +22,21 @@ Reverse and pivot remain off unless an owner makes a separate explicit configura
 
 | Trigger | Behavior |
 |---|---|
-| Owner normal stop / parsed stop phrase | Wheels stop; head lease renewal ends; this is not a latched emergency stop |
+| Owner normal stop / parsed stop phrase | Stops wheels, releases a moving head and disables face tracking until a new session starts |
 | Emergency-stop command / back-pad hold | Pi latches, sends Mega STOP, ends commanded motion; Mega loses head home |
 | Unsafe distance or stale/invalid frame | Pi refuses/ends motion; Mega lease expires if Pi renewal stops |
 | Cliff | Mega independently stops and latches; Pi also refuses/latches |
 | Excess tilt | Pi stops/refuses and latches; Mega does not directly read tilt |
-| Lost Pi heartbeat | Mega independently stops and latches |
+| Lost Pi heartbeat | Mega independently stops and latches. After link loss the Pi reconnects with the session ended. Start a new session and clear after resolving the cause |
 | Lost drive/head renewals | Corresponding Mega motion lease expires |
 | AVR loop hang | AVR watchdog reset if enabled; physical startup behavior still needs testing |
 | Session expires | Pi stops renewing motion; a new session is required |
 
-Voice stop is unavailable while EVE is speaking and may be delayed by transcription. Touch/software stops
+Voice stop is unavailable during standard turn-taking playback and may be delayed by transcription. Touch/software stops
 need functioning electronics. Use the physical Bank B switch to cut actuator power. Software does not
 provide an independent safety-rated circuit or guarantee immediate physical stopping.
 
-A clear request requires safe fresh readings and Mega acceptance. An obstacle can still block drive
+A clear request requires safe fresh readings, the matching firmware ID and Mega acceptance. An obstacle can still block drive
 after clearing. Clear is never evidence that all commissioning has passed.
 
 ## Physical acceptance

@@ -144,8 +144,7 @@ STAGES = {
  "M11": dict(title="Memory", needs=["M10"], run=True, checks=[
         ("memory on", lambda c: st()["features"]["memory"] == "on", "./eve cfg set memory.enabled true"),
     ], steps=SETUP_STEPS['M11'],
-    test="She repeats the note back, `notes` lists it, and after erase the list is empty. Restart EVE between saving and "
-         "asking once: the note is still there."),
+    test="She repeats the test note back after a restart. Record that note's ID, remove it, and verify just that ID is gone."),
  "M12": dict(title="Brain: offline answers (+ optional on-Pi model)", needs=["M11"], run=True, checks=[
         ("answers a question", lambda c: True, ""),
     ], steps=SETUP_STEPS['M12'],
@@ -169,11 +168,13 @@ STAGES = {
  "M15": dict(title="Reminders", needs=["M14"], run=True, checks=[
         ("can list reminders", lambda c: True, ""),
     ], steps=SETUP_STEPS['M15'],
-    test="After one minute she says the reminder aloud, once. A reminder set before a restart still fires after it."),
+    test="After one minute she says the reminder aloud once. It stays marked Announced in Home until you choose Done. "
+         "A reminder set before a restart still fires after it. If audio fails, it stays due."),
  "M16": dict(title="Extras: sleep, phone control page", needs=["M15"], run=True, checks=[
         ("web tools are off unless you chose otherwise", lambda c: True, ""),
     ], steps=SETUP_STEPS['M16'],
-    test="Sleep gives the sleepy face and wake brings her back. If you enabled the control page: it shows live status, "
+    test="Sleep gives the sleepy face, ends the attended session and turns the camera indicator off if the camera was active. "
+         "Wake brings her back. If you enabled phone control: it shows live status, "
          "the red EMERGENCY STOP works, and a wrong token shows no data. Leave network.host at 127.0.0.1 if you do not "
          "need phone control."),
  "M17": dict(title="Whole robot + start at boot", needs=["M16"], run=True, checks=[
@@ -220,6 +221,10 @@ def show(key):
 def guide() -> str:
     out = ["# EVE V3 - software setup, testing and calibration", "",
            "Generated from tools/stage.py (`./eve stage guide`). On the Pi everything lives in `~/eve3`. See [every connection](WIRING.md) and [build progress](PROGRESS.md).",
+           "",
+           "## Check the wiring before powering on", "",
+           "Keep both banks disconnected while wiring. Follow the [Mega, Pi and power diagrams](WIRING.md#wiring-diagrams) and their matching connection tables.", "",
+           "![Power wiring for the separate Pi, actuator and amplifier branches](assets/wiring-power.svg)", "",
            "Two PuTTY windows: **PuTTY 1** runs EVE (`./eve run`, Ctrl+C stops safely), **PuTTY 2** is for commands.",
            "Replace `PI_IP` with the Pi's address. For each stage: run the commands, then `./eve stage Mxx`, do the test "
            "yourself, then `./eve stage Mxx done`.", "",

@@ -37,7 +37,7 @@ class SafetyGate:
             return "cliff data stale or missing (Mega telemetry)"
         if not self.cfg["sensors"]["cliff_calibration"]["calibrated"]:
             return "cliff sensors not calibrated"
-        if any(c is not False for c in frame.cliff):
+        if len(frame.cliff) != 3 or any(c is not False for c in frame.cliff):
             return "cliff"
         if not fresh(frame.tof_at):
             return "distance data stale or missing"
@@ -93,6 +93,8 @@ class SafetyGate:
         with self._lock:
             if not link.online():
                 return Verdict(False, "Mega link offline")
+            if not link.firmware_ok:
+                return Verdict(False, "Mega firmware does not match this config (gen_header, compile, upload)")
             reason = self.sensors_reason(frame, check_obstacle=False)
             if reason:
                 return Verdict(False, reason)

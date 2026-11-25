@@ -32,8 +32,10 @@ class Memory:
             self._db.executescript(
                 "CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY, text TEXT NOT NULL, created REAL NOT NULL);"
                 "CREATE TABLE IF NOT EXISTS reminders(id INTEGER PRIMARY KEY, due REAL NOT NULL, text TEXT NOT NULL,"
-                " done INTEGER NOT NULL DEFAULT 0);"
+                " done INTEGER NOT NULL DEFAULT 0, announced INTEGER NOT NULL DEFAULT 0);"
                 "CREATE TABLE IF NOT EXISTS kv(key TEXT PRIMARY KEY, value TEXT NOT NULL);")
+            if not any(col[1] == "announced" for col in self._db.execute("PRAGMA table_info(reminders)")):
+                self._db.execute("ALTER TABLE reminders ADD COLUMN announced INTEGER NOT NULL DEFAULT 0")
 
     def _q(self, sql, args=()):
         with self._lock, self._db:
@@ -65,14 +67,20 @@ class Memory:
             return self._db.execute("INSERT INTO reminders(due, text) VALUES(?, ?)", (float(due_epoch), text)).lastrowid
 
     def pending_reminders(self) -> list[dict]:
-        return [{"id": i, "due": d, "text": t}
-                for i, d, t in self._q("SELECT id, due, text FROM reminders WHERE done=0 ORDER BY due")]
+        return [{"id": i, "due": d, "text": t, "announced": bool(a)}
+                for i, d, t, a in self._q("SELECT id, due, text, announced FROM reminders WHERE done=0 ORDER BY due, id")]
 
-    def pop_due(self, now: float) -> list[str]:
-        with self._lock, self._db:
-            rows = self._db.execute("SELECT id, text FROM reminders WHERE done=0 AND due<=? ORDER BY due", (now,)).fetchall()
-            self._db.executemany("UPDATE reminders SET done=1 WHERE id=?", [(r[0],) for r in rows])
-        return [r[1] for r in rows]
+    def next_due(self, now: float) -> dict | None:
+        rows = self._q("SELECT id, due, text FROM reminders WHERE done=0 AND announced=0 AND due<=? ORDER BY due, id LIMIT 1", (now,))
+        if rows:
+            ident, due, text = rows[0]
+            return {"id": ident, "due": due, "text": text}
+        return None
+
+    def mark_announced(self, reminder: dict):
+        # Match the original item even if an erase happened during playback.
+        self._q("UPDATE reminders SET announced=1 WHERE id=? AND done=0 AND due=? AND text=?",
+                (reminder["id"], reminder["due"], reminder["text"]))
 
     def cancel_reminder(self, ident: int) -> bool:
         with self._lock, self._db:

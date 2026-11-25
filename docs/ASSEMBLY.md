@@ -56,7 +56,7 @@ Do not test on a real staircase. Use a secured chassis and a removable floor tar
 
 Mount the two INMP441 microphones and amplified speakers with physical separation and
 strain relief. Keep motor leads away from audio/sensor leads. The supported voice
-path is half-duplex; it does not cancel speaker echo for simultaneous listening.
+path takes turns. Simultaneous listening requires the optional local echo-cancel setup at M13.
 
 Check all fasteners, insulation, wheel clearance, head retention, sensor visibility,
 airflow and cutoff reach. Make the first wiring checks with all supplies unplugged.

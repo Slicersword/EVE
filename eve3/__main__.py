@@ -20,7 +20,7 @@ def simulation_config(cfg):
     cfg = copy.deepcopy(cfg)
     cfg["touch"]["enabled"] = False
     cfg["camera"].update(enabled=False, allow_tracking=False)
-    cfg["voice"].update(tts_enabled=False, capture_enabled=False)
+    cfg["voice"].update(tts_enabled=False, capture_enabled=False, echo_cancel_enabled=False)
     cfg["ai"]["local_llm"]["enabled"] = False
     cfg["ai"]["cloud"].update(enabled=False, privacy_consent=False)
     cfg["integrations"]["web_tools_enabled"] = False

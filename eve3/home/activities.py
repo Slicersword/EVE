@@ -5,15 +5,33 @@ import copy
 import json
 import math
 from pathlib import Path
+import re
 import secrets
 import threading
 import time
 import unicodedata
 
 from .store import HomeStore
+from ..intents import normalize
 
 
 LANGUAGES = ("en", "hi", "mr", "hi-en", "mr-en", "hi-mixed", "mr-mixed")
+SPOKEN = {
+    ("game", "start"): ("play a game", "खेल खेलते हैं", "खेळ खेळूया", "game khelu"),
+    ("story", "start"): ("start a story", "कहानी सुनाओ", "गोष्ट सांग", "goshta sang"),
+    ("story", "resume"): ("continue story", "कहानी आगे सुनाओ", "गोष्ट पुढे सांग", "goshta pudhe sang"),
+    ("kitchen", "next"): ("next step", "अगला कदम", "पुढची पायरी", "pudhchi payari"),
+    ("kitchen", "repeat"): ("repeat step", "कदम दोहराओ", "पायरी पुन्हा सांग", "payari punha sang"),
+    ("music_stop", "stop"): ("stop music", "संगीत बंद करो", "गाणे बंद कर", "gane band kar"),
+    ("screen", "view"): ("show household messages", "संदेश दिखाओ", "घरचे संदेश दाखव", "show family memories",
+                         "परिवार की यादें दिखाओ", "घरच्या आठवणी दाखव"),
+}
+SPOKEN_CHOICES = {
+    "story choice": ("story", "choose"), "कहानी विकल्प": ("story", "choose"), "गोष्ट पर्याय": ("story", "choose"),
+    "riddle answer": ("game", "answer"), "जवाब विकल्प": ("game", "answer"), "उत्तर पर्याय": ("game", "answer"),
+}
+OPEN_HOME = {"en": "Open the Home page to view your private items.", "hi": "निजी चीजें देखने के लिए होम पेज खोलें।",
+             "mr": "खासगी गोष्टी पाहण्यासाठी होम पेज उघडा."}
 
 
 def text(value, limit, label="text", empty=False):
@@ -63,6 +81,36 @@ class HomeModule:
                 self.runtime._interaction()
                 return True, result
         return call
+
+    def spoken(self, text, lang):
+        """Use fixed Home shortcuts without granting the microphone owner privileges."""
+        phrase = normalize(text)
+        route = next((route for route, phrases in SPOKEN.items() if phrase in phrases), None)
+        match = re.fullmatch(r"(.+) ([1-9])", phrase) if route is None else None
+        payload = {"lang": lang}
+        if match:
+            route = SPOKEN_CHOICES.get(match[1])
+            payload["choice"] = int(match[2]) - 1
+        if route is None:
+            return None
+        name, payload["action"] = route
+        if name == "screen" or not self._allowed():
+            return OPEN_HOME[lang]
+        with self.lock:
+            try:
+                if name == "game" and payload["action"] == "answer" and (not self.game or self.game["kind"] != "riddles"):
+                    raise ValueError("start a riddle game first")
+                result = {"game": self.game_command, "story": self.story_command,
+                          "kitchen": self.kitchen_command, "music_stop": self.music_stop}[name](payload)
+            except ValueError as exc:
+                return str(exc)
+            if name == "game" and result["game"]:
+                game = result["game"]
+                return " ".join(part for part in (game["feedback"], game.get("speech_text")) if part)
+            if name == "story" and result["story"]:
+                choices = [f"{i}. {choice}" for i, choice in enumerate(result["story"]["choices"], 1)]
+                return " ".join([result["speech_text"], *choices])
+            return result.get("speech_text", result["reply"])
 
     @staticmethod
     def language(payload, default="en"):
