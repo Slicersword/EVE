@@ -5,9 +5,13 @@ Try the touchscreen face in your browser and see the control panel you’ll use 
 ## Touchscreen face
 
 The preview uses the same Lumen renderer as EVE’s 1024 × 600 touchscreen.
-Try Idle for the glass eyes, Happy for the smile, Love for the heart pupils and
-Alert for the red stop face. All 90 expressions share the same eye design and
-lighting. The preview follows your system’s reduced-motion preference.
+Try Happy for the wider smile, Speaking for the animated mouth, Love for the heart
+pupils and Alert for the red stop face. All 90 expressions share the same eye
+design and lighting. The preview follows your system’s reduced-motion preference.
+
+On the Pi, eSpeak NG turns EVE's replies into audio in English, Hindi or Marathi.
+The Speaking expression animates the mouth while EVE talks. **Play cue** plays a
+short expression sound from the bundled WAV pack. See [voice setup at M13](SETUP_GUIDE.md#m13).
 
 <link rel="stylesheet" href="assets/ui-preview/eve-face.css">
 <div id="eve-display-preview" class="eve-display-preview"></div>

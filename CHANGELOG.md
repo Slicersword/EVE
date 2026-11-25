@@ -2,6 +2,7 @@
 
 ## Lumen expressions
 
+- Widen the mouth, deepen smiles, and give the Speaking face a more visible jaw movement.
 - Use the reference preview’s glass eyes and soft lighting for all 90 expressions.
   The build guide, Pi touchscreen, Expression Studio, and Home music display share
   the same renderer. Alert turns red immediately.

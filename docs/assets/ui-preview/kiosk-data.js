@@ -289,15 +289,16 @@
       ctx.globalAlpha = 1;
     }
 
-    const jaw = p.jaw + (moving && target === profiles.speaking ? .22 * (.5 + .5 * Math.sin(time * 13)) : 0);
-    const width = 42 - jaw * (19 - 16 * Math.max(0, p.smile));
-    const curve = 36 * p.smile;
-    ctx.lineWidth = 5;
+    const jaw = p.jaw + (moving && target === profiles.speaking ? .32 * (.5 + .5 * Math.sin(time * 13)) : 0);
+    const smile = Math.max(0, p.smile);
+    const width = 58 + 8 * smile - jaw * (30 - 16 * smile);
+    const curve = 45 * p.smile;
+    ctx.lineWidth = 7;
     ctx.beginPath();
     ctx.moveTo(512 - width, 424);
-    ctx.bezierCurveTo(512 - width, 424 + curve - 20 * jaw, 512 + width, 424 + curve - 20 * jaw, 512 + width, 424);
+    ctx.bezierCurveTo(512 - width, 424 + curve - 28 * jaw, 512 + width, 424 + curve - 28 * jaw, 512 + width, 424);
     if (jaw > .045) {
-      ctx.bezierCurveTo(512 + width, 424 + curve + 34 * jaw, 512 - width, 424 + curve + 34 * jaw, 512 - width, 424);
+      ctx.bezierCurveTo(512 + width, 424 + curve + 42 * jaw, 512 - width, 424 + curve + 42 * jaw, 512 - width, 424);
       ctx.fillStyle = '#09171c';
       ctx.fill();
     }

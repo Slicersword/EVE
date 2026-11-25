@@ -110,3 +110,21 @@ test('the active face targets 60 draws per second on 60, 120 and 144 Hz displays
     assert.equal(draws, 60, `at ${hz} Hz`);
   }
 });
+
+test('the smile reads wider and the surprised mouth keeps a round shape', () => {
+  const {mount, frame} = fixture(true);
+  const {screen, display} = mount();
+  function mouth(name, stamp) {
+    screen.canvas.draws.length = 0;
+    display.show(name);
+    frame(stamp);
+    return screen.canvas.draws.filter(([op, , , , , , , y]) => op === 'bezierCurveTo' && y === 424);
+  }
+  const [idle] = mouth('idle', 0);
+  const [happy] = mouth('happy', 17);
+  const [upper, lower] = mouth('surprised', 34);
+  assert.ok(idle[6] - idle[2] >= 115);
+  assert.ok(happy[6] - happy[2] > idle[6] - idle[2]);
+  assert.ok(upper[6] - upper[2] < idle[6] - idle[2]);
+  assert.ok(lower[3] - upper[3] > 60);
+});
