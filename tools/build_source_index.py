@@ -16,7 +16,7 @@ def source_files():
     files = ['eve', 'requirements.txt', '.gitignore', 'config/eve.json', 'config/local.example.json',
              'config/alsa-inmp441.conf', 'config/eve-inmp441-overlay.dts', '_config.yml',
              '_layouts/manual.html', 'index.html', 'search-data.js', 'progress-data.js', 'source-data.js',
-             'code.html', '_data/navigation.json', '_data/build_progress.json']
+             'code.html', '_data/navigation.json', '_data/build_progress.json', 'docs/assets/ui-preview/preview.js']
     allowed = {'.py', '.ino', '.h', '.cpp', '.mjs', '.js', '.css', '.svg', '.sh', '.json', '.html', '.yml', '.yaml', '.service', '.dts', '.conf'}
     for folder in ('eve3', 'firmware', 'tools', 'scripts', 'systemd', 'tests', '.github', 'site/assets'):
         for path in (ROOT / folder).rglob('*'):

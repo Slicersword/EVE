@@ -11,6 +11,8 @@ wiring](docs/WIRING.md), and use the optional [build progress notebook](docs/PRO
 to save checkmarks, notes and measurements in your browser. Export/import backups
 let you keep progress across devices; no account or subscription is needed.
 
+Try the [eyes and controls preview](docs/UI_PREVIEW.md) before setting up the Pi.
+
 Start with no saved progress: identify your parts, assemble and wire the robot,
 install the software, then test one stage at a time. All commissioning flags ship
 false, actuator outputs are disabled, and cliff calibration is unset.

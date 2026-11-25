@@ -13,6 +13,10 @@ from setup_steps import SETUP_STEPS
 
 STORE = ROOT / "data" / "stages.json"
 P1, P2, WIN = "PuTTY 1", "PuTTY 2", "Windows PowerShell"
+PREVIEW_LINKS = {
+    "M01": "[Try the eyes and expressions in your browser](UI_PREVIEW.md#touchscreen-face).",
+    "M16": "[See the control panel with sample readings](UI_PREVIEW.md#control-panel).",
+}
 
 
 def st():
@@ -235,6 +239,8 @@ def guide() -> str:
         out += [f'<a id="{key.lower()}"></a>', "", f"## {key} - {stage['title']}", ""]
         if stage["needs"]:
             out += [f"Needs: {', '.join(stage['needs'])} done.", ""]
+        if key in PREVIEW_LINKS:
+            out += [PREVIEW_LINKS[key], ""]
         for where, text in stage["steps"]:
             if where == "you":
                 out += [text, ""]

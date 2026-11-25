@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
+<title>EVE control screen preview</title>
+<style>
+body{margin:0;background:#0d1117;color:#dbe7f3;font:15px/1.45 system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:14px}
+h1{font-size:20px;margin:6px 0 12px}h2{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#7d93a8;margin:18px 0 8px}
+button{font:inherit;padding:10px 14px;border-radius:8px;border:1px solid #30445a;background:#16212e;color:#dbe7f3;cursor:pointer;margin:3px}
+button:active{background:#22374d}
+#estop{width:100%;padding:20px;font-size:22px;font-weight:700;background:#b3201f;border-color:#ff5c5c;color:#fff}
+input,select{font:inherit;padding:9px;border-radius:8px;border:1px solid #30445a;background:#0b141d;color:#dbe7f3}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.grow{flex:1;min-width:160px}
+table{border-collapse:collapse;width:100%}td{padding:4px 8px;border-bottom:1px solid #1d2a38;vertical-align:top}
+td:first-child{color:#7d93a8;white-space:nowrap;width:38%}
+.ok{color:#58d68d}.bad{color:#ff7b72}#msg{min-height:22px;margin:8px 0;color:#f2cc60}
+small{color:#7d93a8}
+fieldset{border:0;margin:0;padding:0;min-width:0}fieldset :disabled{opacity:.8;cursor:default}@media(max-width:480px){td:first-child{white-space:normal}}</style>
+</head>
+<body><main><fieldset disabled>
+
+<h1>EVE control</h1>
+<p><span>Expression studio and sound preview</span> · <span>EVE at home</span></p>
+<button id="estop">EMERGENCY STOP</button>
+<p id="msg">Sample status before calibration</p>
+<h2>Status</h2><table id="st">
+<tr><td>Mega</td><td>Online · example firmware matches</td></tr>
+<tr><td>Distance mm (FL, FR, rear)</td><td>[null, null, null]</td></tr>
+<tr><td>Tilt deg</td><td>Unavailable</td></tr>
+<tr><td>Cliff raw (FL, rear, FR)</td><td>[1, 1, 1] · not calibrated</td></tr>
+<tr><td>Person sensor (PIR)</td><td>false</td></tr>
+<tr><td>Session</td><td>Not active</td></tr>
+<tr><td>Pi supply flags</td><td>Sample only</td></tr>
+<tr><td>Wheels allowed</td><td>No · awaiting commissioning</td></tr>
+<tr><td>Head allowed</td><td>No · awaiting commissioning</td></tr>
+<tr><td>Head</td><td>Not homed</td></tr>
+<tr><td>Face</td><td>Idle</td></tr>
+<tr><td>Features</td><td>The Pi shows its enabled features here</td></tr>
+<tr><td>Still to commission</td><td>Power, motor current, test area, wheels and head</td></tr>
+</table>
+<h2>Talk</h2>
+<div class="row"><input id="chat" class="grow" placeholder="Type to EVE (English / हिंदी / मराठी)"><button data-do="chat">Send</button></div>
+<div class="row"><input id="say" class="grow" placeholder="Make EVE say this">
+<select id="lang"><option>en</option><option>hi</option><option>mr</option></select><button data-do="say">Say</button></div>
+<div class="row" id="expr"><select aria-label="Face expression"><option>Happy</option></select><button>Show expression</button></div>
+<h2>Attended session <small>(needed before anything moves)</small></h2>
+<div class="row"><button data-cmd="session_start" data-args='{"minutes":10}'>Start 10 min</button>
+<button data-cmd="session_end">End</button><button data-cmd="clear">Clear stop / arm</button><button data-cmd="stop">Soft stop</button></div>
+<h2>Wheels <small>(M07 test: wheels lifted off the ground)</small></h2>
+<div class="row"><label><input type="checkbox" id="lift"> wheels are lifted</label>
+<button data-do="dtest" data-l="60" data-r="60">Test forward 1 s</button>
+<button data-do="dtest" data-l="40" data-r="70">Test arc left</button><button data-do="dtest" data-l="70" data-r="40">Test arc right</button></div>
+<div class="row"><button data-cmd="drive" data-args='{"left":100,"right":100,"seconds":1.5}'>Forward</button>
+<button data-cmd="drive" data-args='{"left":50,"right":110,"seconds":1.2}'>Left</button>
+<button data-cmd="drive" data-args='{"left":110,"right":50,"seconds":1.2}'>Right</button></div>
+<h2>Head <small>(M08: centre marks aligned by hand first)</small></h2>
+<div class="row"><label><input type="checkbox" id="clear"> nothing blocks the head</label>
+<button data-do="home">Set home here</button><button data-cmd="head_release">Release</button></div>
+<div class="row"><button data-do="jog" data-p="-8">Pan -8</button><button data-do="jog" data-p="8">Pan +8</button>
+<button data-do="jog" data-t="-8">Tilt -8</button><button data-do="jog" data-t="8">Tilt +8</button>
+<button data-cmd="head_look" data-args='{"direction":"center"}'>Look centre</button></div>
+<h2>Memory</h2>
+<div class="row"><button data-do="notes">Show notes</button><button data-do="rem">Show reminders</button><button data-do="erase">Erase all memory</button></div>
+<pre id="out"></pre>
+</fieldset></main></body></html>

@@ -29,5 +29,14 @@
 #source-browser>button{border:1px solid #405367;background:var(--panel);color:var(--accent);border-radius:7px;padding:9px 14px;font:inherit}
 #source-browser>select{appearance:none;padding-right:36px;background-image:linear-gradient(45deg,transparent 50%,#a6b7c8 50%),linear-gradient(135deg,#a6b7c8 50%,transparent 50%);background-position:calc(100% - 20px) center,calc(100% - 15px) center;background-size:5px 5px;background-repeat:no-repeat}
 button:disabled,textarea:disabled{opacity:.65;cursor:default}
+.eve-display-preview,.eve-control-preview{display:block;width:100%;border:1px solid var(--line);border-radius:10px;background:#000}
+.eve-display-preview{aspect-ratio:1024/600;height:auto}
+.eve-control-preview{height:clamp(430px,65vh,650px);background:#0d1117}
+.eve-preview-controls,.eve-preview-gaze{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.eve-preview-controls{margin-top:12px}
+.eve-preview-controls label,.eve-preview-controls [role=status]{font-size:.875rem;color:var(--muted)}
+.eve-preview-controls button,.eve-preview-controls select{border:1px solid #405367;border-radius:7px;background:var(--panel);color:var(--text);padding:7px 11px;min-height:42px;font:inherit}
+.eve-preview-controls select{appearance:none;min-width:9rem;max-width:100%;padding-right:32px;background-image:linear-gradient(45deg,transparent 50%,#a6b7c8 50%),linear-gradient(135deg,#a6b7c8 50%,transparent 50%);background-position:calc(100% - 17px) center,calc(100% - 12px) center;background-size:5px 5px;background-repeat:no-repeat}
+.eve-preview-controls :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media(max-width:720px){.progress-task{padding:14px}.progress-task p,.progress-task>a,.progress-task details{margin-left:0}.progress-controls button{flex:1 1 40%}.progress-overview{padding:17px}.progress-overview strong{font-size:18px}}
 @media print{.progress-controls,.progress-filters{display:none}.progress-task{break-inside:avoid;background:white}.progress-task textarea{color:black;background:white}.progress-task details{display:block}.progress-overview{background:white;color:black}}

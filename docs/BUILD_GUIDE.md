@@ -4,6 +4,8 @@ This is a standalone reference build. Start with unassembled components and no
 commissioning records. Read [Before you begin](GETTING_STARTED.md), then follow
 the steps below. Copyable installation and test commands are in [Software setup](SETUP_GUIDE.md).
 
+Try the [touchscreen face and control panel](UI_PREVIEW.md) to see what the finished setup displays.
+
 ## 1. Select and inspect the parts
 
 Use [Your parts](HARDWARE.md) and [every connection](WIRING.md) as the electrical contract. Record exact module

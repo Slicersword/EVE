@@ -142,6 +142,8 @@ Then: `./eve stage M00 done`
 
 Needs: M00 done.
 
+[Try the eyes and expressions in your browser](UI_PREVIEW.md#touchscreen-face).
+
 **PuTTY 1**
 
 ```bash
@@ -686,6 +688,8 @@ Then: `./eve stage M15 done`
 ## M16 - Extras: sleep, phone control page
 
 Needs: M15 done.
+
+[See the control panel with sample readings](UI_PREVIEW.md#control-panel).
 
 **PuTTY 2**
 

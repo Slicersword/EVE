@@ -37,6 +37,14 @@ class HostedDocumentationTests(unittest.TestCase):
             failures, _ = check(root, search_file='search-data.js')
             self.assertTrue(any('path escapes' in failure for failure in failures))
 
+    def test_preview_frame_must_point_to_a_packaged_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); self.fixture(root)
+            (root / 'docs/guide.html').write_text('<h2 id="setup">Setup</h2><iframe sandbox src="preview.html"></iframe>')
+            self.assertTrue(any('missing file preview.html' in issue for issue in check(root, '/EVE/', 'search-data.js')[0]))
+            (root / 'docs/preview.html').write_text('<fieldset disabled>Sample controls</fieldset>')
+            self.assertEqual(check(root, '/EVE/', 'search-data.js')[0], [])
+
     def test_dynamic_progress_instruction_links_are_checked(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); self.fixture(root)

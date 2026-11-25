@@ -31,6 +31,8 @@ it has been accepted on a physical robot. Start every build at zero.
 
 ## Original expression pack and home activities
 
+Use the [browser preview](UI_PREVIEW.md) to try all 90 faces and hear selected cues.
+
 The clone includes 90 expression definitions and their original WAV cues. The
 simple eyes-and-mouth face remains the normal display. The Expression Studio
 shows the original artwork and lets you audition every clip. Live expression

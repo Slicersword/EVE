@@ -33,6 +33,10 @@ def main():
                               cwd=ROOT, text=True, capture_output=True)
     if diagrams.returncode:
         failures.append(diagrams.stderr.strip() or 'Wiring diagrams are stale')
+    previews = subprocess.run([sys.executable, str(ROOT / 'tools/build_ui_preview.py'), '--check'],
+                              cwd=ROOT, text=True, capture_output=True)
+    if previews.returncode:
+        failures.append(previews.stderr.strip() or 'UI previews are stale')
     snapshot = subprocess.run([sys.executable, str(ROOT / 'tools/build_source_index.py'), '--check'],
                               cwd=ROOT, text=True, capture_output=True)
     if snapshot.returncode:

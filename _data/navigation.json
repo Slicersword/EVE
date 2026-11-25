@@ -13,6 +13,11 @@
         "What EVE can do"
       ],
       [
+        "docs/UI_PREVIEW.html",
+        "docs/UI_PREVIEW.md",
+        "Eyes & controls preview"
+      ],
+      [
         "docs/GETTING_STARTED.html",
         "docs/GETTING_STARTED.md",
         "Before you begin"

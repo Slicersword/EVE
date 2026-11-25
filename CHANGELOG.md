@@ -1,5 +1,10 @@
 # Change log
 
+## Eyes and controls preview
+
+- Preview EVE’s touchscreen face, all 90 expressions and selected original sounds
+  from the build guide. See the Pi’s control panel with read-only sample status.
+
 ## Software audit and wiring diagrams — 25 November 2026
 
 - Require whole motion phrases and keep Stop ahead of movement. Cancel head
