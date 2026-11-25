@@ -37,7 +37,7 @@ build uses the current Pi/Mega interface and setup guide.
 
 | Older work | Current Git build |
 |---|---|
-| Expression artwork and audio | The original artwork and 90 WAVs are in Git. The guide and robot display all 90 expressions using the same eyes-and-mouth style. Live sound is opt-in. |
+| Expression artwork and audio | The guide and robot use the original artwork for all 90 expressions. The 90 original WAV cues are included. Live sound is opt-in. |
 | Family games, story branches, recipe sessions, timers, messages, music and memory capsules | Bundled and accessible from the token-protected Home page. Household data and chosen music are supplied locally. |
 | Expression Studio and spoken Home shortcuts | The current studio auditions all 90 sounds. Fixed spoken shortcuts run riddles, story branches, recipe navigation and music stop. Private household records open through authenticated Home. |
 | Earlier audio and privacy modes | Optional local echo-cancel routing is present. Instant interruption of in-progress speech, family voice profiles and separate guest/focus modes are outside this build. Sleep ends motion and pauses the camera. Enabled microphones remain available for voice wake. |

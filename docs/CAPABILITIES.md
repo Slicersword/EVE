@@ -34,8 +34,8 @@ it has been accepted on a physical robot. Start every build at zero.
 Use the [browser preview](UI_PREVIEW.md) to try all 90 faces and hear selected cues.
 
 The Pi face, Expression Studio, Home music display and build guide all use the
-same glowing eyes and mouth for the 90 expressions. Alert uses red to signal a
-stop. The Expression Studio can audition all 90 original WAV cues. Live
+original artwork for the 90 expressions. Alert uses red to signal a stop.
+The Expression Studio can audition all 90 original WAV cues. Live
 expression sounds are opt-in and use Quiet, Natural, or Playful. Speech and
 microphone capture take precedence.
 

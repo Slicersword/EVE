@@ -163,7 +163,7 @@ sleep 6
 
 Automatic checks (`./eve stage M01`): EVE is running and answers.
 
-**Your test:** The 7-inch screen shows only two eyes and a mouth on black, filling the whole screen - no window frame, no outline, no buttons, no keyboard needed. The eyes blink. `expression name=happy` changes the face for 5 s.
+**Your test:** The 7-inch screen shows EVE's original Idle artwork on black in full screen. The eyes blink. `expression name=happy` shows Happy in the same artwork style for 5 s.
 
 Then: `./eve stage M01 done`
 

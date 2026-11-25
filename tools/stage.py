@@ -63,8 +63,8 @@ STAGES = {
  "M01": dict(title="Face on the screen", needs=["M00"], run=True, checks=[
         ("EVE is running and answers", lambda c: st()["version"].startswith("3."), "PuTTY 1:  ./eve run"),
     ], steps=SETUP_STEPS['M01'],
-    test="The 7-inch screen shows only two eyes and a mouth on black, filling the whole screen - no window frame, no "
-         "outline, no buttons, no keyboard needed. The eyes blink. `expression name=happy` changes the face for 5 s."),
+    test="The 7-inch screen shows EVE's original Idle artwork on black in full screen. The eyes blink. "
+         "`expression name=happy` shows Happy in the same artwork style for 5 s."),
  "M02": dict(title="Mega link + new firmware", needs=["M01"], run=True, checks=[
         ("Mega connected", lambda c: st()["mega"]["connected"], "check the USB cable Pi -> Mega, then ./eve doctor"),
         ("Mega online (heartbeat + telemetry)", lambda c: st()["mega"]["online"], "wait 5 s and repeat; else re-flash"),

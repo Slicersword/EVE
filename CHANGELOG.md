@@ -1,5 +1,10 @@
 # Change log
 
+## Original artwork across all expressions
+
+- Use the original artwork across the full set of 90 expressions on the Pi,
+  in the build guide, and in the Expression Studio and Home. Keep red for Alert.
+
 ## Consistent expression styling
 
 - Use the same eyes-and-mouth display for all 90 expressions on the Pi, in the

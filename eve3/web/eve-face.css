@@ -1,75 +1,47 @@
 .eve-face {
-  --face-ink: #6fe3ff;
-  --face-glow: #2bbcff;
-  --mouth-stroke: 1.4cqh;
   position: relative;
+  display: grid;
+  place-items: center;
   width: 100%;
   aspect-ratio: 1024 / 600;
-  container-type: size;
   overflow: hidden;
   background: #000;
 }
 
-.eve-face[data-expression="alert"] {
-  --face-ink: #ff6b6b;
-  --face-glow: #ff2a2a;
+.eve-face > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.eve-face__eyes {
-  position: absolute;
-  inset: 0;
+.eve-face .eve-art-gaze {
+  transform-box: view-box;
   transform: translate(var(--look-x, 0%), var(--look-y, 0%));
   transition: transform .25s ease-out;
 }
 
-.eve-face__eye {
-  position: absolute;
-  top: 43%;
-  left: 33.5%;
-  width: var(--eye-width);
-  height: var(--eye-height);
-  border-radius: 50%;
-  background: var(--face-ink);
-  opacity: var(--face-opacity, 1);
-  box-shadow: 0 0 5cqw var(--face-glow);
-  transform: translate(-50%, -50%) rotate(var(--eye-tilt));
-  transition: height .18s ease, width .22s ease, border-radius .22s ease, transform .24s ease, background .2s ease, opacity .2s ease;
+.eve-face .eve-art-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform .08s ease;
 }
 
-.eve-face__eye + .eve-face__eye { left: 66.5%; }
-.eve-face[data-lids="arch"] .eve-face__eye { border-radius: 50% 50% 16% 16% / 85% 85% 15% 15%; }
-.eve-face[data-lids="droop"] .eve-face__eye { border-radius: 16% 16% 50% 50% / 15% 15% 85% 85%; }
-.eve-face[data-lids="square"] .eve-face__eye { border-radius: 32%; }
-.eve-face.is-blinking .eve-face__eye { height: 2.6%; border-radius: 50%; transition-duration: .08s; }
+.eve-face.is-blinking .eve-art-eye { transform: scaleY(.08); }
 
-.eve-face__mouth {
-  position: absolute;
-  box-sizing: border-box;
-  top: 71%;
-  left: 50%;
-  width: var(--mouth-width);
-  height: max(var(--mouth-height), var(--mouth-stroke));
-  opacity: var(--face-opacity, 1);
-  border: 0 solid var(--face-ink);
-  border-radius: 0 0 50% 50%;
-  border-bottom-width: var(--mouth-stroke);
-  filter: drop-shadow(0 0 1.5cqw var(--face-glow));
-  transform: translate(-50%, -50%);
-  transition: height .2s ease, width .2s ease, border-radius .2s ease, transform .2s ease;
+.eve-face .speakingMouth {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: eve-face-talk .32s infinite alternate ease-in-out;
 }
-
-.eve-face__mouth[data-shape="flat"] { border-radius: 100vw; }
-.eve-face__mouth[data-shape="frown"] { border-width: var(--mouth-stroke) 0 0; border-radius: 50% 50% 0 0; }
-.eve-face__mouth[data-shape="smirk"] { transform: translate(-50%, -50%) rotate(-13deg); }
-.eve-face__mouth[data-shape="pout"] { transform: translate(-50%, -50%) rotate(11deg); border-radius: 50%; }
-.eve-face__mouth:is([data-shape="open"], [data-shape="talk"]) { border-width: var(--mouth-stroke); border-radius: 48%; }
-.eve-face__mouth[data-shape="talk"] { animation: eve-face-talk .32s infinite alternate ease-in-out; }
 
 @keyframes eve-face-talk {
-  from { transform: translate(-50%, -50%) scaleY(.45); }
-  to { transform: translate(-50%, -50%) scaleY(1); }
+  from { transform: scaleY(.48); }
+  to { transform: scaleY(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .eve-face__eyes, .eve-face__eye, .eve-face__mouth { transition: none; animation: none; }
+  .eve-face .eve-art-gaze, .eve-face .eve-art-eye, .eve-face .speakingMouth {
+    transition: none;
+    animation: none;
+  }
 }

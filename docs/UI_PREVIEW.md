@@ -4,9 +4,9 @@ Try the touchscreen face in your browser and see the control panel you’ll use 
 
 ## Touchscreen face
 
-The preview uses EVE’s 1024 × 600 display proportions. Every expression uses the
-same glowing eyes and mouth on black. Try Happy, Sad, Surprised or Alert to see
-how the shapes change. Alert keeps the red stop signal.
+The preview uses EVE’s 1024 × 600 display proportions and the original artwork
+for all 90 expressions. Try Idle, Happy, Love and Alert. Alert shows the red stop
+signal in the same style.
 
 <iframe id="eve-display-preview" class="eve-display-preview" title="EVE touchscreen preview" sandbox="allow-same-origin" tabindex="-1"></iframe>
 
