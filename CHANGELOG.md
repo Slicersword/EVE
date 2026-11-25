@@ -1,5 +1,11 @@
 # Change log
 
+## Lumen expressions
+
+- Use the reference preview’s glass eyes and soft lighting for all 90 expressions.
+  The build guide, Pi touchscreen, Expression Studio, and Home music display share
+  the same renderer. Alert turns red immediately.
+
 ## Original artwork across all expressions
 
 - Use the original artwork across the full set of 90 expressions on the Pi,

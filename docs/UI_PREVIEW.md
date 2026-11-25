@@ -4,11 +4,13 @@ Try the touchscreen face in your browser and see the control panel you’ll use 
 
 ## Touchscreen face
 
-The preview uses EVE’s 1024 × 600 display proportions and the original artwork
-for all 90 expressions. Try Idle, Happy, Love and Alert. Alert shows the red stop
-signal in the same style.
+The preview uses the same Lumen renderer as EVE’s 1024 × 600 touchscreen.
+Try Idle for the glass eyes, Happy for the smile, Love for the heart pupils and
+Alert for the red stop face. All 90 expressions share the same eye design and
+lighting. The preview follows your system’s reduced-motion preference.
 
-<iframe id="eve-display-preview" class="eve-display-preview" title="EVE touchscreen preview" sandbox="allow-same-origin" tabindex="-1"></iframe>
+<link rel="stylesheet" href="assets/ui-preview/eve-face.css">
+<div id="eve-display-preview" class="eve-display-preview"></div>
 
 <div class="eve-preview-controls">
   <label for="eve-preview-expression">Expression</label>

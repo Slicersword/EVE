@@ -8,7 +8,7 @@
   let musicURL = null, audioContext = null, analyser = null, level = null, wanted = false;
   let musicGeneration = 0, wasDucked = false, polling = false, priorityBusy = false, voiceState = 'disabled';
   const media = $('#music');
-  const musicFace = EveFace.mount($('#musicFace'));
+  const musicFace = EveFace.mount($('#musicFace'), {ambient: false});
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const note = s => { $('#notice').textContent = String(s || ''); };
   async function api(path, body, timeout = 4000) {

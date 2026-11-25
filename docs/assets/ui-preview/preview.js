@@ -1,15 +1,16 @@
 (() => {
   'use strict';
-  const frame = document.querySelector('#eve-display-preview');
+  const face = document.querySelector('#eve-display-preview');
   const expression = document.querySelector('#eve-preview-expression');
   const blink = document.querySelector('#eve-preview-blink');
   const play = document.querySelector('#eve-preview-play');
   const stop = document.querySelector('#eve-preview-stop');
   const status = document.querySelector('#eve-preview-status');
   const directions = document.querySelectorAll('[data-eve-preview-direction]');
-  const { screen, expressions, samples } = window.EveKioskPreview;
+  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const { expressions, samples } = window.EveKioskPreview;
   const { mount, title } = window.EveFace;
-  let display;
+  const display = mount(face);
   let audio;
 
   for (const name of expressions) {
@@ -30,7 +31,7 @@
     const name = expression.value;
     display.show(name);
     display.look();
-    frame.title = 'EVE touchscreen showing ' + title(name);
+    blink.disabled = motion.matches || ['alert', 'dead'].includes(name);
     play.disabled = !Object.hasOwn(samples, name);
     status.textContent = play.disabled
       ? 'Sound samples are available for Happy, Love, and Surprised.'
@@ -38,6 +39,9 @@
   }
 
   expression.addEventListener('change', render);
+  motion.addEventListener('change', () => {
+    blink.disabled = motion.matches || ['alert', 'dead'].includes(expression.value);
+  });
   blink.addEventListener('click', () => display.blink());
   for (const button of directions) {
     button.addEventListener('click', () => display.look(Number(button.dataset.evePreviewDirection), 0));
@@ -61,13 +65,7 @@
   });
   stop.addEventListener('click', stopSound);
   window.addEventListener('pagehide', stopSound);
-  frame.addEventListener('load', () => {
-    const face = frame.contentDocument?.querySelector('#face');
-    if (!face) return;
-    display = mount(face);
-    render();
-    expression.disabled = blink.disabled = false;
-    for (const button of directions) button.disabled = false;
-  });
-  frame.srcdoc = screen;
+  render();
+  expression.disabled = false;
+  for (const button of directions) button.disabled = false;
 })();

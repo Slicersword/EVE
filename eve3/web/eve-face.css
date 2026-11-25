@@ -5,43 +5,13 @@
   width: 100%;
   aspect-ratio: 1024 / 600;
   overflow: hidden;
-  background: #000;
+  background: #060d10;
 }
 
-.eve-face > svg {
+.eve-face > canvas {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.eve-face .eve-art-gaze {
-  transform-box: view-box;
-  transform: translate(var(--look-x, 0%), var(--look-y, 0%));
-  transition: transform .25s ease-out;
-}
-
-.eve-face .eve-art-eye {
-  transform-box: fill-box;
-  transform-origin: center;
-  transition: transform .08s ease;
-}
-
-.eve-face.is-blinking .eve-art-eye { transform: scaleY(.08); }
-
-.eve-face .speakingMouth {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: eve-face-talk .32s infinite alternate ease-in-out;
-}
-
-@keyframes eve-face-talk {
-  from { transform: scaleY(.48); }
-  to { transform: scaleY(1); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .eve-face .eve-art-gaze, .eve-face .eve-art-eye, .eve-face .speakingMouth {
-    transition: none;
-    animation: none;
-  }
+  min-height: 0;
+  object-fit: contain;
 }

@@ -163,7 +163,7 @@ sleep 6
 
 Automatic checks (`./eve stage M01`): EVE is running and answers.
 
-**Your test:** The 7-inch screen shows EVE's original Idle artwork on black in full screen. The eyes blink. `expression name=happy` shows Happy in the same artwork style for 5 s.
+**Your test:** The 7-inch screen shows EVE's teal Lumen eyes in full screen. The eyes blink. `expression name=happy` shows narrower eyes and a smile for 5 s.
 
 Then: `./eve stage M01 done`
 

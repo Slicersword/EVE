@@ -3,7 +3,7 @@
 <title>EVE</title>
 <link rel="stylesheet" href="/eve-face.css">
 <style>
-html,body{margin:0;height:100%;background:#000;overflow:hidden;cursor:none;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;background:#060d10;overflow:hidden;cursor:none;user-select:none;-webkit-user-select:none}
 #face{position:fixed;inset:0;height:100%}
 #cap{position:fixed;left:6vw;right:6vw;bottom:3vh;text-align:center;color:#9adfff;font:600 4.2vh system-ui,"Noto Sans Devanagari",sans-serif;
      opacity:0;transition:opacity .3s;text-shadow:0 0 1vw #000}
@@ -28,17 +28,11 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;cursor:none;user-
 const face = document.getElementById('face');
 const display = EveFace.mount(face);
 const cap = document.getElementById('cap'), off = document.getElementById('off');
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
-let expr = 'idle', misses = 0, trackedOffset = null, idleGaze = [];
+let misses = 0;
 const settings = document.querySelector('#sound-settings');
 const mode = document.querySelector('#sound-mode');
 const toggle = document.querySelector('#cue-toggle');
 let soundsOn = false;
-function updateGaze() {
-  if (trackedOffset) display.look(trackedOffset[0] * 6, trackedOffset[1] * 5);
-  else if (expr === 'idle' && !reduceMotion.matches) display.look(...idleGaze);
-  else display.look();
-}
 function revealSettings() { settings.hidden = !settings.hidden; }
 face.addEventListener('click', revealSettings);
 toggle.disabled = true;
@@ -58,34 +52,19 @@ async function poll(){
   try{
     const r=await fetch('/api/status',{cache:'no-store',signal:AbortSignal.timeout(700)});if(!r.ok)throw 0;
     const s=await r.json();misses=0;off.style.display='none';
-    expr = s.expression || 'idle';
-    display.show(expr);
+    display.show(s.expression);
     EveExpressionAudio.update(s);
     cap.textContent=s.caption||'';cap.className=s.caption?'on':'';
-    trackedOffset = s.face_offset;
-    updateGaze();
+    display.look(s.face_offset?.[0] * 6, s.face_offset?.[1] * 5);
   } catch (_) {
     EveExpressionAudio.update(null);
     if (++misses > 4) {
       off.style.display = 'block';
-      expr = 'sleepy';
-      trackedOffset = null;
-      display.show(expr);
-      updateGaze();
+      display.show('sleepy');
+      display.look();
     }
   }
   finally { setTimeout(poll, 250); }
 }
 poll();
-(function blink() {
-  if (!reduceMotion.matches && ['idle', 'happy', 'listening'].includes(expr)) display.blink();
-  setTimeout(blink, 2600 + Math.random() * 3200);
-})();
-(function drift() {
-  if (expr === 'idle' && !trackedOffset && !reduceMotion.matches) {
-    idleGaze = [Math.random() * 4 - 2, Math.random() * 2 - 1];
-    updateGaze();
-  }
-  setTimeout(drift, 1800 + Math.random() * 2500);
-})();
 </script></body></html>
