@@ -336,13 +336,21 @@ For a Git install, with motor power off and EVE/service stopped:
 bash scripts/update_repo.sh
 ```
 
-The helper refuses local tracked edits or a non-main branch, backs up source and owner data privately,
-fetches main, uses a fast-forward merge, then runs checks. It does not install changed dependencies,
-reflash or start EVE. Review CHANGELOG after updating. It retains the last two successful update snapshots
-in ~/eve_backups. If checks fail it keeps the backup and stops for review; it does not silently reset files.
-ZIP installs require their own saved copy of the current source plus config/local.json and data before
-replacement; do not overlay unknown local edits. Pi-side virtual environments and
-downloaded models are not included in these source/state backups.
+On `main`, leave the generated firmware header unstaged and preserve any source
+edits separately. The helper fetches the candidate, tests its clean defaults and
+checks your existing local settings against it before changing your checkout.
+Once those checks pass, it creates a private backup, fast-forwards Git and installs
+the regenerated header. A failed pre-update check leaves your installed revision
+and header in place. Successful updates keep the latest two backups in
+`~/eve_backups`.
+
+Review CHANGELOG before starting EVE. Apply any dependency changes separately.
+If the helper reports a firmware change, follow M02 to flash and verify the live
+fingerprint with actuator power off.
+
+For a ZIP update, keep a private copy of your current source, `config/local.json`
+and `data/`, then extract the new ZIP to a separate folder. Set up dependencies
+and downloaded models again as needed. They are outside the source/state backup.
 
 To preview a backup without restoring private state:
 

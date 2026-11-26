@@ -29,6 +29,35 @@ page first. PuTTY opens a terminal; the desktop must also be running on the Pi f
 Keep the Bank B actuator branch off. Substitute your real Pi username/IP and ZIP path.
 Labels such as **PuTTY 1** identify the window; they are not shell commands.
 
+### Resume an existing robot
+
+With actuator power off, open the folder from which you normally run EVE and
+identify that copy before choosing a guide.
+
+**PuTTY 1**
+
+```bash
+if [ -f eve3/runtime.py ]; then
+  if [ -e .git ]; then git rev-parse HEAD; else echo 'EVE V3 source without Git history'; fi
+elif [ -f EVA_SETUP.py ] || [ -d modules/mega ]; then
+  echo 'Earlier EVE_SOURCE build'
+else
+  echo 'Open the EVE project folder and run this check again'
+fi
+```
+
+| Installed copy | How to proceed |
+|---|---|
+| EVE V3 Git checkout | Use the corresponding V3 guide. To update, follow the Git update procedure below. |
+| EVE V3 source without Git history | Use the guide shipped in that ZIP. Keep a private backup before installing a newer ZIP in a separate folder. |
+| Earlier EVE_SOURCE build | Use that release's guide for the existing installation. To move to V3, preserve the old checkout and its private data, compare the actual wiring and parts with V3, and install V3 in a fresh folder using Route A or B. |
+
+For a move from EVE_SOURCE, start the V3 stage record at M00 and re-establish the
+firmware match and physical acceptance. Keep older calibration, configuration and
+checklists with their original release. At M04, check all three VL53L0X readings,
+the MPU6050 tilt reading and the three digital cliff channels. At M05, verify
+stop and stale-link behavior before proceeding to motion.
+
 ### Route A — clone the repository on the Pi
 
 **PuTTY 1**
@@ -245,7 +274,7 @@ Then: `./eve stage M03 done`
 
 Needs: M03 done.
 
-Stop EVE with Ctrl+C in PuTTY 1. Keep Bank B off. Fix wiring until diagnostics report all four I2C devices. Releasing XSHUT changes bus addresses; only one process may own the sensors.
+Stop EVE with Ctrl+C in PuTTY 1. Keep Bank B off. This diagnostic checks the shared SDA/SCL bus, the configured tilt address and each distance sensor in isolation. If a tool error or an address in use (UU) interrupts the scan, resolve that first and rerun it.
 
 **PuTTY 1**
 
@@ -253,7 +282,7 @@ Stop EVE with Ctrl+C in PuTTY 1. Keep Bank B off. Fix wiring until diagnostics r
 ./eve i2c
 ```
 
-After all four devices answer, start EVE.
+After all four devices answer, start EVE and check their live readings.
 
 **PuTTY 1**
 
@@ -1080,13 +1109,21 @@ For a Git install, with motor power off and EVE/service stopped:
 bash scripts/update_repo.sh
 ```
 
-The helper refuses local tracked edits or a non-main branch, backs up source and owner data privately,
-fetches main, uses a fast-forward merge, then runs checks. It does not install changed dependencies,
-reflash or start EVE. Review CHANGELOG after updating. It retains the last two successful update snapshots
-in ~/eve_backups. If checks fail it keeps the backup and stops for review; it does not silently reset files.
-ZIP installs require their own saved copy of the current source plus config/local.json and data before
-replacement; do not overlay unknown local edits. Pi-side virtual environments and
-downloaded models are not included in these source/state backups.
+On `main`, leave the generated firmware header unstaged and preserve any source
+edits separately. The helper fetches the candidate, tests its clean defaults and
+checks your existing local settings against it before changing your checkout.
+Once those checks pass, it creates a private backup, fast-forwards Git and installs
+the regenerated header. A failed pre-update check leaves your installed revision
+and header in place. Successful updates keep the latest two backups in
+`~/eve_backups`.
+
+Review CHANGELOG before starting EVE. Apply any dependency changes separately.
+If the helper reports a firmware change, follow M02 to flash and verify the live
+fingerprint with actuator power off.
+
+For a ZIP update, keep a private copy of your current source, `config/local.json`
+and `data/`, then extract the new ZIP to a separate folder. Set up dependencies
+and downloaded models again as needed. They are outside the source/state backup.
 
 To preview a backup without restoring private state:
 

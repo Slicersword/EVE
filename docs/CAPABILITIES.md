@@ -58,6 +58,16 @@ An installation does not start a motion session. Each session is attended and ex
 after the requested duration, at most 30 minutes by default. Restarting loses the
 session. A command must still pass live sensor, link, latch, firmware and readiness checks.
 
+## How EVE speaks
+
+EVE chooses a reply and a language, then eSpeak NG generates the speech on the
+Pi using the English, Hindi or Marathi voice. The Speaking face animates during
+playback. The 90 expression cues are separate, prerecorded sounds.
+
+When enabled, microphone capture uses local whisper.cpp to turn speech into text.
+The default audio path takes turns. The optional local echo-cancel route lets the
+microphone listen during playback after the acoustic test in [M13](SETUP_GUIDE.md#m13).
+
 ## Words EVE understands
 
 After M12, test text using the software guide; after M13, speak the same phrases.

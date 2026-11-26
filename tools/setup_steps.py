@@ -30,11 +30,11 @@ SETUP_STEPS = {'M00': [('you',
          ('PuTTY 1', './eve run'),
          ('PuTTY 2', './eve ctl session_start minutes=1\n./eve status')],
  'M04': [('you',
-          'Stop EVE with Ctrl+C in PuTTY 1. Keep Bank B off. Fix wiring until diagnostics report all '
-          'four I2C devices. Releasing XSHUT changes bus addresses; only one process may own the '
-          'sensors.'),
+          'Stop EVE with Ctrl+C in PuTTY 1. Keep Bank B off. This diagnostic checks the shared '
+          'SDA/SCL bus, the configured tilt address and each distance sensor in isolation. If a '
+          'tool error or an address in use (UU) interrupts the scan, resolve that first and rerun it.'),
          ('PuTTY 1', './eve i2c'),
-         ('you', 'After all four devices answer, start EVE.'),
+         ('you', 'After all four devices answer, start EVE and check their live readings.'),
          ('PuTTY 1', './eve run'),
          ('PuTTY 2', './eve status'),
          ('you',

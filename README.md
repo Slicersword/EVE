@@ -16,6 +16,8 @@ Try the [eyes and controls preview](docs/UI_PREVIEW.md) before setting up the Pi
 Start with no saved progress: identify your parts, assemble and wire the robot,
 install the software, then test one stage at a time. All commissioning flags ship
 false, actuator outputs are disabled, and cliff calibration is unset.
+If EVE is already installed on your Pi, [identify that installation](docs/SETUP_GUIDE.md#resume-an-existing-robot)
+before using the current wiring or setup instructions.
 
 ## Your build path
 

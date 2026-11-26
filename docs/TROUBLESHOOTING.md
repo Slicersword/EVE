@@ -39,8 +39,9 @@ Do not change readiness flags to hide a fault.
 
 | Symptom | Check and recovery |
 |---|---|
-| Every I2C address absent | Stop runtime; run the M04 diagnostic: idle SDA/SCL, IMU with all ToF off, then each XSHUT separately |
-| Tilt missing | MPU6050 shares SDA/SCL; expect 0x68, or identified AD0-high 0x69 |
+| Every I2C address absent | Stop the runtime and run the [M04 diagnostic](SETUP_GUIDE.md#m04) to check idle SDA/SCL, the IMU and each ToF separately. |
+| I2C diagnostic cannot finish or reports `UU` | Read the tool error. Check I2C permissions or identify the driver holding the listed address, then repeat the scan with the runtime stopped. |
+| Tilt missing | MPU6050 shares SDA/SCL. Match `sensors.imu_address` to the board's AD0 setting, 0x68 low or 0x69 high. |
 | SDA/SCL stuck low | Power down; inspect shorts, wrong pins and breakout pull-ups; add one board at a time |
 | ToF answers at 0x29 with all XSHUT low | Inspect that board's shutdown pin and wiring; never drive XSHUT high from the Pi |
 | All ToF absent | Verify breakout power, ground, Pi physical pin 3 SDA, pin 5 SCL and each XSHUT |

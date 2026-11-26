@@ -15,7 +15,7 @@ terminal-to-terminal connections, power branches, checks and manufacturer refere
 | Micro-HDMI-to-HDMI lead | 1 | Pi HDMI0 to display |
 | USB touch data lead | 1 | Pi USB-A to display TOUCH port |
 | Pi 4 thermal kit | 1 | Heatsink mounted without shorts or blocked airflow |
-| 4010 brushless 5 V two-wire fan | As required | Direct-powered cooling; no software PWM fan module |
+| Raspberry Pi cooling fan | 1 | Runs whenever the Pi has power. Match the supply to the fan's rating. |
 | Arduino Mega 2560 | 1 | USB serial motor/digital sensor controller |
 | USB-A-to-USB-B data cable | 1 | Pi to Mega; carries logic power and serial |
 | TTP233 touch modules | 2 | Head and back; direct/momentary active-high Q output at Pi-safe voltage |
