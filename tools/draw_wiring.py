@@ -91,7 +91,7 @@ def mega_diagram():
         ("Each ULN2003 five-pin socket", "Matching keyed 28BYJ-48 5 V motor plug", "to", "signal"),
     ], "Each ULN2003 motor supply uses switched Bank B 5 V and common GND."))
     cliff = ("Front-left", "Rear-centre", "Front-right")
-    rows = [(f"Mega D{pin}", f"{name} TCRT5000 digital OUT", "from", "signal")
+    rows = [(f"Mega D{pin}", f"{name} KY-033 digital OUT", "from", "signal")
             for name, pin in zip(cliff, PINS["cliff"], strict=True)]
     groups.append(("Cliff and presence inputs", rows + [(f"Mega D{PINS['pir']}", "HC-SR501 PIR OUT", "from", "signal")],
                    "Mega-side supply only if the module accepts it. All module GNDs go to Mega GND."))

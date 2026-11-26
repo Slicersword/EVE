@@ -38,14 +38,13 @@ SETUP_STEPS = {'M00': [('you',
          ('PuTTY 1', './eve run'),
          ('PuTTY 2', './eve status'),
          ('you',
-          'Keep actuator power disconnected. Securely support the robot; never put it at an '
-          'uncontrolled edge. Capture floor readings with all three cliff sensors over the normal '
-          'floor.'),
+          'Keep actuator power disconnected. Securely support the robot and put removable floor '
+          'targets under all three KY-033 modules at their installed floor gaps. Capture floor readings.'),
          ('PuTTY 2', './eve cliff floor'),
          ('you',
-          'While securely holding/supporting the robot, expose all three cliff sensors to a drop/no '
-          'floor and capture edge readings. Each sensor must give steady values and flip between floor '
-          'and edge.'),
+          'Remove the targets while the chassis stays supported. Capture no-floor readings. Each '
+          'KY-033 must give a steady digital value that flips when its floor target is removed. '
+          'Calibration records each channel\'s observed no-floor value.'),
          ('PuTTY 2', './eve cliff edge\n./eve cliff apply'),
          ('you',
           'Stop EVE with Ctrl+C in PuTTY 1. Keep Bank B off; reflash the changed cliff calibration.'),

@@ -15,7 +15,7 @@ No hardware test or completed stage is assumed.
 | Display | HDMI + USB-touch, target 1024×600 | Model, power input/load and mounting dimensions |
 | Distance boards | Three VL53L0X breakouts with separate XSHUT | Breakout supply range, pull-ups/level shifting and safe XSHUT voltage |
 | Tilt board | MPU6050 on Pi I2C | Module supply/logic ratings, AD0 state, fixed mounting and orientation |
-| Cliff boards | Three TCRT5000 IR reflex tracking modules, digital OUT/D0 to Mega | Identify digital terminal, supply/output polarity, final height and tests on each intended floor |
+| Cliff boards | Three KY-033 modules with a TCRT5000 and 74HC14D. Digital outputs go to Mega. | Record board labels, supply rating, final floor gap and each channel's measured floor and no-floor levels. |
 | Touch | Two TTP233 modules | Exact suffix/jumper mode: direct/momentary active-high Q, 3.3 V-compatible |
 | Camera | Camera Module 3, Pi 4 CSI ribbon and physical shutter | Cable orientation, indicator circuit and clearance |
 | Microphones | Two INMP441 I2S modules | Opposite L/R slots, both-channel test, ALSA EVEINMP441/eve_mic setup and threshold |

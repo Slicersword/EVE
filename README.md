@@ -44,8 +44,9 @@ optional model downloads are installed in the documented setup stages. The websi
 source files; it includes offline search, copy buttons and full source listings.
 
 The hardware path uses two regulated 5 V USB banks, two TB6612FNG wheel drivers,
-four N20 motors, two 28BYJ-48/ULN2003 head drives, TCRT5000 cliff modules, two TTP233
-touch pads, two INMP441 I2S microphones, Camera Module 3 and a PAM8610 amplifier.
+four N20 motors, two 28BYJ-48/ULN2003 head drives, three KY-033 cliff modules
+(TCRT5000 + 74HC14D), two TTP233 touch pads, two INMP441 I2S microphones,
+Camera Module 3 and a PAM8610 amplifier.
 The PAM8610 needs an added regulated 5 V-to-9 V boost branch and a verified volume
 limit for the 4 Ω / 3 W speakers. Confirm actual bank/current and breakout ratings
 before wiring. The optional lithium/BMS system and INA219 are not part of this build.

@@ -29,7 +29,7 @@ terminal-to-terminal connections, power branches, checks and manufacturer refere
 | 28BYJ-48 5 V steppers | 2 | Pan and tilt; verify connector sequence, head balance and unpowered retention |
 | ULN2003 / ULN2003A stepper boards | 2 | Matching five-pin motor socket and four logic inputs per board |
 | VL53L0X breakout boards | 3 | Front-left, front-right, rear distance; accessible XSHUT and Pi-safe I2C |
-| TCRT5000 IR reflex tracking modules | 3 | Front-left, rear-centre, front-right cliff; digital OUT/D0 required |
+| KY-033 IR tracking / line-following modules (TCRT5000 + 74HC14D) | 3 | Downward-facing cliff detection at front-left, rear-centre and front-right. Digital outputs go to Mega D39, D40 and D41. |
 | MPU6050 IMU breakout | 1 | Tilt sensing; fixed to the base, shared Pi I2C |
 | HC-SR501 PIR | 1 | Presence input to Mega; identify labelled terminals |
 | INMP441 I2S MEMS microphones | 2 | Shared clock/frame/data with opposite L/R slot selection |

@@ -47,9 +47,10 @@ private build worksheet before drilling or ordering brackets.
 | Head/back touch | Insulate signal pads from metalwork; use momentary active-high modules |
 | Camera and LED | Pi-compatible camera with a nearby visible activity indicator |
 
-TCRT5000 module height depends on surface and trimmer setting. Test dark/light flooring,
-transitions and ambient light at the final mounting height. Place the front sensors
-far enough ahead of the wheels that measured stopping distance fits inside the margin.
+The KY-033 floor gap depends on surface reflectivity and any threshold adjustment
+on the fitted module. Test dark and light flooring, transitions and ambient light
+at the final mounting height. Place the front sensors far enough ahead of the
+wheels that measured stopping distance fits inside the margin.
 Do not test on a real staircase. Use a secured chassis and a removable floor target.
 
 ## Audio and final inspection

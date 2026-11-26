@@ -233,23 +233,24 @@ known tilted positions. Missing/implausible data blocks motion; do not replace i
 
 ## Three cliff sensors
 
-Use **TCRT5000 IR reflex tracking modules with digital OUT / DO / D0**. A four-pin
-module may also expose A0; leave A0 unconnected. Bare TCRT5000 emitter/phototransistor
-parts or analogue-only boards need additional interface circuitry and are not this
-connection. Confirm the digital terminal on the fitted modules before power-on.
+Fit three **KY-033 IR tracking / line-following modules** with a **TCRT5000**
+reflective sensor and a **74HC14D** Schmitt-trigger inverter. EVE points these
+modules down to detect the floor. Locate power, ground and digital signal by
+the labels on the actual board before wiring. These signals go to Mega digital
+inputs. The Pi's shared I2C bus is used by the distance and tilt sensors.
 
 | Terminal | Front-left cliff 0 | Rear-centre cliff 1 | Front-right cliff 2 |
 |---|---|---|---|
-| VCC | Mega 5 V if module is rated for it | Same | Same |
-| GND | Mega GND | Mega GND | Mega GND |
-| OUT / DO / D0 | Mega D39 | Mega D40 | Mega D41 |
-| A0, if present | Unconnected | Unconnected | Unconnected |
+| `+` or `VCC` | Mega 5 V if the module is rated for it | Same | Same |
+| `-` or `GND` | Mega GND | Mega GND | Mega GND |
+| Digital `S`, `OUT`, `DO` or `D0` | Mega D39 | Mega D40 | Mega D41 |
+| `AO` or `A0`, if present | Unconnected | Unconnected | Unconnected |
 
-Mount downward at a height where each module distinguishes every intended floor
-from no floor. Adjust its threshold trimmer gently; do not force it past its stops.
-The indicator LED only shows its comparator state, not a universal meaning of “safe”.
-Record actual raw 0/1 values for each sensor over floor and no-floor targets, then
-apply M04 calibration and reflash. Each individual value must change reliably.
+Mount each module at a gap where its digital output distinguishes every intended
+floor from no floor. If the board has a threshold trimmer, adjust it gently within
+its travel. Use the raw 0/1 readings to verify each channel at the final mounting
+height. [M04](SETUP_GUIDE.md#m04) records the measured no-floor level separately
+for each sensor. Apply that calibration and reflash before continuing.
 
 Front-left/front-right/rear is **ToF order**. Front-left/rear-centre/front-right is
 **cliff order**. Label the wires to prevent transposing these. Test with a supported
@@ -443,6 +444,8 @@ Do not mark a subsystem complete simply because a board LED turns on.
 - [Arduino Mega 2560 documentation and pinout](https://docs.arduino.cc/hardware/mega-2560/).
 - [SparkFun TB6612 board signal reference](https://learn.sparkfun.com/tutorials/tb6612fng-hookup-guide/board-overview); match the actual board revision.
 - [Pololu VL53L0X carrier explanation](https://www.pololu.com/product/2490); a useful regulator/level-shifter example, not proof of another breakout's circuit.
+- [Vishay TCRT5000 reflective optical sensor datasheet](https://www.vishay.com/docs/83760/tcrt5000.pdf).
+- [Nexperia 74HC14D Schmitt-trigger inverter](https://www.nexperia.com/product/74HC14D).
 - [TDK INMP441 datasheet](https://invensense.tdk.com/wp-content/uploads/2015/02/INMP441.pdf).
 - [Tontek TTP233 family](https://www.tontek.com.tw/product/product2?idx=120&lang=en); identify the exact suffix/mode.
 - [Diodes PAM8610 datasheet](https://www.diodes.com/assets/Datasheets/PAM8610.pdf).

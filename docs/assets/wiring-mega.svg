@@ -87,13 +87,13 @@
 <text x="38" y="1162" class="heading">Cliff and presence inputs</text>
 <text x="38" y="1194" class="terminal">Mega D39</text>
 <path d="M303 1189 H382" class="signal" marker-start="url(#arrow)"/>
-<text x="402" y="1194" class="">Front-left TCRT5000 digital OUT</text>
+<text x="402" y="1194" class="">Front-left KY-033 digital OUT</text>
 <text x="38" y="1227" class="terminal">Mega D40</text>
 <path d="M303 1222 H382" class="signal" marker-start="url(#arrow)"/>
-<text x="402" y="1227" class="">Rear-centre TCRT5000 digital OUT</text>
+<text x="402" y="1227" class="">Rear-centre KY-033 digital OUT</text>
 <text x="38" y="1260" class="terminal">Mega D41</text>
 <path d="M303 1255 H382" class="signal" marker-start="url(#arrow)"/>
-<text x="402" y="1260" class="">Front-right TCRT5000 digital OUT</text>
+<text x="402" y="1260" class="">Front-right KY-033 digital OUT</text>
 <text x="38" y="1293" class="terminal">Mega D38</text>
 <path d="M303 1288 H382" class="signal" marker-start="url(#arrow)"/>
 <text x="402" y="1293" class="">HC-SR501 PIR OUT</text>
