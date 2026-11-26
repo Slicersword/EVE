@@ -1,5 +1,14 @@
 # Change log
 
+## Updating an installed EVE — 26 November 2026
+
+- Check the exact Git candidate and existing owner settings before applying an update.
+  Retain two private backups and indicate when the Mega needs a fresh flash.
+- Report blocked or failed I2C scans separately from missing sensors. Use the
+  configured tilt address and release the XSHUT lines when the diagnostic exits.
+- Document how to identify earlier installations, how EVE generates its voice,
+  and the continuous Pi cooling requirement.
+
 ## Lumen expressions
 
 - Widen the mouth, deepen smiles, and give the Speaking face a more visible jaw movement.

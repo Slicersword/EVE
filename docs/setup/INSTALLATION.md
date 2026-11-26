@@ -14,6 +14,35 @@ page first. PuTTY opens a terminal; the desktop must also be running on the Pi f
 Keep the Bank B actuator branch off. Substitute your real Pi username/IP and ZIP path.
 Labels such as **PuTTY 1** identify the window; they are not shell commands.
 
+### Resume an existing robot
+
+With actuator power off, open the folder from which you normally run EVE and
+identify that copy before choosing a guide.
+
+**PuTTY 1**
+
+```bash
+if [ -f eve3/runtime.py ]; then
+  if [ -e .git ]; then git rev-parse HEAD; else echo 'EVE V3 source without Git history'; fi
+elif [ -f EVA_SETUP.py ] || [ -d modules/mega ]; then
+  echo 'Earlier EVE_SOURCE build'
+else
+  echo 'Open the EVE project folder and run this check again'
+fi
+```
+
+| Installed copy | How to proceed |
+|---|---|
+| EVE V3 Git checkout | Use the corresponding V3 guide. To update, follow the Git update procedure below. |
+| EVE V3 source without Git history | Use the guide shipped in that ZIP. Keep a private backup before installing a newer ZIP in a separate folder. |
+| Earlier EVE_SOURCE build | Use that release's guide for the existing installation. To move to V3, preserve the old checkout and its private data, compare the actual wiring and parts with V3, and install V3 in a fresh folder using Route A or B. |
+
+For a move from EVE_SOURCE, start the V3 stage record at M00 and re-establish the
+firmware match and physical acceptance. Keep older calibration, configuration and
+checklists with their original release. At M04, check all three VL53L0X readings,
+the MPU6050 tilt reading and the three digital cliff channels. At M05, verify
+stop and stale-link behavior before proceeding to motion.
+
 ### Route A — clone the repository on the Pi
 
 **PuTTY 1**

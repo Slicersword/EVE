@@ -400,14 +400,13 @@ assume “10 W amplifier” plus “3 W speaker” is automatically a safe match
 
 ## Cooling and charging
 
-Connect each **4010 5 V two-wire fan** red/+ to its appropriate verified 5 V branch
-and black/− to that branch's return, after checking the actual label. The Pi fan
-runs whenever the Pi is powered. Keep blades and cables clear; install the thermal
-kit without shorting exposed pads. There is no PWM fan driver in this build.
+Connect the **Pi cooling fan** to its verified supply and return so it runs whenever
+the Pi is powered. Check its voltage rating and polarity. Keep blades and cables
+clear and install the thermal kit without shorting exposed pads.
 
-A fan near an optional charger must use a regulated supply of its rated voltage;
-a 5 V fan must not be connected directly to a 3S charger. No charger-presence
-detection, automatic fan switching, BMS monitoring or battery charging is implemented.
+A separate fan for the optional charger is intended to run while the charger is
+active. Use a regulated supply that matches the fan rating. Keep the charger and
+its fan as part of the separate battery design.
 Follow the power-bank maker's charging instructions; power the robot down for charging
 unless that exact bank explicitly supports the intended pass-through arrangement.
 

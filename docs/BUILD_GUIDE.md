@@ -87,9 +87,10 @@ Complete the M17 attended test and [acceptance record](TESTING.md). Install the
 service only after the foreground runtime works. Reboot with actuator power off,
 check the face and service, and verify that a fresh session/clear is needed for motion.
 
-Maintain local calibration/data privately. Use the update procedure to create a backup,
-fast-forward, test clean defaults, and regenerate the firmware header. A new pin map,
-calibration or firmware setting requires compile/upload and a matching fingerprint.
+Maintain local calibration and data privately. The update procedure checks the
+new revision and your local settings, saves a backup, fast-forwards Git and
+regenerates the firmware header. Changes to the Mega sketch, pin map, calibration
+or compiled settings require a fresh upload and a matching live settings fingerprint.
 
 ## Stage map
 

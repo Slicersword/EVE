@@ -1,5 +1,7 @@
 """Configuration and installer contracts that must work before physical commissioning."""
+from contextlib import redirect_stderr, redirect_stdout
 import copy
+import io
 import json
 import os
 from pathlib import Path
@@ -100,6 +102,40 @@ class DeviceSelectionRegressionTests(unittest.TestCase):
     def test_i2c_advice_includes_configured_shutdown_pin(self):
         advice = i2c_diag.advice([0x68], [False, True, True], True, [17, 6, 13], [11, 31, 33])
         self.assertIn('BCM17, pin 11', advice[0])
+
+    def test_i2c_uses_the_configured_tilt_address(self):
+        self.assertEqual(i2c_diag.advice([0x69], [True] * 3, True, imu_address=0x69), [])
+        messages = i2c_diag.advice([0x68], [True] * 3, True, imu_address=0x69)
+        self.assertIn('configured tilt address 0x69 is silent', messages[0])
+
+    def test_i2c_distinguishes_unclaimed_and_driver_owned_addresses(self):
+        columns = '    ' + '  '.join('0123456789abcdef') + '\n'
+        row = columns + '60: ' + ' '.join(['--'] * 8 + ['UU', '69'] + ['--'] * 6)
+        self.assertEqual(i2c_diag.parse_i2cdetect(row), ([0x69], [0x68]))
+        with patch.object(i2c_diag, 'sh', return_value=row):
+            with self.assertRaisesRegex(RuntimeError, r'0x68.*\(UU\)'):
+                i2c_diag.scan([0x30, 0x31, 0x32])
+        with self.assertRaisesRegex(RuntimeError, 'no address table'):
+            i2c_diag.parse_i2cdetect('')
+
+    def test_i2c_command_failure_releases_all_shutdown_pins(self):
+        def run(argv, **kwargs):
+            if argv[0] == 'i2cdetect':
+                raise subprocess.CalledProcessError(1, argv, stderr='Permission denied')
+            stdout = '2: a0 | hi\n3: a0 | hi\n' if argv[1] == 'get' else ''
+            return subprocess.CompletedProcess(argv, 0, stdout, '')
+
+        errors = io.StringIO()
+        with (patch.object(_common, 'eve_running', return_value=False),
+              patch.object(i2c_diag.os.path, 'exists', return_value=True),
+              patch.object(i2c_diag.shutil, 'which', return_value='/bin/fake-tool'),
+              patch.object(i2c_diag.time, 'sleep'),
+              patch.object(subprocess, 'run', side_effect=run) as command,
+              redirect_stdout(io.StringIO()), redirect_stderr(errors)):
+            self.assertEqual(i2c_diag.main(), 2)
+        self.assertIn('i2cdetect failed. Permission denied', errors.getvalue())
+        self.assertEqual([call.args[0] for call in command.call_args_list[-3:]],
+                         [['pinctrl', 'set', str(pin), 'ip', 'pn'] for pin in i2c_diag.XSHUT])
 
 
 class FlashScriptRegressionTests(unittest.TestCase):
