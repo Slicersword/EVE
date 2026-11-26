@@ -1,5 +1,5 @@
 """M04 - sensors. 3x GY-530 VL53L0X (XSHUT BCM5/6/13 -> 0x30/0x31/0x32), MPU-6050 (0x68), and the three
-digital TCRT5000 cliff modules + PIR that arrive through Mega telemetry.
+digital KY-033 (TCRT5000 + 74HC14D) cliff modules and PIR that arrive through Mega telemetry.
 
 Order of the ToF tuple: (front-left, front-right, rear). Order of cliff: (front-left, rear-centre, front-right).
 A reading that is missing, stale or out of range is None / unsafe - nothing is ever invented.
@@ -46,7 +46,7 @@ def calibrate_cliff(floor_rows, edge_rows) -> dict:
         floor, edge = {r[i] for r in floor_rows}, {r[i] for r in edge_rows}
         if len(floor) != 1 or len(edge) != 1 or floor == edge:
             raise ValueError(f"{name} cliff sensor: reading flickers or does not change between floor and edge "
-                             "(adjust the threshold on that digital cliff module and repeat)")
+                             "(check mounting gap, floor reflectivity and any threshold trimmer, then repeat)")
         levels.append(next(iter(edge)))
     return {"calibrated": True, "edge_level": levels}
 

@@ -55,7 +55,7 @@ reports a settings fingerprint that matches the Pi's configuration.
 ## 5. Measure power and calibrate sensors
 
 Follow M03–M06. Measure the electrical loads with suitable test equipment and secure
-the chassis. Calibrate all three digital cliff channels over both a safe floor target
+the chassis. Calibrate all three KY-033 cliff channels over both a safe floor target
 and a controlled no-floor target. Verify each distance sensor and the IMU separately.
 
 **Continue when:** power flags have measurements behind them, all readings

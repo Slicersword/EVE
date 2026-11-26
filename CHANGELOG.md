@@ -1,5 +1,10 @@
 # Change log
 
+## KY-033 cliff sensor module
+
+- Identify the TCRT5000 and 74HC14D KY-033 module in the parts list, wiring diagram
+  and setup guide. Capture floor and no-floor readings for each channel at M04.
+
 ## Updating an installed EVE — 26 November 2026
 
 - Check the exact Git candidate and existing owner settings before applying an update.

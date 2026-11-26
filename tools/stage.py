@@ -97,7 +97,7 @@ STAGES = {
     ], steps=SETUP_STEPS['M04'],
     test="`./eve status`: Distance shows three numbers 30-1000 that change when you move your hand in front of each "
          "sensor (order: front-left, front-right, rear). Tilt is near 0 on the floor and rises when you tip the robot. "
-         "Cliff raw flips for each sensor when you lift that corner over an edge."),
+         "Each KY-033 raw value flips when you remove its floor target from beneath the supported chassis."),
  "M05": dict(title="Safety: it must refuse when anything is wrong", needs=["M04"], run=True, checks=[
         ("wheels are blocked (nothing is commissioned to move yet)", lambda c: not st()["safety"]["drive_permitted"], "this must be blocked at M05"),
         ("a reason is always given", lambda c: bool(st()["safety"]["drive_block_reason"]), ""),

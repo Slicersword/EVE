@@ -103,8 +103,8 @@
         },
         {
           "id": "cliff-wire",
-          "title": "Wire and label the three cliff sensors",
-          "detail": "Digital OUT to D39/D40/D41; use front-left, rear-centre, front-right order.",
+          "title": "Wire and label the three KY-033 cliff sensors",
+          "detail": "Digital outputs to D39, D40 and D41 in front-left, rear-centre, front-right order.",
           "href": "docs/WIRING.html#three-cliff-sensors"
         },
         {

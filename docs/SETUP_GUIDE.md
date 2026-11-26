@@ -296,7 +296,7 @@ After all four devices answer, start EVE and check their live readings.
 ./eve status
 ```
 
-Keep actuator power disconnected. Securely support the robot; never put it at an uncontrolled edge. Capture floor readings with all three cliff sensors over the normal floor.
+Keep actuator power disconnected. Securely support the robot and put removable floor targets under all three KY-033 modules at their installed floor gaps. Capture floor readings.
 
 **PuTTY 2**
 
@@ -304,7 +304,7 @@ Keep actuator power disconnected. Securely support the robot; never put it at an
 ./eve cliff floor
 ```
 
-While securely holding/supporting the robot, expose all three cliff sensors to a drop/no floor and capture edge readings. Each sensor must give steady values and flip between floor and edge.
+Remove the targets while the chassis stays supported. Capture no-floor readings. Each KY-033 must give a steady digital value that flips when its floor target is removed. Calibration records each channel's observed no-floor value.
 
 **PuTTY 2**
 
@@ -323,7 +323,7 @@ Stop EVE with Ctrl+C in PuTTY 1. Keep Bank B off; reflash the changed cliff cali
 
 Automatic checks (`./eve stage M04`): distance sensors all give numbers; tilt sensor gives a number; robot standing level (tilt under 10 degrees); sensor data is fresh; cliff sensors calibrated; no cliff seen while standing on the floor.
 
-**Your test:** `./eve status`: Distance shows three numbers 30-1000 that change when you move your hand in front of each sensor (order: front-left, front-right, rear). Tilt is near 0 on the floor and rises when you tip the robot. Cliff raw flips for each sensor when you lift that corner over an edge.
+**Your test:** `./eve status`: Distance shows three numbers 30-1000 that change when you move your hand in front of each sensor (order: front-left, front-right, rear). Tilt is near 0 on the floor and rises when you tip the robot. Each KY-033 raw value flips when you remove its floor target from beneath the supported chassis.
 
 Then: `./eve stage M04 done`
 

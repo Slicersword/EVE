@@ -49,8 +49,8 @@ Do not change readiness flags to hide a fault.
 | Distance null / None | Device missing, bus timeout or value outside 30–1000 mm; test with an object in usable range |
 | Tilt near 180 degrees | Confirm mounting, then choose inverted orientation if appropriate; do not use it to hide missing data |
 | Tilt is exactly zero | Valid for a level chassis; zero is a measurement, not a missing value |
-| Cliff never flips / flickers | Test final mounting height, intended floor, reflectivity, lighting and trimmer; every channel must be stable and change |
-| Cliff calibration rejected | Capture both steady floor and no-floor rows for all three channels; order is front-left, rear-centre, front-right |
+| KY-033 cliff output stays fixed or flickers | Check the actual floor gap, reflectivity, lighting and any threshold trimmer. Each channel must give steady opposite readings with the floor target in place and removed. |
+| Cliff calibration rejected | Capture both steady floor and no-floor rows for all three channels in front-left, rear-centre, front-right order. Check the raw 0/1 values before applying calibration. |
 | Lifted wheels blocked by cliff | Place safe floor targets under the sensors within their calibrated range; keep the support secure |
 | Sensor data stale | Correct bus/serial faults; repeat live response checks; never enlarge timeouts to conceal a disconnected sensor |
 | Diagnostic GPIOs differ from wiring | Check `sensors.tof_xshut`; keep documentation and physical numbering aligned after any pin change |

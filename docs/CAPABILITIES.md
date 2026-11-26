@@ -13,7 +13,7 @@ it has been accepted on a physical robot. Start every build at zero.
 | Short forward movements | Four N20 wheels move forward or along an arc, then stop on a time limit | Two TB6612 boards, tested sensors, measured power and attended session | M07: lifted direction tests, automatic stop, fault stop, contained floor test |
 | Pan/tilt looks | Small relative jogs and named left/right/up/down/centre looks | Two 28BYJ-48 + ULN2003 sets, balanced head, manual home and measured limits | M08: every jog has clearance; head stops and remains supported unpowered |
 | Distance protection | Front distance can slow/block driving; all three readings must be valid/fresh | Three VL53L0X boards on Pi I2C with separate XSHUT | M04/M05: each reading responds; obstruction blocks the right behavior |
-| Drop sensing | Calibrated digital cliff values latch a stop | Three TCRT5000 digital modules on Mega | M04/M05: each floor/no-floor result changes reliably at final mounting height |
+| Drop sensing | Calibrated digital cliff values latch a stop | Three KY-033 modules (TCRT5000 + 74HC14D) on Mega | M04/M05: each floor/no-floor result changes reliably at final mounting height |
 | Tilt protection | Excess tilt or missing data blocks motion | MPU6050 fixed to the base | M04/M05: near zero level; controlled tilt triggers refusal/latch |
 | Presence greeting | A new presence event can produce a greeting, subject to cooldown/night hours | HC-SR501, or a local detected face | M14: arrival greets once; repeated presence does not constantly speak |
 | Touch interaction | Head touch changes expression; back tap wakes/listens; back hold requests emergency stop | Two TTP233 pads in compatible direct active-high mode | M09: tap/release/hold work as described |
